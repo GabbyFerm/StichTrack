@@ -15,7 +15,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
 
 jobs:
-  # Job 1: Build and test class libraries (fast, cross-platform)
+  # Job 1: Build and test class libraries only (Ubuntu - fastest)
   build-libs:
     name: Build Libraries & Tests
     runs-on: ubuntu-latest
@@ -37,25 +37,55 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore dependencies
-        run: dotnet restore StitchTrack.sln
+      # Restore ONLY non-MAUI projects (libraries and tests)
+      - name: Restore Core library
+        run: dotnet restore src/StitchTrack.Core/StitchTrack.Core.csproj
 
-      - name: Build Core libraries
-        run: |
-          dotnet build src/StitchTrack.Core/StitchTrack.Core.csproj -c Release --no-restore
-          dotnet build src/StitchTrack.Application/StitchTrack.Application.csproj -c Release --no-restore
-          dotnet build src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj -c Release --no-restore
+      - name: Restore Application library
+        run: dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
 
-      - name: Build Test projects
-        run: |
-          dotnet build tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj -c Release --no-restore
-          dotnet build tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj -c Release --no-restore
+      - name: Restore Infrastructure library
+        run: dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
 
+      - name: Restore Unit Tests
+        run: dotnet restore tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj
+
+      - name: Restore Integration Tests
+        run: dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
+
+      # Build libraries
+      - name: Build Core library
+        run: dotnet build src/StitchTrack.Core/StitchTrack.Core.csproj -c Release --no-restore
+
+      - name: Build Application library
+        run: dotnet build src/StitchTrack.Application/StitchTrack.Application.csproj -c Release --no-restore
+
+      - name: Build Infrastructure library
+        run: dotnet build src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj -c Release --no-restore
+
+      # Build test projects
+      - name: Build Unit Tests
+        run: dotnet build tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj -c Release --no-restore
+
+      - name: Build Integration Tests
+        run: dotnet build tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj -c Release --no-restore
+
+      # Run tests
       - name: Run Unit Tests
-        run: dotnet test tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj --no-build -c Release --verbosity normal
+        run: dotnet test tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj --no-build -c Release --verbosity normal --logger "trx;LogFileName=unit-tests.trx"
 
       - name: Run Integration Tests
-        run: dotnet test tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj --no-build -c Release --verbosity normal
+        run: dotnet test tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj --no-build -c Release --verbosity normal --logger "trx;LogFileName=integration-tests.trx"
+
+      # Upload test results
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/TestResults/*.trx
+          retention-days: 7
 
   # Job 2: Build MAUI Android (Windows runner - fastest for Android)
   build-android:
@@ -72,18 +102,17 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Install MAUI Workload
+      - name: Install MAUI Android Workload
         run: dotnet workload install maui-android --skip-manifest-update
 
       - name: Restore solution
         run: dotnet restore StitchTrack.sln
 
       - name: Build Android App
-        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-android -c Release
+        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-android -c Release --no-restore
 
-      - name: Publish Android (unsigned)
+      - name: Publish Android APK
         run: |
-          mkdir -p artifacts/android
           dotnet publish src/StitchTrack.App/StitchTrack.App.csproj `
             -f net9.0-android `
             -c Release `
@@ -95,7 +124,7 @@ jobs:
         with:
           name: android-apk
           path: artifacts/android/**/*.apk
-          retention-days: 7
+          retention-days: 30
 
   # Job 3: Build MAUI iOS (macOS runner required)
   build-ios:
@@ -112,14 +141,14 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Install MAUI Workload
+      - name: Install MAUI iOS Workload
         run: dotnet workload install maui-ios --skip-manifest-update
 
       - name: Restore solution
         run: dotnet restore StitchTrack.sln
 
       - name: Build iOS App
-        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-ios -c Release
+        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-ios -c Release --no-restore
 
   # Job 4: Build MAUI Windows (Windows runner)
   build-windows:
@@ -136,11 +165,11 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Install MAUI Workload
+      - name: Install MAUI Windows Workload
         run: dotnet workload install maui-windows --skip-manifest-update
 
       - name: Restore solution
         run: dotnet restore StitchTrack.sln
 
       - name: Build Windows App
-        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-windows10.0.19041.0 -c Release
+        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-windows10.0.19041.0 -c Release --no-restore
