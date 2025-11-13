@@ -1,36 +1,30 @@
-name: CI - build & test (split:libs/tests + MAUI)
+name: CI - Build & Test
 
 on:
   push:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
   pull_request:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  id-token: write
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
 
 jobs:
-  libs-and-tests:
-    name: Build libraries & run tests
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
+  # Job 1: Build and test class libraries (fast, cross-platform)
+  build-libs:
+    name: Build Libraries & Tests
+    runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET (9.x)
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
@@ -39,174 +33,114 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.sln') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore non-MAUI projects (Linux / macOS)
-        if: runner.os != 'Windows'
+      - name: Restore dependencies
+        run: dotnet restore StitchTrack.sln
+
+      - name: Build Core libraries
         run: |
-          # list csproj files but exclude the MAUI app directory
-          git ls-files "src/**/*.csproj" | grep -v "^src/StitchTrack.App/" > projlist.txt || true
-          if [ -s projlist.txt ]; then
-            while IFS= read -r p; do
-              echo "Restoring $p"
-              dotnet restore "$p"
-            done < projlist.txt
-          else
-            echo "No non-MAUI projects found under src/ (or only MAUI project present)."
-          fi
+          dotnet build src/StitchTrack.Core/StitchTrack.Core.csproj -c Release --no-restore
+          dotnet build src/StitchTrack.Application/StitchTrack.Application.csproj -c Release --no-restore
+          dotnet build src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj -c Release --no-restore
 
-      - name: Restore non-MAUI projects (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
+      - name: Build Test projects
         run: |
-          $files = git ls-files 'src/**/*.csproj' 2>$null | Where-Object { $_ -notmatch '^src/StitchTrack.App/' }
-          if ($files) {
-            foreach ($p in $files) {
-              Write-Host "Restoring $p"
-              dotnet restore $p
-            }
-          } else {
-            Write-Host "No non-MAUI projects found under src/ (or only MAUI project present)."
-          }
+          dotnet build tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj -c Release --no-restore
+          dotnet build tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj -c Release --no-restore
 
-      - name: Build non-MAUI projects (Linux / macOS)
-        if: runner.os != 'Windows'
-        run: |
-          if [ -f projlist.txt ] && [ -s projlist.txt ]; then
-            while IFS= read -r p; do
-              echo "Building $p"
-              dotnet build "$p" -c Release --no-restore
-            done < projlist.txt
-          else
-            echo "Nothing to build (no non-MAUI projects found)."
-          fi
+      - name: Run Unit Tests
+        run: dotnet test tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj --no-build -c Release --verbosity normal
 
-      - name: Build non-MAUI projects (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $files = git ls-files 'src/**/*.csproj' 2>$null | Where-Object { $_ -notmatch '^src/StitchTrack.App/' }
-          if ($files) {
-            foreach ($p in $files) {
-              Write-Host "Building $p"
-              dotnet build $p -c Release --no-restore
-            }
-          } else {
-            Write-Host "Nothing to build (no non-MAUI projects found)."
-          }
+      - name: Run Integration Tests
+        run: dotnet test tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj --no-build -c Release --verbosity normal
 
-      - name: Run tests (Linux / macOS)
-        if: runner.os != 'Windows'
-        run: |
-          tests=$(git ls-files "tests/**/*.csproj" || true)
-          if [ -n "$tests" ]; then
-            for t in $tests; do
-              echo "Running tests in $t"
-              dotnet test "$t" --no-build --verbosity normal || exit $?
-            done
-          else
-            echo "No test projects found under tests/."
-          fi
-
-      - name: Run tests (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $tests = git ls-files 'tests/**/*.csproj' 2>$null
-          if ($tests) {
-            foreach ($t in $tests) {
-              Write-Host "Running tests in $t"
-              dotnet test $t --no-build --verbosity normal
-            }
-          } else {
-            Write-Host "No test projects found under tests/."
-          }
-
-      - name: Upload libs/test artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: libs-out-${{ matrix.os }}
-          path: ./out || true
-
-  maui-macos:
-    name: MAUI build (macOS)
-    runs-on: macos-latest
-    needs: libs-and-tests
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET (9.x)
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-
-      - name: Install MAUI workloads (macOS)
-        run: |
-          # restore workloads referenced by the projects and install MAUI
-          dotnet workload restore
-          dotnet workload install maui --skip-manifest-update || true
-
-      - name: Restore solution
-        run: dotnet restore ./StitchTrack.sln
-
-      - name: Build solution (Release)
-        run: dotnet build ./StitchTrack.sln -c Release --no-restore
-
-      - name: Publish Android (no-sign) - macOS runner
-        run: |
-          mkdir -p out/android
-          dotnet publish ./src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-android -c Release -o ./out/android || true
-
-      - name: Publish iOS (no-sign) - macOS runner
-        run: |
-          mkdir -p out/ios
-          dotnet publish ./src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-ios -c Release -o ./out/ios || true
-
-      - name: Upload MAUI artifacts (macOS)
-        uses: actions/upload-artifact@v4
-        with:
-          name: maui-publish-macos
-          path: ./out
-
-  maui-windows-android:
-    name: MAUI Android build (Windows)
+  # Job 2: Build MAUI Android (Windows runner - fastest for Android)
+  build-android:
+    name: Build Android
     runs-on: windows-latest
-    needs: libs-and-tests
+    needs: build-libs
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET (9.x)
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      - name: Install MAUI workloads (Windows)
-        shell: pwsh
-        run: |
-          dotnet workload restore
-          dotnet workload install maui-android --skip-manifest-update || true
+      - name: Install MAUI Workload
+        run: dotnet workload install maui-android --skip-manifest-update
 
       - name: Restore solution
-        shell: pwsh
-        run: dotnet restore .\StitchTrack.sln
+        run: dotnet restore StitchTrack.sln
 
-      - name: Build & publish Android (Windows)
-        shell: pwsh
+      - name: Build Android App
+        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-android -c Release
+
+      - name: Publish Android (unsigned)
         run: |
-          mkdir .\out\android -Force
-          dotnet publish .\src\StitchTrack.App\StitchTrack.App.csproj -f net9.0-android -c Release -o .\out\android || true
+          mkdir -p artifacts/android
+          dotnet publish src/StitchTrack.App/StitchTrack.App.csproj `
+            -f net9.0-android `
+            -c Release `
+            -o artifacts/android `
+            /p:AndroidPackageFormat=apk
 
-      - name: List Android artifacts (Windows)
-        shell: pwsh
-        run: dir .\out\android -Recurse || true
-
-      - name: Upload Android artifact (Windows)
+      - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk-windows
-          path: ./out/android
+          name: android-apk
+          path: artifacts/android/**/*.apk
+          retention-days: 7
+
+  # Job 3: Build MAUI iOS (macOS runner required)
+  build-ios:
+    name: Build iOS
+    runs-on: macos-latest
+    needs: build-libs
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install MAUI Workload
+        run: dotnet workload install maui-ios --skip-manifest-update
+
+      - name: Restore solution
+        run: dotnet restore StitchTrack.sln
+
+      - name: Build iOS App
+        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-ios -c Release
+
+  # Job 4: Build MAUI Windows (Windows runner)
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    needs: build-libs
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install MAUI Workload
+        run: dotnet workload install maui-windows --skip-manifest-update
+
+      - name: Restore solution
+        run: dotnet restore StitchTrack.sln
+
+      - name: Build Windows App
+        run: dotnet build src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-windows10.0.19041.0 -c Release
