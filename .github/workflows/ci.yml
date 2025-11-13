@@ -24,26 +24,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Quick check for .NET projects
+      - name: Quick check for solution / projects
         id: check
-        if: always()
-        shell: pwsh
+        shell: bash
         run: |
-          # Look for solution or project files anywhere in the repo (PowerShell)
-          $found = git ls-files "*.sln" "*.csproj" "*.fsproj" | Where-Object { $_ -ne "" }
-          if ($found) {
-            Write-Host "dotnet: project files found"
-            Add-Content -Path $env:GITHUB_OUTPUT -Value "has_projects=true"
-          } else {
-            Write-Host "dotnet: no solution or project files found; skipping dotnet steps"
-            Add-Content -Path $env:GITHUB_OUTPUT -Value "has_projects=false"
-          }
+          if git ls-files '*.sln' | grep -q .; then
+            echo "found_sln=true" >> $GITHUB_OUTPUT
+          elif git ls-files '*.csproj' | grep -q .; then
+            echo "found_csproj=true" >> $GITHUB_OUTPUT
+          else
+            echo "found_any=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup .NET
-        if: steps.check.outputs.has_projects == 'true'
+        if: steps.check.outputs.found_sln == 'true' || steps.check.outputs.found_csproj == 'true'
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
 
       - name: Cache NuGet packages
         if: steps.check.outputs.has_projects == 'true'
@@ -55,21 +52,57 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore
-        if: steps.check.outputs.has_projects == 'true'
+        if: steps.check.outputs.found_sln == 'true'
+        run: dotnet restore ./StitchTrack.sln
+
+      - name: Restore (fallback)
+        if: steps.check.outputs.found_sln != 'true' && steps.check.outputs.found_csproj == 'true'
         run: dotnet restore
 
-      - name: Build (Release)
-        if: steps.check.outputs.has_projects == 'true'
-        run: dotnet build --configuration Release --no-restore
+      - name: Build solution
+        if: steps.check.outputs.found_sln == 'true'
+        run: dotnet build ./StitchTrack.sln -c Release --no-restore
 
-      - name: Test
-        if: steps.check.outputs.has_projects == 'true'
-        run: dotnet test --no-build --verbosity normal --configuration Release
+      - name: Build projects (fallback)
+        if: steps.check.outputs.found_sln != 'true' && steps.check.outputs.found_csproj == 'true'
+        run: dotnet build -c Release --no-restore
+
+      - name: Run unit & integration tests (if any)
+        if: steps.check.outputs.found_csproj == 'true'
+        run: |
+          set -e
+          # run every test project under tests/
+          test_projects=$(git ls-files "tests/**/*.csproj" || true)
+          if [ -n "$test_projects" ]; then
+            for p in $test_projects; do
+              echo "Running tests in $p"
+              dotnet test "$p" --no-build --verbosity normal || exit $?
+            done
+          else
+            # try test projects anywhere that match *Test*
+            test_projects=$(git ls-files "**/*Test*.csproj" || true)
+            if [ -n "$test_projects" ]; then
+              for p in $test_projects; do
+                echo "Running tests in $p"
+                dotnet test "$p" --no-build --verbosity normal || exit $?
+              done
+            else
+              echo "No test projects found, skipping tests."
+            fi
+          fi
+
+      - name: Publish build outputs (optional)
+        if: steps.check.outputs.found_csproj == 'true'
+        run: |
+          mkdir -p ./out || true
+          # publish MAUI app output if it exists
+          if [ -f "src/StitchTrack.App/StitchTrack.App.csproj" ]; then
+            dotnet publish src/StitchTrack.App/StitchTrack.App.csproj -c Release -o ./out/maui || true
+          fi
 
       - name: Upload artifacts (if any)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts-${{ runner.os }}
-          path: |
-            ./out
+          name: build-artifacts-${{ matrix.os }}
+          path: ./out
