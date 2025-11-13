@@ -25,20 +25,12 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Ensure dotnet tool manifest (optional) and install dotnet-format
-        run: |
-          # If a tool manifest exists, restore tools and run the local tool.
-          if [ -f "./dotnet-tools.json" ]; then
-            echo "Tool manifest found; restoring tools..."
-            dotnet tool restore
-            echo "Running dotnet-format from local tool manifest..."
-            dotnet tool run dotnet-format -- --verify-no-changes
-          else
-            echo "No tool manifest found; installing dotnet-format as a global tool (temporary)..."
-            dotnet tool install --global dotnet-format --version 9.* || true
-            export PATH="$HOME/.dotnet/tools:$PATH"
-            echo "Running dotnet-format (global)..."
-            dotnet format --verify-no-changes
-          fi
+      - name: Show dotnet info
+        run: dotnet --info
+
+      - name: Run dotnet format (verify no changes)
         env:
           DOTNET_CLI_TELEMETRY_OPTOUT: 1
+        run: |
+          # Prefer SDK-integrated dotnet format (available in .NET 6+)
+          dotnet format --verify-no-changes
