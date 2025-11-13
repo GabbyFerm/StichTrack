@@ -20,7 +20,7 @@ As a [type of user], I want [goal] so that [reason].
 ## Phase
 - [ ] Phase 1 (MVP)
 - [ ] Phase 2 (Enhanced)
-- [ ] Phase 3 (Cloud)
+- [ ] Phase 3 (Cloud & Advanced Features)
 - [ ] Phase 4 (Polish)
 
 ## Additional Context
