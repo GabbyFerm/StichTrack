@@ -1,0 +1,14 @@
+root = true
+
+[*.cs]
+charset = utf-8
+indent_style = space
+indent_size = 2
+dotnet_sort_system_directives_first = true
+
+# Make formatting analyzer IDE0055 an error (change to warning if too strict)
+dotnet_diagnostic.IDE0055.severity = error
+
+# Example style rules (adjust to taste)
+csharp_new_line_before_open_brace = all
+csharp_prefer_braces = true:suggestion
