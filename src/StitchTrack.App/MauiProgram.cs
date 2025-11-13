@@ -6,6 +6,7 @@ internal static class MauiProgram
 {
   public static MauiApp CreateMauiApp()
   {
+    // testing ci/cd with comment
     var builder = MauiApp.CreateBuilder();
     builder
         .UseMauiApp<App>()
