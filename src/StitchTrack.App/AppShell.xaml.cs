@@ -1,9 +1,10 @@
 ﻿namespace StitchTrack.App;
 
-public partial class AppShell : Shell
+internal partial class AppShell : Shell
 {
-	public AppShell()
-	{
-		InitializeComponent();
-	}
+  public AppShell()
+  {
+    InitializeComponent();
+  }
 }
+
