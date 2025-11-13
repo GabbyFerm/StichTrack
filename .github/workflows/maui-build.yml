@@ -25,26 +25,36 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
 
       - name: Restore workloads
-        run: dotnet workload restore
+        run: dotnet workload install maui --skip-manifest-update || true
 
       - name: Restore solution
-        run: dotnet restore ./MyService.sln
+        run: |
+          if [ -f ./StitchTrack.sln ]; then
+            dotnet restore ./StitchTrack.sln
+          else
+            dotnet restore
+          fi
 
       - name: Build solution (Release)
-        run: dotnet build ./MyService.sln -c Release --no-restore
+        run: |
+          if [ -f ./StitchTrack.sln ]; then
+            dotnet build ./StitchTrack.sln -c Release --no-restore
+          else
+            dotnet build -c Release --no-restore
+          fi
 
       - name: Publish Android (no-sign)
         run: |
           mkdir -p out/android
-          dotnet publish ./src/MyMauiApp/MyMauiApp.csproj -f net8.0-android -c Release -o ./out/android || true
+          dotnet publish ./src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-android -c Release -o ./out/android || true
 
       - name: Publish iOS (no-sign)
         run: |
           mkdir -p out/ios
-          dotnet publish ./src/MyMauiApp/MyMauiApp.csproj -f net8.0-ios -c Release -o ./out/ios || true
+          dotnet publish ./src/StitchTrack.App/StitchTrack.App.csproj -f net9.0-ios -c Release -o ./out/ios || true
 
       - name: Upload publish artifacts
         uses: actions/upload-artifact@v4
