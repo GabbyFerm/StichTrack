@@ -24,12 +24,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Quick check for .NET projects
+        id: check
+        run: |
+          # Look for solution or project files anywhere in the repo
+          set -e
+          if git ls-files '*.sln' '*.csproj' '*.fsproj' | grep -q .; then
+            echo "dotnet: project files found"
+            echo "has_projects=true" >> $GITHUB_OUTPUT
+          else
+            echo "dotnet: no solution or project files found; skipping dotnet steps"
+            echo "has_projects=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup .NET
+        if: steps.check.outputs.has_projects == 'true'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
       - name: Cache NuGet packages
+        if: steps.check.outputs.has_projects == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
@@ -38,12 +53,15 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore
+        if: steps.check.outputs.has_projects == 'true'
         run: dotnet restore
 
       - name: Build (Release)
+        if: steps.check.outputs.has_projects == 'true'
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
+        if: steps.check.outputs.has_projects == 'true'
         run: dotnet test --no-build --verbosity normal --configuration Release
 
       - name: Upload artifacts (if any)
@@ -53,4 +71,3 @@ jobs:
           name: build-artifacts-${{ runner.os }}
           path: |
             ./out
-            # Add more artifact paths if your build produces artifacts
