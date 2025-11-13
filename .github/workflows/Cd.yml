@@ -1,0 +1,110 @@
+name: CD - Deploy & Notify
+
+on:
+  workflow_run:
+    workflows: ["CI - Build & Test"]
+    types: [completed]
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-dev:
+    name: Deploy to Development
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'develop'
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Android artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: artifacts/
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: List downloaded artifacts
+        run: |
+          echo "📦 Downloaded artifacts:"
+          ls -laR artifacts/ || echo "No artifacts found"
+
+      - name: Simulate deployment
+        run: |
+          echo "🚀 Deploying StitchTrack to DEV environment"
+          echo "Branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "Commit: ${{ github.event.workflow_run.head_sha }}"
+          echo "✅ Deployment completed (simulated)"
+
+      - name: Notify Discord (Dev)
+        if: vars.DISCORD_WEBHOOK_DEV != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"content":"✅ **StitchTrack DEV** deployed successfully\nBranch: `${{ github.event.workflow_run.head_branch }}`\nCommit: `${{ github.event.workflow_run.head_sha }}`"}' \
+            ${{ vars.DISCORD_WEBHOOK_DEV }}
+
+  deploy-prod:
+    name: Deploy to Production
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Android artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: artifacts/
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: List downloaded artifacts
+        run: |
+          echo "📦 Production artifacts:"
+          ls -laR artifacts/ || echo "No artifacts found"
+
+      - name: Deploy to Production
+        run: |
+          echo "🚀 Deploying StitchTrack to PRODUCTION"
+          echo "Version: ${{ github.event.workflow_run.head_sha }}"
+          # Add your actual deployment steps here
+          # Examples:
+          # - Upload to Google Play Store (using fastlane)
+          # - Upload to App Store Connect
+          # - Deploy to internal distribution platform
+          echo "✅ Production deployment completed (simulated)"
+
+      - name: Notify Discord (Prod)
+        if: vars.DISCORD_WEBHOOK_PROD != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"content":"🚀 **StitchTrack PRODUCTION** deployed!\nVersion: `${{ github.event.workflow_run.head_sha }}`\n@everyone"}' \
+            ${{ vars.DISCORD_WEBHOOK_PROD }}
+
+  notify-failure:
+    name: Notify Build Failure
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Notify Discord (Failure)
+        if: vars.DISCORD_WEBHOOK_DEV != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"content":"❌ **StitchTrack CI** failed\nBranch: `${{ github.event.workflow_run.head_branch }}`\nCheck: ${{ github.event.workflow_run.html_url }}"}' \
+            ${{ vars.DISCORD_WEBHOOK_DEV }}
