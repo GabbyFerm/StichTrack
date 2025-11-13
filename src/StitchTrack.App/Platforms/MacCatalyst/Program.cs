@@ -1,9 +1,8 @@
-using ObjCRuntime;
 using UIKit;
 
 namespace StitchTrack.App;
 
-internal class Program
+public sealed class Program
 {
   // This is the main entry point of the application.
   static void Main(string[] args)
@@ -13,4 +12,3 @@ internal class Program
     UIApplication.Main(args, null, typeof(AppDelegate));
   }
 }
-

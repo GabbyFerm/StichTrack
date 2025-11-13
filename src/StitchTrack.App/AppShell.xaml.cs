@@ -1,6 +1,6 @@
-﻿namespace StitchTrack.App;
+namespace StitchTrack.App;
 
-internal partial class AppShell : Shell
+public partial class AppShell : Shell
 {
   public AppShell()
   {

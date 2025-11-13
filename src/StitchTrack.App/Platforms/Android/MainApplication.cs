@@ -4,7 +4,7 @@ using Android.Runtime;
 namespace StitchTrack.App;
 
 [Application]
-public class MainApplication : MauiApplication
+public sealed class MainApplication : MauiApplication
 {
   public MainApplication(IntPtr handle, JniHandleOwnership ownership)
       : base(handle, ownership)
@@ -13,4 +13,3 @@ public class MainApplication : MauiApplication
 
   protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
 }
-

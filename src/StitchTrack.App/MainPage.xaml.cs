@@ -1,8 +1,8 @@
-﻿namespace StitchTrack.App;
+namespace StitchTrack.App;
 
-internal partial class MainPage : ContentPage
+public partial class MainPage : ContentPage
 {
-  int count = 0;
+  private int count;
 
   public MainPage()
   {
@@ -21,5 +21,3 @@ internal partial class MainPage : ContentPage
     SemanticScreenReader.Announce(CounterBtn.Text);
   }
 }
-
-
