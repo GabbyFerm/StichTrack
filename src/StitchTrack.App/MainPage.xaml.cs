@@ -25,9 +25,9 @@ public partial class MainPage : ContentPage
         SemanticScreenReader.Announce(CounterBtn.Text);
 
 <<<<<<< TODO: Unmerged change from project 'StitchTrack.App(net9.0-ios)', Before:
-  }
+    }
 =======
     }
 >>>>>>> After
-    }
+}
 }
