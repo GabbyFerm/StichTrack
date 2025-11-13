@@ -1,0 +1,37 @@
+name: Format check
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dotnet-format tool
+        run: |
+          dotnet tool install --global dotnet-format || true
+          export PATH="$HOME/.dotnet/tools:$PATH"
+
+      - name: Run dotnet format (verify no changes)
+        env:
+          DOTNET_CLI_TELEMETRY_OPTOUT: 1
+        run: |
+          dotnet format --verify-no-changes
