@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable analyzers and treat format analyzer as error on CI -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+  </PropertyGroup>
+
+  <Target Name="VerifyFormattingOnCI" AfterTargets="Build" Condition="'$(CI)' == 'true'">
+    <Exec Command="dotnet tool restore" ContinueOnError="true" />
+    <Exec Command="dotnet format --verify-no-changes" ContinueOnError="false" />
+  </Target>
+</Project>
