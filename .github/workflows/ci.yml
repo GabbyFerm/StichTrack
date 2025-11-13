@@ -26,6 +26,7 @@ jobs:
 
       - name: Quick check for solution / projects
         id: check
+        shell: bash
         run: |
           if git ls-files '*.sln' | grep -q .; then
             echo "found_sln=true" >> $GITHUB_OUTPUT
