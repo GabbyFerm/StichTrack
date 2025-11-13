@@ -1,12 +1,15 @@
 <Project>
   <PropertyGroup>
-    <!-- Enable analyzers and treat format analyzer as error on CI -->
+    <!-- All the good stuff from before -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    
+    <!-- PLUS new features -->
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors Condition="CI">true</TreatWarningsAsErrors>
+    <!-- Version info, optimizations, etc. -->
   </PropertyGroup>
-
-  <Target Name="VerifyFormattingOnCI" AfterTargets="Build" Condition="'$(CI)' == 'true'">
-    <Exec Command="dotnet tool restore" ContinueOnError="true" />
-    <Exec Command="dotnet format --verify-no-changes" ContinueOnError="false" />
-  </Target>
+  
+  <!-- NO format check target - workflow handles it! -->
 </Project>
