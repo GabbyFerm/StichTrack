@@ -1,0 +1,26 @@
+name: PR helper - greeting & checklist
+
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  pr-greeting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create or update PR comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Hi @${{ github.event.pull_request.user.login }} — thanks for the PR! Quick reminders:
+            - Please target the `develop` branch for feature work.
+            - Run `dotnet test` locally and ensure formatting (run `dotnet format`).
+            - Add short testing steps to the PR description.
+            ---
+            (Automated message)
