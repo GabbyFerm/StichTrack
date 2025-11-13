@@ -1,0 +1,53 @@
+name: MAUI - build & publish (macOS)
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-maui:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore workloads
+        run: dotnet workload restore
+
+      - name: Restore solution
+        run: dotnet restore ./MyService.sln
+
+      - name: Build solution (Release)
+        run: dotnet build ./MyService.sln -c Release --no-restore
+
+      - name: Publish Android (no-sign)
+        run: |
+          mkdir -p out/android
+          dotnet publish ./src/MyMauiApp/MyMauiApp.csproj -f net8.0-android -c Release -o ./out/android || true
+
+      - name: Publish iOS (no-sign)
+        run: |
+          mkdir -p out/ios
+          dotnet publish ./src/MyMauiApp/MyMauiApp.csproj -f net8.0-ios -c Release -o ./out/ios || true
+
+      - name: Upload publish artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: maui-publish
+          path: ./out
