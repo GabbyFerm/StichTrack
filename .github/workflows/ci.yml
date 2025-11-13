@@ -29,7 +29,7 @@ jobs:
         run: |
           # Look for solution or project files anywhere in the repo
           set -e
-          if git ls-files '*.sln' '*.csproj' '*.fsproj' | grep -q .; then
+          if git ls-files "*.sln" "*.csproj" "*.fsproj" | grep -q .; then
             echo "dotnet: project files found"
             echo "has_projects=true" >> $GITHUB_OUTPUT
           else
