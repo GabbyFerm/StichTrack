@@ -6,9 +6,9 @@
     
     <!-- PLUS new features -->
     <Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <TreatWarningsAsErrors Condition="CI">true</TreatWarningsAsErrors>
-    <!-- Version info, optimizations, etc. -->
+    <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
   </PropertyGroup>
   
   <!-- NO format check target - workflow handles it! -->
