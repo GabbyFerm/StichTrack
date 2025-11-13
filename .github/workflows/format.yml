@@ -1,9 +1,7 @@
-name: Format check
+name: Format Check
 
 on:
   pull_request:
-    branches: [develop, main]
-  push:
     branches: [develop, main]
 
 permissions:
@@ -15,12 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+      
+      # IMPORTANT: Restore before formatting!
+      - name: Restore dependencies
+        run: |
+          dotnet restore src/StitchTrack.Core/StitchTrack.Core.csproj
+          dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
+          dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
+          dotnet restore tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj
+          dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
       
       - name: Check format
         run: dotnet format --verify-no-changes
