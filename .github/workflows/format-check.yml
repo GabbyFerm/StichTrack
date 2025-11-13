@@ -28,6 +28,9 @@ jobs:
       - name: Show dotnet info
         run: dotnet --info
 
+      - name: Restore dependencies
+        run: dotnet restore
+      
       - name: Run dotnet format (verify no changes)
         env:
           DOTNET_CLI_TELEMETRY_OPTOUT: 1
