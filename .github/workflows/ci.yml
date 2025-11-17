@@ -1,5 +1,4 @@
 name: CI - Build & Test
-
 on:
   push:
     branches: [develop, main]
@@ -13,25 +12,31 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
-      
-      - name: Build Core
-        run: dotnet build src/StitchTrack.Core/StitchTrack.Core.csproj -c Release
-      
-      - name: Build Application
-        run: dotnet build src/StitchTrack.Application/StitchTrack.Application.csproj -c Release
-      
-      - name: Build Infrastructure
-        run: dotnet build src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj -c Release
-      
-      - name: Test
+          dotnet-version: "8.0.x"
+
+      # Build only the non-MAUI projects for now
+      - name: Restore dependencies
         run: |
-          dotnet test tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj -c Release
-          dotnet test tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj -c Release
+          dotnet restore src/StitchTrack.Domain/StitchTrack.Domain.csproj
+          dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
+          dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
+          dotnet restore tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj
+          dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
+
+      - name: Build projects
+        run: |
+          dotnet build src/StitchTrack.Domain/StitchTrack.Domain.csproj -c Release --no-restore
+          dotnet build src/StitchTrack.Application/StitchTrack.Application.csproj -c Release --no-restore
+          dotnet build src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj -c Release --no-restore
+
+      - name: Run tests
+        run: |
+          dotnet test tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj -c Release --no-restore --verbosity normal
+          dotnet test tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj -c Release --no-restore --verbosity normal

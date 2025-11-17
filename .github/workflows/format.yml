@@ -1,5 +1,4 @@
 name: Format Check
-
 on:
   pull_request:
     branches: [develop, main]
@@ -11,43 +10,30 @@ jobs:
   format:
     name: Check Formatting
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
-      
-      - name: Restore Core
-        run: dotnet restore src/StitchTrack.Core/StitchTrack.Core.csproj
-      
-      - name: Restore Application
-        run: dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
-      
-      - name: Restore Infrastructure
-        run: dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
-      
-      - name: Restore UnitTests
-        run: dotnet restore tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj
-      
-      - name: Restore IntegrationTests
-        run: dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
-      
-      # Format each project individually
-      - name: Format Core
-        run: dotnet format src/StitchTrack.Core/StitchTrack.Core.csproj --verify-no-changes
-      
-      - name: Format Application
-        run: dotnet format src/StitchTrack.Application/StitchTrack.Application.csproj --verify-no-changes
-      
-      - name: Format Infrastructure
-        run: dotnet format src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj --verify-no-changes
-      
-      - name: Format UnitTests
-        run: dotnet format tests/StitchTrack.UnitTests/StitchTrack.UnitTests.csproj --verify-no-changes
-      
-      - name: Format IntegrationTests
-        run: dotnet format tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj --verify-no-changes
+          dotnet-version: "8.0.x"
+
+      # Restore only non-MAUI projects
+      - name: Restore dependencies
+        run: |
+          dotnet restore src/StitchTrack.Domain/StitchTrack.Domain.csproj
+          dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
+          dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
+          dotnet restore tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj
+          dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
+
+      # Format only non-MAUI projects
+      - name: Check formatting
+        run: |
+          dotnet format src/StitchTrack.Domain/StitchTrack.Domain.csproj --verify-no-changes
+          dotnet format src/StitchTrack.Application/StitchTrack.Application.csproj --verify-no-changes
+          dotnet format src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj --verify-no-changes
+          dotnet format tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj --verify-no-changes
+          dotnet format tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj --verify-no-changes
