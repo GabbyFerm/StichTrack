@@ -1,4 +1,4 @@
-﻿namespace StitchTrack.MAUI
+namespace StitchTrack.MAUI
 {
     public partial class App : Application
     {
