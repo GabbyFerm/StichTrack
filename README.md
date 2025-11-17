@@ -31,7 +31,7 @@ Prerequisites:
 
 Quick local dev commands
 1. Clone:
-   git clone https://github.com/GabbyFerm/StichTrack.git
+   git clone https://github.com/GabbyFerm/StitchTrack.git
    git checkout develop
 
 2. Restore, build and test:
