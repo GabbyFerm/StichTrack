@@ -20,9 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\StitchTrack.Application\StitchTrack.Application.csproj" />
     <ProjectReference Include="..\..\src\StitchTrack.Domain\StitchTrack.Domain.csproj" />
-    <ProjectReference Include="..\..\src\StitchTrack.Infrastructure\StitchTrack.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
