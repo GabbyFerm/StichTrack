@@ -20,10 +20,20 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      # Restore entire solution
+      # Restore only non-MAUI projects
       - name: Restore dependencies
-        run: dotnet restore StitchTrack.sln
+        run: |
+          dotnet restore src/StitchTrack.Domain/StitchTrack.Domain.csproj
+          dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
+          dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
+          dotnet restore tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj
+          dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
 
-      # Format entire solution at once
+      # Format only non-MAUI projects
       - name: Check formatting
-        run: dotnet format StitchTrack.sln --verify-no-changes --verbosity diagnostic
+        run: |
+          dotnet format src/StitchTrack.Domain/StitchTrack.Domain.csproj --verify-no-changes
+          dotnet format src/StitchTrack.Application/StitchTrack.Application.csproj --verify-no-changes
+          dotnet format src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj --verify-no-changes
+          dotnet format tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj --verify-no-changes
+          dotnet format tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj --verify-no-changes

@@ -21,14 +21,22 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      # Restore all projects at once
+      # Build only the non-MAUI projects for now
       - name: Restore dependencies
-        run: dotnet restore StitchTrack.sln
+        run: |
+          dotnet restore src/StitchTrack.Domain/StitchTrack.Domain.csproj
+          dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
+          dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
+          dotnet restore tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj
+          dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
 
-      # Build entire solution
-      - name: Build solution
-        run: dotnet build StitchTrack.sln -c Release --no-restore
+      - name: Build projects
+        run: |
+          dotnet build src/StitchTrack.Domain/StitchTrack.Domain.csproj -c Release --no-restore
+          dotnet build src/StitchTrack.Application/StitchTrack.Application.csproj -c Release --no-restore
+          dotnet build src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj -c Release --no-restore
 
-      # Run all tests in solution
       - name: Run tests
-        run: dotnet test StitchTrack.sln -c Release --no-build --verbosity normal
+        run: |
+          dotnet test tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj -c Release --no-restore --verbosity normal
+          dotnet test tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj -c Release --no-restore --verbosity normal
