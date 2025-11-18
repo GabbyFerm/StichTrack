@@ -3,13 +3,12 @@
     x:Class="StitchTrack.MAUI.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:StitchTrack.MAUI"
-    Shell.FlyoutBehavior="Disabled"
-    Title="StitchTrack.MAUI">
+    xmlns:local="clr-namespace:StitchTrack.MAUI.Views"
+    Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+  <ShellContent
+        Title="Guest Counter"
+        ContentTemplate="{DataTemplate local:GuestCounterPage}"
+        Route="GuestCounterPage" />
 
 </Shell>

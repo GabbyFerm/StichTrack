@@ -16,6 +16,9 @@ public class GuestCounterViewModel : INotifyPropertyChanged
     // PropertyChanged event for data binding
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    // Action to trigger haptic feedback (injected from UI layer)
+    public Action? TriggerHapticFeedback { get; set; }
+
     // Current row count displayed to user
     public int CurrentCount => _project.CurrentCount;
 
@@ -42,18 +45,21 @@ public class GuestCounterViewModel : INotifyPropertyChanged
     private void OnIncrement()
     {
         _project.IncrementCount();
+        TriggerHapticFeedback?.Invoke();
         OnPropertyChanged(nameof(CurrentCount)); // Notify UI to update
     }
 
     private void OnDecrement()
     {
         _project.DecrementCount();
+        TriggerHapticFeedback?.Invoke();
         OnPropertyChanged(nameof(CurrentCount)); // Notify UI to update
     }
 
     private void OnReset()
     {
         _project.ResetCount();
+        TriggerHapticFeedback?.Invoke();
         OnPropertyChanged(nameof(CurrentCount)); // Notify UI to update
     }
 

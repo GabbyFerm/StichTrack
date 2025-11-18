@@ -5,10 +5,22 @@
              x:Class="StitchTrack.MAUI.App">
   <Application.Resources>
     <ResourceDictionary>
+
+      <!-- Keep the default MAUI styles -->
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
         <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
       </ResourceDictionary.MergedDictionaries>
+
+      <!-- Add your custom font styles here -->
+      <Style TargetType="Label">
+        <Setter Property="FontFamily" Value="MontserratRegular" />
+      </Style>
+
+      <Style TargetType="Button">
+        <Setter Property="FontFamily" Value="MontserratSemiBold" />
+      </Style>
+
     </ResourceDictionary>
   </Application.Resources>
 </Application>
