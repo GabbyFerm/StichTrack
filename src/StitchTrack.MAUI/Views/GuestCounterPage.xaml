@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:StitchTrack.Application.ViewModels;assembly=StitchTrack.Application"
+             x:Class="StitchTrack.MAUI.Views.GuestCounterPage"
+             BackgroundColor="#E8E8E8"
+             Shell.NavBarIsVisible="False">
+
+  <!-- Bind to GuestCounterViewModel -->
+  <ContentPage.BindingContext>
+    <viewmodels:GuestCounterViewModel />
+  </ContentPage.BindingContext>
+
+  <Grid RowDefinitions="Auto,*,Auto">
+
+    <!-- Header with Logo -->
+    <VerticalStackLayout Grid.Row="0" 
+                           Padding="20,30,20,20"
+                           Spacing="5">
+      <Image Source="logo.svg"
+       HeightRequest="80"
+       HorizontalOptions="Center" />
+      <Label Text="NEVER MISS A ROW"
+                   FontSize="12"
+                   FontFamily="MontserratMedium"
+                   TextColor="#000"
+                   HorizontalOptions="Center"
+                   CharacterSpacing="8" />
+    </VerticalStackLayout>
+
+    <!-- Counter Card with ScrollView -->
+    <ScrollView Grid.Row="1">
+      <Frame Margin="20,10,20,10"
+           Padding="20"
+           CornerRadius="15"
+           BackgroundColor="White"
+           HasShadow="True">
+
+        <VerticalStackLayout Spacing="10">
+
+          <!-- Title -->
+        <Label Text="Quick Row Counter"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="#000"
+                       HorizontalOptions="Center" />
+
+        <Label Text="No login required - perfect for quick counting!"
+                       FontSize="12"
+                       TextColor="#000"
+                       HorizontalOptions="Center"
+                       Margin="0,0,0,10" />
+
+        <!-- Current Row Display with grey background -->
+        <Frame BackgroundColor="#F1F1F1"
+               CornerRadius="10"
+               Padding="10,5"
+               HasShadow="False"
+               BorderColor="Transparent">
+          <VerticalStackLayout Spacing="0">
+            <Label Text="Current Row"
+                      FontSize="14"
+                      TextColor="#000"
+                      HorizontalOptions="Center"
+                      Margin="0,10,0,0" />
+
+            <!-- The actual counter number -->
+              <Label Text="{Binding CurrentCount}"
+                     FontSize="90"
+                     FontFamily="MontserratExtraBold"
+                     TextColor="#424B54"
+                     HorizontalOptions="Center"
+                     LineHeight="0.8"
+                     Margin="0,-5,0,-5" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Buttons -->
+        <Grid ColumnDefinitions="*,*" 
+                      ColumnSpacing="15"
+                      Margin="0,15,0,0">
+
+          <!-- Decrement Button -->
+          <Button Grid.Column="0"
+                            Text="- DECREASE"
+                            Command="{Binding DecrementCommand}"
+                            BackgroundColor="#424B54"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="10" />
+
+          <!-- Increment Button -->
+          <Button Grid.Column="1"
+                            Text="+ INCREASE"
+                            Command="{Binding IncrementCommand}"
+                            BackgroundColor="#E1AD37"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="10" />
+        </Grid>
+
+        <!-- Reset Button -->
+        <Button Text="↻ Reset Counter"
+                        Command="{Binding ResetCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#424B54"
+                        FontAttributes="Bold"
+                        FontSize="14"
+                        Margin="0,10,0,0" />
+
+        <!-- Tip Text -->
+        <Label Text="💡 Tip: Login to save your projects"
+                       FontSize="12"
+                       TextColor="#424B54"
+                       HorizontalOptions="Center"
+                       Margin="0,10,0,0" />
+
+      </VerticalStackLayout>
+      </Frame>
+    </ScrollView>
+
+    <!-- Bottom Buttons -->
+    <VerticalStackLayout Grid.Row="2" 
+                   Padding="20,10,20,30"
+                   Spacing="10">
+
+      <Button Text="Login"
+            BackgroundColor="#FE64A3"
+            TextColor="White"
+            FontAttributes="Bold"
+            HeightRequest="50"
+            CornerRadius="25"
+            Opacity="0.5"
+            IsEnabled="False" />
+
+      <Button Text="Register"
+            BackgroundColor="#424B54"
+            TextColor="White"
+            FontAttributes="Bold"
+            HeightRequest="50"
+            CornerRadius="25"
+            Opacity="0.5"
+            IsEnabled="False" />
+
+      <Label Text="(Login/Register coming in Phase 3)"
+           FontSize="10"
+           TextColor="#999"
+           HorizontalOptions="Center" />
+
+    </VerticalStackLayout>
+
+  </Grid>
+
+</ContentPage>
