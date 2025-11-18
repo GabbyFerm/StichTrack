@@ -67,4 +67,8 @@
 	  <ProjectReference Include="..\StitchTrack.Infrastructure\StitchTrack.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Views\" />
+	</ItemGroup>
+
 </Project>

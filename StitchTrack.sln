@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36705.20 d17.14
+VisualStudioVersion = 17.14.36705.20
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.Domain", "src\StitchTrack.Domain\StitchTrack.Domain.csproj", "{1EA62ED0-8785-4B49-89F8-FA09E75F2876}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.Domain.Tests", "tests\StitchTrack.Domain.Tests\StitchTrack.Domain.Tests.csproj", "{9B96DF15-6CB3-4FB1-9D3B-767576A94002}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.IntegrationTests", "tests\StitchTrack.IntegrationTests\StitchTrack.IntegrationTests.csproj", "{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.Application.Tests", "tests\StitchTrack.Application.Tests\StitchTrack.Application.Tests.csproj", "{22F9376B-BB74-4B83-85E4-950048C68B4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22F9376B-BB74-4B83-85E4-950048C68B4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22F9376B-BB74-4B83-85E4-950048C68B4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22F9376B-BB74-4B83-85E4-950048C68B4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22F9376B-BB74-4B83-85E4-950048C68B4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
