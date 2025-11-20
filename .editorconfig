@@ -33,9 +33,10 @@ indent_style = space
 trim_trailing_whitespace = false
 
 # C# files
-# Suppress CA1054 for URL parameters (using strings for simplicity)
+# Suppress URL/URI analyzer rules (using strings for simplicity in Phase 1)
 [*.cs]
-dotnet_diagnostic.CA1054.severity = suggestion
+dotnet_diagnostic.CA1054.severity = suggestion  # URI parameters should not be strings
+dotnet_diagnostic.CA1056.severity = suggestion  # URI properties should not be strings
 
 # Suppress ALL analyzer warnings for auto-generated migration files
 [**/Migrations/*.cs]
