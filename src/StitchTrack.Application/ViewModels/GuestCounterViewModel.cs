@@ -34,7 +34,7 @@ public class GuestCounterViewModel : INotifyPropertyChanged
     public GuestCounterViewModel()
     {
         // Create in-memory project (not saved to database)
-        _project = Project.Create("Guest Counter");
+        _project = Project.CreateProject("Guest Counter");
 
         // Initialize commands with actions
         IncrementCommand = new RelayCommand(OnIncrement);

@@ -10,7 +10,7 @@ public class ProjectTests
     public void Create_ShouldGenerateNewGuid_ForGuestProject()
     {
         // Arrange & Act
-        var project = Project.Create("Test Socks");
+        var project = Project.CreateProject("Test Socks");
 
         // Assert
         project.Id.Should().NotBe(Guid.Empty);
@@ -20,10 +20,10 @@ public class ProjectTests
     }
 
     [Test]
-    public void Create_ShouldThowException_WhenNameIsEmpty()
+    public void Create_ShouldThrowException_WhenNameIsEmpty()
     {
         // Arrange & Act
-        Action act = () => Project.Create("");
+        Action act = () => Project.CreateProject("");
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -34,7 +34,7 @@ public class ProjectTests
     public void IncrementCount_ShouldIncreaseByOne()
     {
         // Arrange
-        var project = Project.Create("Scarf");
+        var project = Project.CreateProject("Scarf");
 
         // Act
         project.IncrementCount();
@@ -49,7 +49,7 @@ public class ProjectTests
     public void IncrementCount_MultipleTimesShouldWork(int times)
     {
         // Arrange
-        var project = Project.Create("Blanket");
+        var project = Project.CreateProject("Blanket");
 
         // Act
         for (int i = 0; i < times; i++)
@@ -65,7 +65,7 @@ public class ProjectTests
     public void DecrementCount_ShouldDecreaseByOne()
     {
         // Arrange
-        var project = Project.Create("Hat");
+        var project = Project.CreateProject("Hat");
 
         // Act
         project.DecrementCount();
@@ -78,7 +78,7 @@ public class ProjectTests
     public void DecrementCount_WhenAtZero_ShouldStayAtZero()
     {
         // Arrange
-        var project = Project.Create("Mittens");
+        var project = Project.CreateProject("Mittens");
         // CurrentCount is already 0
 
         // Act
@@ -92,7 +92,7 @@ public class ProjectTests
     public void ResetCount_ShouldSetToZero()
     {
         // Arrange
-        var project = Project.Create("Sweater");
+        var project = Project.CreateProject("Sweater");
         project.IncrementCount();
         project.IncrementCount();
         project.IncrementCount(); // Now at 3
@@ -108,7 +108,7 @@ public class ProjectTests
     public void IncrementCount_ShouldUpdateTimestamp()
     {
         // Arrange
-        var project = Project.Create("Socks");
+        var project = Project.CreateProject("Socks");
         var originalTimestamp = project.UpdatedAt;
 
         // Wait a tiny bit to ensure time difference
