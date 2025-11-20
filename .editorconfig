@@ -263,3 +263,7 @@ dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = none
 [*.xaml.cs]
 # Code-behind files can have different rules
 csharp_style_expression_bodied_methods = false:none
+
+# Suppress CA1062 for migration files (auto-generated)
+[**/Migrations/*.cs]
+dotnet_diagnostic.CA1062.severity = none
