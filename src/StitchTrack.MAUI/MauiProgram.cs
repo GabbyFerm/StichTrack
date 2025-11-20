@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using StitchTrack.Application.ViewModels;
+using StitchTrack.Infrastructure.Data;
+using StitchTrack.MAUI.Data;
 
 namespace StitchTrack.MAUI;
 
@@ -21,6 +25,11 @@ public static class MauiProgram
                 fonts.AddFont("Montserrat-ExtraBold.ttf", "MontserratExtraBold");
                 fonts.AddFont("Montserrat-Bold.ttf", "MontserratBold");
             });
+
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlite(DatabaseConfig.ConnectionString));
+
+        builder.Services.AddTransient<GuestCounterViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

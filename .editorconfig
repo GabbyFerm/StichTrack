@@ -4,13 +4,13 @@ root = true
 # All files
 [*]
 charset = utf-8
+indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
 # Code files
 [*.{cs,csx,vb,vbx}]
 indent_size = 4
-indent_style = space
 tab_width = 4
 
 # XML/XAML files
@@ -33,7 +33,16 @@ indent_style = space
 trim_trailing_whitespace = false
 
 # C# files
+# Suppress URL/URI analyzer rules (using strings for simplicity in Phase 1)
 [*.cs]
+dotnet_diagnostic.CA1054.severity = suggestion  # URI parameters should not be strings
+dotnet_diagnostic.CA1056.severity = suggestion  # URI properties should not be strings
+
+# Suppress ALL analyzer warnings for auto-generated migration files
+[**/Migrations/*.cs]
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1861.severity = none
+generated_code = true
 
 # ============================================
 # Code Style Rules
