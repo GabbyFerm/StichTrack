@@ -1,4 +1,5 @@
 namespace StitchTrack.Domain.Entities;
+
 public class Reminder
 {
     public Guid Id { get; private set; }
@@ -9,7 +10,6 @@ public class Reminder
     public bool IsEnabled { get; private set; }
     public DateTime? LastTriggeredAt { get; private set; }
 
-    // Computed property
     public bool ShouldTrigger
     {
         get

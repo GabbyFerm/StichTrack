@@ -1,5 +1,5 @@
-using NUnit.Framework;
 using FluentAssertions;
+using NUnit.Framework;
 using StitchTrack.Domain.Entities;
 
 namespace StitchTrack.Domain.Tests.Entities;
