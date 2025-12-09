@@ -1,78 +1,213 @@
 # StitchTrack
 
-Cross-platform row counter for knitters & crocheters — .NET MAUI · SQLite · Clean Architecture
+Cross-platform row counter for knitters & crocheters — .NET MAUI · SQLite · Local-First
 
-[![CI status](https://img.shields.io/badge/ci-pending-lightgrey)](#) [![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey)](#) [![License](https://img.shields.io/badge/license-Unlicensed-lightgrey)](#)
+[![CI status](https://img.shields.io/badge/ci-passing-brightgreen)](#) [![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-blue)](#) [![License](https://img.shields.io/badge/license-Unlicensed-lightgrey)](#)
 
-Short description
------------------
-StitchTrack is a small, offline-first mobile app to help knitters and crocheters track row counts, sessions and project progress. It’s built with .NET MAUI and uses SQLite for local storage (optional cloud sync is planned for later phases).
+---
 
-Key features (Phase 1 / MVP)
-- Quick guest counter with + / − / reset and undo.
-- Create / edit / delete projects and switch between them.
-- Persist projects locally with SQLite.
-- Simple, accessible UI optimized for one-handed operation.
+## Overview
 
-Roadmap highlights
-- Phase 1 (MVP): Counter, projects, local persistence (done first).
-- Phase 2: Images, notes, session timers, archive.
-- Phase 3: Authentication + cloud sync, PDF patterns, reminders.
-- Phase 4: Polishing, multi-device sync, app store publishing.
+StitchTrack is a **local-first**, **privacy-focused** mobile app for knitters and crocheters to track row counts, projects, and sessions. No account required—your data stays on your device unless you choose to back it up to your own cloud storage.
 
-Screenshots / wireframes
-- See docs/assets/ for wireframes and UI mockups (add images to docs/assets and link them here).
+### Core Philosophy
+- **Start immediately** — no signup, no friction
+- **Privacy by default** — data lives on your device
+- **Own your data** — export anytime, sync to your cloud (optional)
+- **Offline-first** — works perfectly without internet
 
-Getting started (developer)
----------------------------
-Prerequisites:
-- .NET SDK (8.0 or change to the target SDK)
-- Visual Studio 2022/2023 with MAUI workloads (or use dotnet CLI + appropriate dev tools)
+---
 
-Quick local dev commands
-1. Clone:
-   git clone https://github.com/GabbyFerm/StitchTrack.git
-   git checkout develop
+## Key Features
 
-2. Restore, build and test:
-   dotnet restore
-   dotnet build -c Release
-   dotnet test
+### Phase 1 (Current - MVP) ✅
+- ✅ **Quick Counter** — start counting immediately without creating a project
+- ✅ **Project Management** — create, edit, delete projects with row counts
+- ✅ **Undo Support** — undo counter changes with full history
+- ✅ **Local Storage** — SQLite database, no cloud required
+- ✅ **Haptic Feedback** — tactile response on button press
+- ✅ **Bottom Navigation** — quick access to Counter, Projects, Sessions, Export, Settings
 
-3. Format (if you use the repo formatting rules):
-   dotnet tool restore
-   dotnet format
+### Phase 2 (Enhanced Features) 🚧
+- 📸 Project photos
+- 📝 Notes and comments per project
+- ⏱️ Session timer with history
+- 📊 Progress tracking (X of Y rows)
+- 📦 Archive completed projects
+- 🌓 Dark mode
 
-Development branches
---------------------
-- main — production releases
-- develop — active development (default PR target)
-- feature/* — short-lived feature branches
+### Phase 3 (Cloud Sync) 📅
+- ☁️ iCloud sync (iOS)
+- ☁️ Google Drive sync (Android)  
+- 📤 Conflict resolution UI
+- 🔄 Sync status indicator
+- 💾 Automatic backup reminders
 
-See BRANCHING.md for full branching strategy and contribution notes.
+### Phase 4 (Polish) 📅
+- 🏷️ Project tags
+- 🔍 Search and filters
+- 📊 Multiple counters per project
+- 🎨 Custom themes
+- 📱 App Store & Play Store release
 
-CI / Workflows
---------------
-This repository includes GitHub Actions to:
-- Run build & tests on PRs
-- Enforce code formatting
-- MacOS MAUI build skeleton (unsigned)
-- CD workflow to simulate deploys and post Discord notifications
+---
 
-License / visibility
---------------------
-This repository currently does not include an open-source license. Copyright remains with the author (Gabriella Frank Ferm). If you'd like permission to reuse or contribute, please contact the author first.
+## Screenshots
 
-Contributing
-------------
-- Read docs/BRANCHING.md before opening PRs.
-- Run tests and format locally before creating a PR.
-- Open small PRs with clear titles and testing steps.
+> Coming soon — check `docs/assets/` for wireframes
 
-Contact
--------
-Author: Gabriella Frank Ferm gabbzf@gmail.com
+---
 
-Acknowledgements
-----------------
-- Built with .NET MAUI and community packages. See docs for more details.
+## Getting Started (Developers)
+
+### Prerequisites
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- Visual Studio 2022/2023 with .NET MAUI workload
+- Android emulator or iOS simulator
+
+### Quick Start
+```bash
+# Clone the repo
+git clone https://github.com/GabbyFerm/StitchTrack.git
+cd StitchTrack
+git checkout develop
+
+# Restore dependencies
+dotnet restore
+
+# Build the solution
+dotnet build -c Release
+
+# Run tests
+dotnet test
+
+# Format code (optional)
+dotnet format
+```
+
+### Run the app
+**Android (Visual Studio):**
+1. Open `StitchTrack.sln`
+2. Select Android emulator as target
+3. Press F5 to run
+
+**iOS (Mac only):**
+1. Open `StitchTrack.sln`
+2. Select iOS simulator as target
+3. Press F5 to run
+
+---
+
+## Architecture
+
+StitchTrack follows **Clean Architecture** principles:
+
+```
+StitchTrack/
+├── src/
+│   ├── StitchTrack.Domain/        # Core entities, business rules
+│   ├── StitchTrack.Application/   # ViewModels, commands, use cases
+│   ├── StitchTrack.Infrastructure/# Database, repositories, sync services
+│   └── StitchTrack.MAUI/          # UI, views, platform-specific code
+└── tests/
+    ├── StitchTrack.Domain.Tests/
+    ├── StitchTrack.Application.Tests/
+    └── StitchTrack.IntegrationTests/
+```
+
+**Key Technologies:**
+- .NET MAUI (UI framework)
+- SQLite + EF Core (local database)
+- MVVM pattern (ViewModels + data binding)
+- NUnit + FluentAssertions (testing)
+
+---
+
+## Development Workflow
+
+### Branching Strategy
+- `main` — production releases only
+- `develop` — active development (default PR target)
+- `feature/*` — short-lived feature branches
+- `bugfix/*` — bug fixes
+
+See [BRANCHING.md](docs/BRANCHING.md) for detailed workflow.
+
+### CI/CD
+GitHub Actions automatically:
+- ✅ Runs tests on all PRs
+- ✅ Enforces code formatting (`.editorconfig`)
+- ✅ Builds Android/iOS packages (on `develop` and `main`)
+- 🔔 Posts Discord notifications on deploy (optional)
+
+---
+
+## Data & Privacy
+
+### Where is my data stored?
+- **Phase 1:** All data stored locally in SQLite on your device
+- **Phase 2+:** Optional sync to **your own cloud** (iCloud, Google Drive, Dropbox)
+
+### Do you collect my data?
+**No.** StitchTrack does not:
+- ❌ Require an account
+- ❌ Send data to our servers (we don't have any!)
+- ❌ Track your usage
+- ❌ Sell your data
+
+Your knitting projects are **yours**. We just help you count rows.
+
+### Can I export my data?
+**Yes!** You can export all projects as:
+- JSON (full backup)
+- CSV (for spreadsheets)
+
+Export is available in Settings → Data Management → Export All Projects.
+
+---
+
+## Roadmap & Status
+
+| Phase | Status | Features | Target |
+|-------|--------|----------|--------|
+| Phase 1 | ✅ Complete | Quick counter, projects, local storage | Jan 2025 |
+| Phase 2 | 🚧 In Progress | Photos, notes, sessions | Mar 2025 |
+| Phase 3 | 📅 Planned | Cloud sync (iCloud/Drive) | Jun 2025 |
+| Phase 4 | 📅 Planned | Polish, app store release | Sep 2025 |
+
+---
+
+## Contributing
+
+We're not accepting external contributions yet, but you can:
+- 🐛 Report bugs via [GitHub Issues](https://github.com/GabbyFerm/StitchTrack/issues)
+- 💡 Suggest features (use "Feature Request" template)
+- ⭐ Star the repo if you find it useful!
+
+If you want to contribute code, please reach out first: gabbzf@gmail.com
+
+---
+
+## License
+
+This project is currently **unlicensed** — all rights reserved by Gabriella Frank Ferm. If you'd like to use or fork this code, please contact the author for permission.
+
+---
+
+## Contact & Support
+
+**Author:** Gabriella Frank Ferm  
+**Email:** gabbzf@gmail.com  
+**GitHub:** [@GabbyFerm](https://github.com/GabbyFerm)
+
+---
+
+## Acknowledgments
+
+Built with:
+- [.NET MAUI](https://dotnet.microsoft.com/apps/maui) — Microsoft's cross-platform framework
+- [SQLite](https://www.sqlite.org/) — Lightweight local database
+- [Entity Framework Core](https://docs.microsoft.com/ef/core/) — ORM for database access
+- [NUnit](https://nunit.org/) + [FluentAssertions](https://fluentassertions.com/) — Testing frameworks
+
+Special thanks to the .NET community for excellent documentation and support! 🎉
