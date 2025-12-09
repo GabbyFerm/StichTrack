@@ -4,7 +4,9 @@ using StitchTrack.Domain.Entities;
 
 namespace StitchTrack.Infrastructure.Data.Configurations;
 
-// Configures the Project entity mapping to database table
+/// <summary>
+/// Configures the Project entity mapping to database table
+/// </summary>
 public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 {
     public void Configure(EntityTypeBuilder<Project> builder)
@@ -31,7 +33,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasMaxLength(9);
 
         builder.Property(p => p.Notes)
-            .HasMaxLength(4000); // nvarchar(max) equivalent
+            .HasMaxLength(4000);
 
         builder.Property(p => p.ImagePath)
             .HasMaxLength(512);
@@ -46,6 +48,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(p => p.UpdatedAt)
             .IsRequired();
 
+        // 🆕 Cloud sync fields (Phase 3)
         builder.Property(p => p.LastSyncedAt);
 
         builder.Property(p => p.CloudFileId)
@@ -55,17 +58,17 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .IsRequired()
             .HasDefaultValue(0);
 
-        // Foreign key to User (nullable for guest mode)
+        // Foreign key to User 
         builder.HasOne(p => p.User)
             .WithMany(u => u.Projects)
             .HasForeignKey(p => p.UserId)
-            .OnDelete(DeleteBehavior.SetNull); // If user deleted, keep projects
+            .OnDelete(DeleteBehavior.SetNull);
 
         // Relationships - one-to-many
         builder.HasMany(p => p.CounterHistoryEntries)
             .WithOne(ch => ch.Project)
             .HasForeignKey(ch => ch.ProjectId)
-            .OnDelete(DeleteBehavior.Cascade); // Delete history with project
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(p => p.Sessions)
             .WithOne(s => s.Project)
@@ -92,5 +95,4 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.HasIndex(p => p.UpdatedAt);
         builder.HasIndex(p => p.IsArchived);
     }
-
 }

@@ -26,10 +26,15 @@ public static class MauiProgram
                 fonts.AddFont("Montserrat-Bold.ttf", "MontserratBold");
             });
 
+        // Register database context
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(DatabaseConfig.ConnectionString));
 
-        builder.Services.AddTransient<GuestCounterViewModel>();
+        // Register repositories
+
+
+        // Register ViewModels
+        builder.Services.AddTransient<QuickCounterViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

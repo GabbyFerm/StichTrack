@@ -2,7 +2,6 @@ namespace StitchTrack.Domain.Entities;
 
 /// <summary>
 /// Represents a registered user with authentication credentials.
-/// Phase 3 feature - not used in Phase 1 (guest mode).
 /// </summary>
 public class User
 {

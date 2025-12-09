@@ -68,10 +68,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\QuickCounterPage.xaml.cs">
+	    <DependentUpon>QuickCounterPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiXaml Update="Views\ExportPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\GuestCounterPage.xaml">
+	  <MauiXaml Update="Views\QuickCounterPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\ProjectsPage.xaml">

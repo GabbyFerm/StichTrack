@@ -8,17 +8,66 @@ using StitchTrack.Infrastructure.Data;
 
 #nullable disable
 
-namespace StitchTrack.Infrastructure.Data.Migrations
+namespace StitchTrack.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251120104709_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251209172832_AddSyncFieldsAndAppSettings")]
+    partial class AddSyncFieldsAndAppSettings
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
+
+            modelBuilder.Entity("StitchTrack.Domain.Entities.AppSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FirstRunCompletedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("HapticFeedbackEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsFirstRun")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSuccessfulSync")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProjectCreationCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SyncEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SyncProvider")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Theme")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppSettings", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
+                            HapticFeedbackEnabled = true,
+                            IsFirstRun = true,
+                            ProjectCreationCount = 0,
+                            SyncEnabled = false,
+                            Theme = "Auto"
+                        });
+                });
 
             modelBuilder.Entity("StitchTrack.Domain.Entities.CounterHistory", b =>
                 {
@@ -90,6 +139,10 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CloudFileId")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ColorHex")
                         .HasMaxLength(9)
                         .HasColumnType("TEXT");
@@ -113,6 +166,9 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                     b.Property<bool>("IsArchived")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -124,6 +180,11 @@ namespace StitchTrack.Infrastructure.Data.Migrations
 
                     b.Property<int?>("RowsPerRepeat")
                         .HasColumnType("INTEGER");
+
+                    b.Property<int>("SyncVersion")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.Property<int?>("TotalRows")
                         .HasColumnType("INTEGER");
