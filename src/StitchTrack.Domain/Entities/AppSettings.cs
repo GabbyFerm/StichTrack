@@ -13,7 +13,7 @@ public class AppSettings
 
     public string Theme { get; private set; } = "Auto";
     public bool HapticFeedbackEnabled { get; private set; } = true;
-    public int ProjectCreationCount { get; private set; } = 0;
+    public int ProjectCreationCount { get; private set; }
 
     private AppSettings() { }
 
