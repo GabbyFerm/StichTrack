@@ -46,6 +46,15 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(p => p.UpdatedAt)
             .IsRequired();
 
+        builder.Property(p => p.LastSyncedAt);
+
+        builder.Property(p => p.CloudFileId)
+            .HasMaxLength(255);
+
+        builder.Property(p => p.SyncVersion)
+            .IsRequired()
+            .HasDefaultValue(0);
+
         // Foreign key to User (nullable for guest mode)
         builder.HasOne(p => p.User)
             .WithMany(u => u.Projects)

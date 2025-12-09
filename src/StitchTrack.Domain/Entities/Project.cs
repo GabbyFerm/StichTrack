@@ -24,6 +24,11 @@ public class Project
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
+    // Cloud sync fields (nullable for local-only projects)
+    public DateTime? LastSyncedAt { get; private set; }
+    public string? CloudFileId { get; private set; } // iCloud/Drive file ID
+    public int SyncVersion { get; private set; } // increment on each change
+
     public ICollection<Session> Sessions { get; private set; } = new List<Session>();
     public ICollection<CounterHistory> CounterHistoryEntries { get; private set; } = new List<CounterHistory>();
     public ICollection<RowNote> RowNotes { get; private set; } = new List<RowNote>();
@@ -135,5 +140,17 @@ public class Project
         ImagePath = imagePath;
         ImageUrl = imageUrl;
         UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void MarkAsSynced(string cloudFileId)
+    {
+        if (string.IsNullOrWhiteSpace(cloudFileId))
+        {
+            throw new ArgumentException("Cloud file ID cannot be empty", nameof(cloudFileId));
+        }
+
+        CloudFileId = cloudFileId;
+        LastSyncedAt = DateTime.UtcNow;
+        SyncVersion++;
     }
 }
