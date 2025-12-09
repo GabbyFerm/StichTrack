@@ -5,15 +5,15 @@ using StitchTrack.Application.ViewModels;
 namespace StitchTrack.Application.Tests.ViewModels;
 
 [TestFixture]
-public class GuestCounterViewModelTests
+public class QuickCounterViewModelTests
 {
-    private GuestCounterViewModel _viewModel;
+    private QuickCounterViewModel _viewModel;
 
     [SetUp]
     public void Setup()
     {
         // Create fresh ViewModel before each test
-        _viewModel = new GuestCounterViewModel();
+        _viewModel = new QuickCounterViewModel();
     }
 
     [Test]

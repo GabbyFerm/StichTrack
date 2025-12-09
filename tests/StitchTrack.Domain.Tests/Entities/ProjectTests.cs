@@ -7,7 +7,7 @@ namespace StitchTrack.Domain.Tests.Entities;
 public class ProjectTests
 {
     [Test]
-    public void Create_ShouldGenerateNewGuid_ForGuestProject()
+    public void Create_ShouldGenerateNewGuid_ForNewProject()
     {
         // Arrange & Act
         var project = Project.CreateProject("Test Socks");

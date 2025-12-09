@@ -27,7 +27,7 @@
     <ShellContent
       Title="Counter"
       Icon="counter_icon.png"
-      ContentTemplate="{DataTemplate local:GuestCounterPage}"
+      ContentTemplate="{DataTemplate local:QuickCounterPage}"
       Route="Counter" />
 
     <ShellContent

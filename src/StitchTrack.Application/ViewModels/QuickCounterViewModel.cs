@@ -6,10 +6,11 @@ using StitchTrack.Domain.Entities;
 
 namespace StitchTrack.Application.ViewModels;
 
-/// ViewModel for guest mode counter - no login required, in-memory only.
+/// <summary>
+/// ViewModel for Quick Counter - temporary counting that can be saved to a project.
 /// Wraps a Project entity to provide UI-friendly commands and property notifications.
-
-public class GuestCounterViewModel : INotifyPropertyChanged
+/// </summary>
+public class QuickCounterViewModel : INotifyPropertyChanged
 {
     private readonly Project _project;
 
@@ -31,10 +32,10 @@ public class GuestCounterViewModel : INotifyPropertyChanged
     // Command to reset counter to zero
     public ICommand ResetCommand { get; }
 
-    public GuestCounterViewModel()
+    public QuickCounterViewModel()
     {
-        // Create in-memory project (not saved to database)
-        _project = Project.CreateProject("Guest Counter");
+        // Create in-memory project (not saved to database yet)
+        _project = Project.CreateProject("Quick Counter");
 
         // Initialize commands with actions
         IncrementCommand = new RelayCommand(OnIncrement);
