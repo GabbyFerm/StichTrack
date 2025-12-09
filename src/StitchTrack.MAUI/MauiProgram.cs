@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StitchTrack.Application.ViewModels;
+using StitchTrack.Domain.Interfaces;
 using StitchTrack.Infrastructure.Data;
+using StitchTrack.Infrastructure.Repositories;
 using StitchTrack.MAUI.Data;
 
 namespace StitchTrack.MAUI;
@@ -31,7 +33,7 @@ public static class MauiProgram
             options.UseSqlite(DatabaseConfig.ConnectionString));
 
         // Register repositories
-
+        builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
 
         // Register ViewModels
         builder.Services.AddTransient<QuickCounterViewModel>();
