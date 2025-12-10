@@ -119,6 +119,7 @@
 
             <!-- Save to Project Button (Issue #12) -->
             <Button Text="💾 Save to Project"
+                    Command="{Binding SaveToProjectCommand}"
                     BackgroundColor="Transparent"
                     TextColor="#FE64A3"
                     BorderColor="#FE64A3"
@@ -127,8 +128,7 @@
                     FontSize="16"
                     CornerRadius="10"
                     Margin="0,10,0,0"
-                    IsEnabled="False"
-                    Opacity="0.5" />
+                    IsEnabled="{Binding CanSave}" />
 
             <Label Text="(Coming soon - Issue #12)"
                    FontSize="10"

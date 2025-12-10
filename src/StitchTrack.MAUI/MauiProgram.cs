@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.ViewModels;
 using StitchTrack.Domain.Interfaces;
 using StitchTrack.Infrastructure.Data;
 using StitchTrack.Infrastructure.Repositories;
 using StitchTrack.MAUI.Data;
+using StitchTrack.MAUI.Services;
 using StitchTrack.MAUI.Views;
 
 namespace StitchTrack.MAUI;
@@ -35,6 +37,10 @@ public static class MauiProgram
 
         // Register repositories
         builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
+        builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+
+        // Register services
+        builder.Services.AddSingleton<IDialogService, MauiDialogService>();
 
         // Register ViewModels
         builder.Services.AddTransient<QuickCounterViewModel>();
