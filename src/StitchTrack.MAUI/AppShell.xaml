@@ -24,17 +24,19 @@
   </Shell.TitleView>
 
   <TabBar>
+    <!-- Quick Counter Tab -->
     <ShellContent
-      Title="Counter"
+      Title="Quick Counter"
       Icon="counter_icon.png"
       ContentTemplate="{DataTemplate local:QuickCounterPage}"
-      Route="Counter" />
+      Route="QuickCounterPage" />
 
+    <!-- Projects Tab -->
     <ShellContent
       Title="Projects"
       Icon="projects_icon.png"
       ContentTemplate="{DataTemplate local:ProjectsPage}"
-      Route="Projects" />
+      Route="ProjectsPage" />
 
     <ShellContent
       Title="Sessions"

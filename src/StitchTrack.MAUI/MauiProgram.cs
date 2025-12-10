@@ -44,6 +44,7 @@ public static class MauiProgram
 
         // Register ViewModels
         builder.Services.AddTransient<QuickCounterViewModel>();
+        builder.Services.AddTransient<ProjectsViewModel>();
 
         // Register Pages (for constructor injection)
         builder.Services.AddTransient<QuickCounterPage>();
