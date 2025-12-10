@@ -18,123 +18,143 @@
                            Padding="20,30,20,20"
                            Spacing="5">
         <Image Source="logo.svg"
-               HeightRequest="80"
-               HorizontalOptions="Center" />
+       HeightRequest="80"
+       HorizontalOptions="Center" />
         <Label Text="NEVER MISS A ROW"
-               FontSize="12"
-               FontFamily="MontserratMedium"
-               TextColor="#000"
-               HorizontalOptions="Center"
-               CharacterSpacing="8" />
+                   FontSize="12"
+                   FontFamily="MontserratMedium"
+                   TextColor="#000"
+                   HorizontalOptions="Center"
+                   CharacterSpacing="8" />
       </VerticalStackLayout>
 
       <!-- Counter Card with ScrollView -->
       <ScrollView Grid.Row="1">
         <Frame Margin="20,10,20,10"
-               Padding="20"
-               CornerRadius="15"
-               BackgroundColor="White"
-               HasShadow="True">
+           Padding="20"
+           CornerRadius="15"
+           BackgroundColor="White"
+           HasShadow="True">
 
           <VerticalStackLayout Spacing="10">
 
             <!-- Title -->
             <Label Text="Quick Row Counter"
-                   FontSize="20"
-                   FontAttributes="Bold"
-                   TextColor="#000"
-                   HorizontalOptions="Center" />
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="#000"
+                       HorizontalOptions="Center" />
 
-            <Label Text="Start counting immediately - save to project anytime!"
-                   FontSize="12"
-                   TextColor="#666"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,10" />
+            <Label Text="No login required - perfect for quick counting!"
+                       FontSize="12"
+                       TextColor="#000"
+                       HorizontalOptions="Center"
+                       Margin="0,0,0,10" />
 
             <!-- Current Row Display with grey background -->
             <Frame BackgroundColor="#F1F1F1"
-                   CornerRadius="10"
-                   Padding="10,5"
-                   HasShadow="False"
-                   BorderColor="Transparent">
+               CornerRadius="10"
+               Padding="10,5"
+               HasShadow="False"
+               BorderColor="Transparent">
               <VerticalStackLayout Spacing="0">
                 <Label Text="Current Row"
-                       FontSize="14"
-                       TextColor="#000"
-                       HorizontalOptions="Center"
-                       Margin="0,10,0,0" />
+                      FontSize="14"
+                      TextColor="#000"
+                      HorizontalOptions="Center"
+                      Margin="0,10,0,0" />
 
                 <!-- The actual counter number -->
                 <Label Text="{Binding CurrentCount}"
-                       FontSize="90"
-                       FontFamily="MontserratExtraBold"
-                       TextColor="#424B54"
-                       HorizontalOptions="Center"
-                       LineHeight="0.8"
-                       Margin="0,-5,0,-5" />
+                     FontSize="90"
+                     FontFamily="MontserratExtraBold"
+                     TextColor="#424B54"
+                     HorizontalOptions="Center"
+                     LineHeight="0.8"
+                     Margin="0,-5,0,-5" />
               </VerticalStackLayout>
             </Frame>
 
             <!-- Buttons -->
             <Grid ColumnDefinitions="*,*" 
-                  ColumnSpacing="15"
-                  Margin="0,15,0,0">
+                      ColumnSpacing="15"
+                      Margin="0,15,0,0">
 
               <!-- Decrement Button -->
               <Button Grid.Column="0"
-                      Text="- DECREASE"
-                      Command="{Binding DecrementCommand}"
-                      BackgroundColor="#424B54"
-                      TextColor="White"
-                      FontAttributes="Bold"
-                      HeightRequest="50"
-                      CornerRadius="10" />
+                            Text="- DECREASE"
+                            Command="{Binding DecrementCommand}"
+                            BackgroundColor="#424B54"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="10" />
 
               <!-- Increment Button -->
               <Button Grid.Column="1"
-                      Text="+ INCREASE"
-                      Command="{Binding IncrementCommand}"
-                      BackgroundColor="#E1AD37"
-                      TextColor="White"
-                      FontAttributes="Bold"
-                      HeightRequest="50"
-                      CornerRadius="10" />
+                            Text="+ INCREASE"
+                            Command="{Binding IncrementCommand}"
+                            BackgroundColor="#E1AD37"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="10" />
             </Grid>
 
             <!-- Reset Button -->
             <Button Text="↻ Reset Counter"
-                    Command="{Binding ResetCommand}"
-                    BackgroundColor="Transparent"
-                    TextColor="#424B54"
-                    FontAttributes="Bold"
-                    FontSize="14"
-                    Margin="0,10,0,0" />
-
-            <!-- Tip Text -->
-            <Label Text="💡 Tip: Tap 'Save to Project' below to keep this counter"
-                   FontSize="12"
-                   TextColor="#424B54"
-                   HorizontalOptions="Center"
-                   Margin="0,10,0,0" />
+                        Command="{Binding ResetCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#424B54"
+                        FontAttributes="Bold"
+                        FontSize="14"
+                        Margin="0,10,0,0" />
 
             <!-- Save to Project Button (Issue #12) -->
             <Button Text="💾 Save to Project"
-                    Command="{Binding SaveToProjectCommand}"
-                    BackgroundColor="Transparent"
-                    TextColor="#FE64A3"
-                    BorderColor="#FE64A3"
-                    BorderWidth="2"
-                    FontAttributes="Bold"
-                    FontSize="16"
-                    CornerRadius="10"
-                    Margin="0,10,0,0"
-                    IsEnabled="{Binding CanSave}" />
+                Command="{Binding SaveToProjectCommand}"
+                BackgroundColor="Transparent"
+                TextColor="#FE64A3"
+                BorderColor="#FE64A3"
+                BorderWidth="2"
+                FontFamily="MontserratSemiBold"
+                FontSize="16"
+                HeightRequest="50"
+                CornerRadius="10"
+                Margin="0,15,0,0" />
 
-            <Label Text="(Coming soon - Issue #12)"
-                   FontSize="10"
-                   TextColor="#999"
-                   HorizontalOptions="Center"
-                   Margin="0,5,0,0" />
+            <!-- Visual Hint (Issue #14) -->
+            <Frame x:Name="SaveHintFrame"
+               BackgroundColor="#FFF3E0"
+               BorderColor="#FE64A3"
+               CornerRadius="8"
+               Padding="12"
+               HasShadow="False"
+               Margin="0,10,0,0"
+               IsVisible="False">
+              <HorizontalStackLayout Spacing="8">
+                <Label Text="✨"
+                   FontSize="20"
+                   VerticalOptions="Center" />
+                <Label x:Name="SaveHintLabel"
+                   Text="Saved! Check the Projects tab to continue."
+                   FontFamily="MontserratMedium"
+                   FontSize="12"
+                   TextColor="#424B54"
+                   VerticalOptions="Center"
+                   LineBreakMode="WordWrap"
+                   HorizontalOptions="FillAndExpand" />
+              </HorizontalStackLayout>
+            </Frame>
+
+            <!-- Tip Text -->
+            <Label Text="💡 Tap 'Save to Project' to keep this counter permanently"
+                       FontSize="12"
+                       TextColor="#424B54"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,10,0,0"
+                       LineBreakMode="WordWrap" />
 
           </VerticalStackLayout>
         </Frame>
