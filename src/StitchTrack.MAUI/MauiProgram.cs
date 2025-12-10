@@ -48,6 +48,7 @@ public static class MauiProgram
 
         // Register Pages (for constructor injection)
         builder.Services.AddTransient<QuickCounterPage>();
+        builder.Services.AddTransient<ProjectsPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

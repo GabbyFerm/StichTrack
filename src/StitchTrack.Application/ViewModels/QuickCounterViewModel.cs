@@ -57,6 +57,9 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     public ICommand MaybeLaterCommand { get; }
     public ICommand SaveToProjectCommand { get; }
 
+    // Add this property to QuickCounterViewModel to fix CS1061
+    public Func<Task>? OnProjectSaved { get; set; }
+
     public QuickCounterViewModel(
         IAppSettingsRepository settingsRepository,
         IProjectRepository projectRepository,
@@ -222,6 +225,14 @@ public class QuickCounterViewModel : INotifyPropertyChanged
 
             // Navigate to Projects tab (Phase 1: just show message for now)
             System.Diagnostics.Debug.WriteLine("📱 TODO: Navigate to Projects tab");
+
+            // Notify that the project was saved
+            if (OnProjectSaved != null)
+            {
+                System.Diagnostics.Debug.WriteLine("▶️ Executing OnProjectSaved callback...");
+                await OnProjectSaved.Invoke().ConfigureAwait(false);
+                System.Diagnostics.Debug.WriteLine("✅ OnProjectSaved callback completed");
+            }
         }
         catch (InvalidOperationException ex)
         {
