@@ -1,6 +1,9 @@
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using StitchTrack.Application.ViewModels;
+using StitchTrack.Domain.Entities;
+using StitchTrack.Domain.Interfaces;
 
 namespace StitchTrack.Application.Tests.ViewModels;
 
@@ -8,12 +11,22 @@ namespace StitchTrack.Application.Tests.ViewModels;
 public class QuickCounterViewModelTests
 {
     private QuickCounterViewModel _viewModel;
+    private Mock<IAppSettingsRepository> _mockSettingsRepo;
 
     [SetUp]
     public void Setup()
     {
-        // Create fresh ViewModel before each test
-        _viewModel = new QuickCounterViewModel();
+        // Create mock repository
+        _mockSettingsRepo = new Mock<IAppSettingsRepository>();
+
+        // Setup default behavior: return default settings
+        var defaultSettings = AppSettings.CreateDefault();
+        _mockSettingsRepo
+            .Setup(x => x.GetAppSettingsAsync())
+            .ReturnsAsync(defaultSettings);
+
+        // Create ViewModel with mocked repository
+        _viewModel = new QuickCounterViewModel(_mockSettingsRepo.Object);
     }
 
     [Test]
@@ -103,5 +116,66 @@ public class QuickCounterViewModelTests
 
         // Assert - ensures UI updates
         propertyChangedRaised.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task ShowOnboarding_WhenFirstRun_ShouldBeTrue()
+    {
+        // Arrange
+        var settings = AppSettings.CreateDefault();
+        _mockSettingsRepo
+            .Setup(x => x.GetAppSettingsAsync())
+            .ReturnsAsync(settings);
+
+        // Act
+        var viewModel = new QuickCounterViewModel(_mockSettingsRepo.Object);
+
+        // Wait a bit for async initialization
+        await Task.Delay(100).ConfigureAwait(false);
+
+        // Assert
+        viewModel.ShowOnboarding.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task ShowOnboarding_WhenNotFirstRun_ShouldBeFalse()
+    {
+        // Arrange
+        var settings = AppSettings.CreateDefault();
+        settings.CompleteFirstRun();
+
+        _mockSettingsRepo
+            .Setup(x => x.GetAppSettingsAsync())
+            .ReturnsAsync(settings);
+
+        // Act
+        var viewModel = new QuickCounterViewModel(_mockSettingsRepo.Object);
+
+        // Wait for async initialization
+        await Task.Delay(100).ConfigureAwait(false);
+
+        // Assert
+        viewModel.ShowOnboarding.Should().BeFalse();
+    }
+
+    [Test]
+    public async Task GetStartedCommand_ShouldHideOnboarding()
+    {
+        // Arrange
+        var settings = AppSettings.CreateDefault();
+        _mockSettingsRepo
+            .Setup(x => x.GetAppSettingsAsync())
+            .ReturnsAsync(settings);
+
+        var viewModel = new QuickCounterViewModel(_mockSettingsRepo.Object);
+        await Task.Delay(100).ConfigureAwait(false); // Wait for initialization
+
+        // Act
+        viewModel.GetStartedCommand.Execute(null);
+        await Task.Delay(100).ConfigureAwait(false); // Wait for async command
+
+        // Assert
+        viewModel.ShowOnboarding.Should().BeFalse();
+        _mockSettingsRepo.Verify(x => x.SaveAppSettingsAsync(It.IsAny<AppSettings>()), Times.Once);
     }
 }

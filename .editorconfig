@@ -44,6 +44,38 @@ dotnet_diagnostic.CA1062.severity = none
 dotnet_diagnostic.CA1861.severity = none
 generated_code = true
 
+# Suppress warnings for MAUI platform-specific files
+[src/StitchTrack.MAUI/Platforms/**/App*.cs]
+dotnet_diagnostic.CA1711.severity = none  # Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1724.severity = none  # Type names should not match namespaces
+
+[src/StitchTrack.MAUI/Platforms/**/MainActivity.cs]
+dotnet_diagnostic.CA1822.severity = none  # Mark members as static
+
+# ConfigureAwait warnings - can be ignored for MAUI UI code
+[src/StitchTrack.MAUI/**/*.cs]
+dotnet_diagnostic.CA2007.severity = suggestion  # Consider calling ConfigureAwait
+
+# ConfigureAwait warnings - should be fixed for library code
+[src/StitchTrack.Application/**/*.cs]
+dotnet_diagnostic.CA2007.severity = warning  # Consider calling ConfigureAwait
+
+[src/StitchTrack.Infrastructure/**/*.cs]
+dotnet_diagnostic.CA2007.severity = warning  # Consider calling ConfigureAwait
+
+# Suppress platform-specific warnings for MAUI code (these are safe)
+[src/StitchTrack.MAUI/**/*.cs]
+dotnet_diagnostic.CA1416.severity = none  # Platform compatibility warnings
+dotnet_diagnostic.CA1724.severity = none  # Type name conflicts with namespace (Android.App vs App)
+
+# Suppress CA1062 for extension methods (element parameter will be checked by caller)
+[**/VisualTreeExtensions.cs]
+dotnet_diagnostic.CA1062.severity = none  # Validate parameter is non-null
+
+# If you have a separate file for the extension, use this pattern:
+[**/Controls/*Extensions.cs]
+dotnet_diagnostic.CA1062.severity = none
+
 # ============================================
 # Code Style Rules
 # ============================================

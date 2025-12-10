@@ -5,6 +5,7 @@ using StitchTrack.Domain.Interfaces;
 using StitchTrack.Infrastructure.Data;
 using StitchTrack.Infrastructure.Repositories;
 using StitchTrack.MAUI.Data;
+using StitchTrack.MAUI.Views;
 
 namespace StitchTrack.MAUI;
 
@@ -37,6 +38,9 @@ public static class MauiProgram
 
         // Register ViewModels
         builder.Services.AddTransient<QuickCounterViewModel>();
+
+        // Register Pages (for constructor injection)
+        builder.Services.AddTransient<QuickCounterPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

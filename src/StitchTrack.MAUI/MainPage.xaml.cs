@@ -2,7 +2,7 @@ namespace StitchTrack.MAUI;
 
 public partial class MainPage : ContentPage
 {
-    int _count = 0;
+    int _count;
 
     public MainPage()
     {

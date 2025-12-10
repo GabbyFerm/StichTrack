@@ -42,25 +42,21 @@ public partial class App : Microsoft.Maui.Controls.Application
         }
         catch (DbUpdateException dbEx)
         {
-            // Database-specific errors
+            // Database-specific errors (CA1031: Catch specific exception)
             System.Diagnostics.Debug.WriteLine($"❌ DATABASE UPDATE ERROR: {dbEx.Message}");
             System.Diagnostics.Debug.WriteLine($"Stack Trace: {dbEx.StackTrace}");
             if (dbEx.InnerException != null)
             {
                 System.Diagnostics.Debug.WriteLine($"Inner Exception: {dbEx.InnerException.Message}");
             }
+            throw; // Re-throw to prevent app from running with broken database
         }
         catch (InvalidOperationException ioEx)
         {
-            // Configuration errors
+            // Configuration errors (CA1031: Catch specific exception)
             System.Diagnostics.Debug.WriteLine($"❌ CONFIGURATION ERROR: {ioEx.Message}");
             System.Diagnostics.Debug.WriteLine($"Stack Trace: {ioEx.StackTrace}");
-        }
-        catch (Exception ex)
-        {
-            // Catch-all for unexpected errors
-            System.Diagnostics.Debug.WriteLine($"❌ UNEXPECTED ERROR: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+            throw; // Re-throw to prevent app from running with broken database
         }
     }
 }
