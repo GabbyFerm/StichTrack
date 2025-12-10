@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using StitchTrack.Application.Commands;
+using StitchTrack.Application.Interfaces;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
 
@@ -15,6 +16,8 @@ public class QuickCounterViewModel : INotifyPropertyChanged
 {
     private readonly Project _project;
     private readonly IAppSettingsRepository _settingsRepository;
+    private readonly IProjectRepository _projectRepository;
+    private readonly IDialogService _dialogService;
     private readonly SynchronizationContext? _syncContext;
     private bool _showOnboarding;
 
@@ -42,6 +45,9 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     // Current row count displayed to user
     public int CurrentCount => _project.CurrentCount;
 
+    // Whether the Save button should be enabled
+    public bool CanSave => CurrentCount > 0;
+
     // Commands
     public ICommand IncrementCommand { get; }
     public ICommand DecrementCommand { get; }
@@ -49,10 +55,16 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     public ICommand GetStartedCommand { get; }
     public ICommand EnableSyncCommand { get; }
     public ICommand MaybeLaterCommand { get; }
+    public ICommand SaveToProjectCommand { get; }
 
-    public QuickCounterViewModel(IAppSettingsRepository settingsRepository)
+    public QuickCounterViewModel(
+        IAppSettingsRepository settingsRepository,
+        IProjectRepository projectRepository,
+        IDialogService dialogService)
     {
         _settingsRepository = settingsRepository ?? throw new ArgumentNullException(nameof(settingsRepository));
+        _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
+        _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
         // Capture the UI synchronization context for cross-thread updates
         _syncContext = SynchronizationContext.Current;
@@ -67,8 +79,12 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         GetStartedCommand = new RelayCommand(OnGetStarted);
         EnableSyncCommand = new RelayCommand(OnEnableSync);
         MaybeLaterCommand = new RelayCommand(OnMaybeLater);
+        SaveToProjectCommand = new RelayCommand(OnSaveToProject);
 
         System.Diagnostics.Debug.WriteLine("✅ QuickCounterViewModel created, commands initialized");
+
+        // Ensure initial CanSave state is propagated
+        UpdateOnUiThread(() => OnPropertyChanged(nameof(CanSave)));
 
         // Check if we should show onboarding
         _ = CheckAndShowOnboardingAsync();
@@ -105,6 +121,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         _project.IncrementCount();
         TriggerHapticFeedback?.Invoke();
         OnPropertyChanged(nameof(CurrentCount));
+        OnPropertyChanged(nameof(CanSave));
     }
 
     private void OnDecrement()
@@ -112,6 +129,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         _project.DecrementCount();
         TriggerHapticFeedback?.Invoke();
         OnPropertyChanged(nameof(CurrentCount));
+        OnPropertyChanged(nameof(CanSave));
     }
 
     private void OnReset()
@@ -119,6 +137,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         _project.ResetCount();
         TriggerHapticFeedback?.Invoke();
         OnPropertyChanged(nameof(CurrentCount));
+        OnPropertyChanged(nameof(CanSave));
     }
 
     private void OnGetStarted()
@@ -137,6 +156,117 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     {
         System.Diagnostics.Debug.WriteLine("⏭️ Maybe Later tapped");
         _ = CompleteOnboardingAsync();
+    }
+
+    private void OnSaveToProject()
+    {
+        System.Diagnostics.Debug.WriteLine("💾 Save to Project tapped");
+        _ = SaveToProjectAsync();
+    }
+
+    /// <summary>
+    /// Saves the current quick counter as a permanent project.
+    /// Shows a prompt for project name, validates input, and saves to database.
+    /// </summary>
+    private async Task SaveToProjectAsync()
+    {
+        try
+        {
+            // Show project name dialog
+            var projectName = await ShowProjectNameDialogAsync().ConfigureAwait(false);
+
+            // Validate name
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                System.Diagnostics.Debug.WriteLine("⚠️ Project save cancelled - no name provided");
+                return;
+            }
+
+            if (projectName.Length > 200)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Project name too long: {projectName.Length} chars");
+                await ShowAlertAsync("Name Too Long", "Project name must be 200 characters or less.").ConfigureAwait(false);
+                return;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"💾 Creating project: {projectName}");
+
+            // Create new project with current counter state
+            var newProject = Project.CreateProject(projectName.Trim());
+
+            // Transfer the current count
+            // Set the counter to match current count by incrementing
+            for (int i = 0; i < _project.CurrentCount; i++)
+            {
+                newProject.IncrementCount();
+            }
+
+            System.Diagnostics.Debug.WriteLine($"✅ Project created with count: {newProject.CurrentCount}");
+
+            // Save to database
+            await _projectRepository.AddAsync(newProject).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            System.Diagnostics.Debug.WriteLine($"✅ Project saved to database: {newProject.Id}");
+
+            // Show success message
+            await ShowToastAsync($"✅ Project '{projectName}' saved!").ConfigureAwait(false);
+
+            // Reset quick counter for next use
+            _project.ResetCount();
+            UpdateOnUiThread(() =>
+            {
+                OnPropertyChanged(nameof(CurrentCount));
+                OnPropertyChanged(nameof(CanSave));
+            });
+
+            // Navigate to Projects tab (Phase 1: just show message for now)
+            System.Diagnostics.Debug.WriteLine("📱 TODO: Navigate to Projects tab");
+        }
+        catch (InvalidOperationException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Database error saving project: {ex.Message}");
+            await ShowAlertAsync("Save Failed", "Could not save project. Please try again.").ConfigureAwait(false);
+        }
+        catch (ArgumentException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Validation error: {ex.Message}");
+            await ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Shows a dialog prompting the user to enter a project name.
+    /// Returns the entered name or empty string if cancelled.
+    /// </summary>
+    private async Task<string> ShowProjectNameDialogAsync()
+    {
+        var result = await _dialogService.ShowPromptAsync(
+            title: "Save to Project",
+            message: "Enter a name for this project:",
+            accept: "Save",
+            cancel: "Cancel",
+            placeholder: "My Knitting Project",
+            maxLength: 200
+        ).ConfigureAwait(false);
+
+        return result ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Shows an alert dialog with title and message.
+    /// </summary>
+    private async Task ShowAlertAsync(string title, string message)
+    {
+        await _dialogService.ShowAlertAsync(title, message).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Shows a brief toast message (simulated with DisplayAlert for Phase 1).
+    /// </summary>
+    private async Task ShowToastAsync(string message)
+    {
+        await _dialogService.ShowToastAsync(message).ConfigureAwait(false);
     }
 
     private async Task CompleteOnboardingAsync()

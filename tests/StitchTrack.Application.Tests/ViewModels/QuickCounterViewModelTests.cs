@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.ViewModels;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
@@ -12,12 +13,16 @@ public class QuickCounterViewModelTests
 {
     private QuickCounterViewModel _viewModel;
     private Mock<IAppSettingsRepository> _mockSettingsRepo;
+    private Mock<IProjectRepository> _mockProjectRepo;
+    private Mock<IDialogService> _mockDialogService;
 
     [SetUp]
     public void Setup()
     {
-        // Create mock repository
+        // Create mock repositories and services
         _mockSettingsRepo = new Mock<IAppSettingsRepository>();
+        _mockProjectRepo = new Mock<IProjectRepository>();
+        _mockDialogService = new Mock<IDialogService>();
 
         // Setup default behavior: return default settings
         var defaultSettings = AppSettings.CreateDefault();
@@ -25,8 +30,11 @@ public class QuickCounterViewModelTests
             .Setup(x => x.GetAppSettingsAsync())
             .ReturnsAsync(defaultSettings);
 
-        // Create ViewModel with mocked repository
-        _viewModel = new QuickCounterViewModel(_mockSettingsRepo.Object);
+        // Create ViewModel with mocked dependencies
+        _viewModel = new QuickCounterViewModel(
+            _mockSettingsRepo.Object,
+            _mockProjectRepo.Object,
+            _mockDialogService.Object);
     }
 
     [Test]
@@ -123,12 +131,15 @@ public class QuickCounterViewModelTests
     {
         // Arrange
         var settings = AppSettings.CreateDefault();
-        _mockSettingsRepo
+        var mockSettings = new Mock<IAppSettingsRepository>();
+        var mockProject = new Mock<IProjectRepository>();
+        var mockDialog = new Mock<IDialogService>();
+        mockSettings
             .Setup(x => x.GetAppSettingsAsync())
             .ReturnsAsync(settings);
 
         // Act
-        var viewModel = new QuickCounterViewModel(_mockSettingsRepo.Object);
+        var viewModel = new QuickCounterViewModel(mockSettings.Object, mockProject.Object, mockDialog.Object);
 
         // Wait a bit for async initialization
         await Task.Delay(100).ConfigureAwait(false);
@@ -144,12 +155,15 @@ public class QuickCounterViewModelTests
         var settings = AppSettings.CreateDefault();
         settings.CompleteFirstRun();
 
-        _mockSettingsRepo
+        var mockSettings = new Mock<IAppSettingsRepository>();
+        var mockProject = new Mock<IProjectRepository>();
+        var mockDialog = new Mock<IDialogService>();
+        mockSettings
             .Setup(x => x.GetAppSettingsAsync())
             .ReturnsAsync(settings);
 
         // Act
-        var viewModel = new QuickCounterViewModel(_mockSettingsRepo.Object);
+        var viewModel = new QuickCounterViewModel(mockSettings.Object, mockProject.Object, mockDialog.Object);
 
         // Wait for async initialization
         await Task.Delay(100).ConfigureAwait(false);
@@ -163,11 +177,14 @@ public class QuickCounterViewModelTests
     {
         // Arrange
         var settings = AppSettings.CreateDefault();
-        _mockSettingsRepo
+        var mockSettings = new Mock<IAppSettingsRepository>();
+        var mockProject = new Mock<IProjectRepository>();
+        var mockDialog = new Mock<IDialogService>();
+        mockSettings
             .Setup(x => x.GetAppSettingsAsync())
             .ReturnsAsync(settings);
 
-        var viewModel = new QuickCounterViewModel(_mockSettingsRepo.Object);
+        var viewModel = new QuickCounterViewModel(mockSettings.Object, mockProject.Object, mockDialog.Object);
         await Task.Delay(100).ConfigureAwait(false); // Wait for initialization
 
         // Act
@@ -176,6 +193,6 @@ public class QuickCounterViewModelTests
 
         // Assert
         viewModel.ShowOnboarding.Should().BeFalse();
-        _mockSettingsRepo.Verify(x => x.SaveAppSettingsAsync(It.IsAny<AppSettings>()), Times.Once);
+        mockSettings.Verify(x => x.SaveAppSettingsAsync(It.IsAny<AppSettings>()), Times.Once);
     }
 }
