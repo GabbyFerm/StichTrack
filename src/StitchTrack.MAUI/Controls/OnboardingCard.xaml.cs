@@ -1,4 +1,4 @@
-﻿namespace StitchTrack.MAUI.Controls;
+namespace StitchTrack.MAUI.Controls;
 
 /// <summary>
 /// Onboarding card shown on first app launch.
