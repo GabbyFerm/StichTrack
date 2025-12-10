@@ -1,4 +1,4 @@
-﻿namespace StitchTrack.Application.Interfaces;
+namespace StitchTrack.Application.Interfaces;
 
 /// <summary>
 /// Service interface for showing user dialogs and prompts.

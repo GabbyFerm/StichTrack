@@ -1,4 +1,4 @@
-﻿using StitchTrack.Application.Interfaces;
+using StitchTrack.Application.Interfaces;
 
 namespace StitchTrack.MAUI.Services;
 

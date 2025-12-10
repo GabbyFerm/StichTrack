@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
 using StitchTrack.Infrastructure.Data;

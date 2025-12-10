@@ -1,4 +1,4 @@
-﻿using StitchTrack.Domain.Entities;
+using StitchTrack.Domain.Entities;
 
 namespace StitchTrack.Domain.Interfaces;
 
