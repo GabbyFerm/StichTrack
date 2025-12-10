@@ -2,21 +2,27 @@ using StitchTrack.Application.ViewModels;
 
 namespace StitchTrack.MAUI.Views;
 
+/// <summary>
+/// Code-behind for QuickCounterPage.
+/// Uses constructor injection to get ViewModel from DI container.
+/// </summary>
 public partial class QuickCounterPage : ContentPage
 {
-    public QuickCounterPage()
+    public QuickCounterPage(QuickCounterViewModel viewModel)
     {
+        // Null validation required by CA1062
+        ArgumentNullException.ThrowIfNull(viewModel);
+
         InitializeComponent();
 
-        // Wire up haptic feedback to ViewModel
-        if (BindingContext is QuickCounterViewModel viewModel)
+        // Set ViewModel from DI container
+        BindingContext = viewModel;
+
+        // Wire up haptic feedback
+        viewModel.TriggerHapticFeedback = () =>
         {
-            viewModel.TriggerHapticFeedback = () =>
-            {
-                // Light haptic feedback for button press
-                // MAUI's HapticFeedback works on iOS and Android
-                HapticFeedback.Default.Perform(HapticFeedbackType.Click);
-            };
-        }
+            // Light haptic feedback for button press
+            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+        };
     }
 }
