@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui.Views;
 using StitchTrack.Application.ViewModels;
 
 namespace StitchTrack.MAUI.Views;
@@ -10,44 +11,63 @@ public partial class QuickCounterPage : ContentPage
 {
     public QuickCounterPage(QuickCounterViewModel viewModel)
     {
-        // Null validation required by CA1062
         ArgumentNullException.ThrowIfNull(viewModel);
 
         InitializeComponent();
 
-        // Set ViewModel from DI container
         BindingContext = viewModel;
 
-        // Wire up haptic feedback
-        viewModel.TriggerHapticFeedback = () =>
-        {
-            // Light haptic feedback for button press
-            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
-        };
+        viewModel.TriggerHapticFeedback = () => global::Microsoft.Maui.Devices.HapticFeedback.Default.Perform(global::Microsoft.Maui.Devices.HapticFeedbackType.Click);
 
-        // Wire up save hint display (Issue #14)
-        viewModel.OnProjectSaved = async () =>
-        {
-            await ShowSaveHintAsync();
-        };
+        viewModel.OnProjectSaved = async () => await ShowSaveHintAsync();
+
+        System.Diagnostics.Debug.WriteLine("✅ QuickCounterPage initialized with ViewModel");
     }
 
-    /// <summary>
-    /// Shows visual hint after saving project (Issue #14)
-    /// </summary>
     private async Task ShowSaveHintAsync()
     {
-        // Show hint
         SaveHintFrame.IsVisible = true;
-
-        // Animate in
         await SaveHintFrame.FadeTo(1, 300);
-
-        // Wait 4 seconds
         await Task.Delay(4000);
-
-        // Animate out
         await SaveHintFrame.FadeTo(0, 300);
         SaveHintFrame.IsVisible = false;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        _ = ShowOnboardingIfNeededAsync();
+    }
+
+    private async Task ShowOnboardingIfNeededAsync()
+    {
+        try
+        {
+            await Task.Delay(50).ConfigureAwait(false);
+
+            if (BindingContext is QuickCounterViewModel vm && vm.ShowOnboarding)
+            {
+                await global::Microsoft.Maui.ApplicationModel.MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    try
+                    {
+                        var popup = new StitchTrack.MAUI.Controls.OnboardingPopup
+                        {
+                            BindingContext = vm
+                        };
+                        // Use fully-qualified Application to avoid namespace collisions
+                        await global::Microsoft.Maui.Controls.Application.Current.MainPage.ShowPopupAsync(popup);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"ShowOnboardingIfNeededAsync.ShowPopup error: {ex}");
+                    }
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ShowOnboardingIfNeededAsync error: {ex}");
+        }
     }
 }

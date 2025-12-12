@@ -3,176 +3,200 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:StitchTrack.MAUI.Controls"
              x:Class="StitchTrack.MAUI.Views.QuickCounterPage"
-             BackgroundColor="#E8E8E8"
+             BackgroundColor="{DynamicResource PageBackground}"
              Shell.NavBarIsVisible="False">
 
-  <!-- BindingContext set in code-behind via constructor injection -->
+  <!-- Golden background visible as padding around content -->
+  <Grid RowDefinitions="Auto,*"
+        Padding="0,0,0,0">
 
-  <Grid>
+    <VerticalStackLayout Grid.Row="0"
+                         BackgroundColor="{StaticResource StitchGold}"
+                         Padding="20,40,20,20"
+                         Spacing="8">
 
-    <!-- Main Content -->
-    <Grid RowDefinitions="Auto,*,Auto">
+      <!-- Logo -->
+      <Image Source="logowhite.svg"
+             HeightRequest="35"
+             HorizontalOptions="Start"
+             Aspect="AspectFit" />
 
-      <!-- Header with Logo -->
-      <VerticalStackLayout Grid.Row="0" 
-                           Padding="20,30,20,20"
-                           Spacing="5">
-        <Image Source="logo.svg"
-       HeightRequest="80"
-       HorizontalOptions="Center" />
-        <Label Text="NEVER MISS A ROW"
-                   FontSize="12"
-                   FontFamily="MontserratMedium"
-                   TextColor="#000"
-                   HorizontalOptions="Center"
-                   CharacterSpacing="8" />
-      </VerticalStackLayout>
+      <!-- Page Title -->
+      <Label Text="QUICK ROW COUNTER"
+             FontFamily="MontserratBold"
+             FontSize="20"
+             TextColor="White"
+             HorizontalOptions="Center"
+             Margin="0,10,0,0" />
 
-      <!-- Counter Card with ScrollView -->
-      <ScrollView Grid.Row="1">
-        <Frame Margin="20,10,20,10"
-           Padding="20"
-           CornerRadius="15"
-           BackgroundColor="White"
-           HasShadow="True">
+    </VerticalStackLayout>
 
-          <VerticalStackLayout Spacing="10">
+    <!-- Add x:Name so code-behind can access the Border's handler/platform view -->
+    <Border x:Name="MainContentCard"
+            Grid.Row="1"
+            BackgroundColor="{DynamicResource CardBackground}"
+            StrokeThickness="0"
+            Margin="0,0,0,10"
+            Padding="0">
+      <!-- ALL corners rounded -->
+      <Border.StrokeShape>
+        <RoundRectangle CornerRadius="15" />
+      </Border.StrokeShape>
 
-            <!-- Title -->
-            <Label Text="Quick Row Counter"
-                       FontSize="20"
-                       FontAttributes="Bold"
-                       TextColor="#000"
-                       HorizontalOptions="Center" />
+      <!-- Proper shadow all around (keep it; we will raise native Z) -->
+      <Border.Shadow>
+        <Shadow Brush="#000"
+                Opacity="0.50"
+                Radius="35"
+                Offset="0,10" />
+      </Border.Shadow>
 
-            <Label Text="No login required - perfect for quick counting!"
-                       FontSize="12"
-                       TextColor="#000"
-                       HorizontalOptions="Center"
-                       Margin="0,0,0,10" />
+      <ScrollView>
+        <VerticalStackLayout Spacing="15"
+                             Padding="20,25,20,90">
 
-            <!-- Current Row Display with grey background -->
-            <Frame BackgroundColor="#F1F1F1"
-               CornerRadius="10"
-               Padding="10,5"
-               HasShadow="False"
-               BorderColor="Transparent">
-              <VerticalStackLayout Spacing="0">
-                <Label Text="Current Row"
-                      FontSize="14"
-                      TextColor="#000"
-                      HorizontalOptions="Center"
-                      Margin="0,10,0,0" />
+          <Grid ColumnDefinitions="*,Auto"
+                ColumnSpacing="10">
 
-                <!-- The actual counter number -->
-                <Label Text="{Binding CurrentCount}"
-                     FontSize="90"
-                     FontFamily="MontserratExtraBold"
-                     TextColor="#424B54"
-                     HorizontalOptions="Center"
-                     LineHeight="0.8"
-                     Margin="0,-5,0,-5" />
-              </VerticalStackLayout>
-            </Frame>
+            <!-- Session Timer -->
+            <HorizontalStackLayout Grid.Column="0"
+                                  Spacing="8"
+                                  VerticalOptions="Center">
+              <Label Text="⏱️"
+                     FontSize="18" />
+              <Label Text="SESSION: "
+                     FontFamily="MontserratBold"
+                     FontSize="12"
+                     TextColor="{StaticResource StitchGold}"
+                     VerticalOptions="Center" />
+              <Label Text="1h 23m"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="12"
+                     TextColor="{StaticResource StitchGold}"
+                     VerticalOptions="Center" />
+            </HorizontalStackLayout>
 
-            <!-- Buttons -->
-            <Grid ColumnDefinitions="*,*" 
-                      ColumnSpacing="15"
-                      Margin="0,15,0,0">
+            <!-- Pause Button -->
+            <Button Grid.Column="1"
+                    Text="⏸️ PAUSE"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource StitchGold}"
+                    BorderColor="{StaticResource StitchGold}"
+                    BorderWidth="1"
+                    FontFamily="MontserratBold"
+                    FontSize="11"
+                    CornerRadius="6"
+                    Padding="12,6"
+                    HeightRequest="35" />
+          </Grid>
 
-              <!-- Decrement Button -->
-              <Button Grid.Column="0"
-                            Text="- DECREASE"
-                            Command="{Binding DecrementCommand}"
-                            BackgroundColor="#424B54"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            HeightRequest="50"
-                            CornerRadius="10" />
+          <Frame BackgroundColor="{StaticResource CounterBackground}"
+                 CornerRadius="12"
+                 HasShadow="False"
+                 Padding="20,25"
+                 BorderColor="Transparent">
+            <VerticalStackLayout Spacing="5">
 
-              <!-- Increment Button -->
-              <Button Grid.Column="1"
-                            Text="+ INCREASE"
-                            Command="{Binding IncrementCommand}"
-                            BackgroundColor="#E1AD37"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            HeightRequest="50"
-                            CornerRadius="10" />
-            </Grid>
+              <Label Text="Current Row"
+                     FontFamily="MontserratMedium"
+                     FontSize="14"
+                     TextColor="{StaticResource TextSecondary}"
+                     HorizontalOptions="Center" />
 
-            <!-- Reset Button -->
-            <Button Text="↻ Reset Counter"
-                        Command="{Binding ResetCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="#424B54"
-                        FontAttributes="Bold"
-                        FontSize="14"
-                        Margin="0,10,0,0" />
+              <Label Text="{Binding CurrentCount}"
+                     Style="{StaticResource CounterLabel}"
+                     Margin="0,5" />
 
-            <!-- Save to Project Button (Issue #12) -->
-            <Button Text="💾 Save to Project"
-                Command="{Binding SaveToProjectCommand}"
-                BackgroundColor="Transparent"
-                TextColor="#FE64A3"
-                BorderColor="#FE64A3"
-                BorderWidth="2"
-                FontFamily="MontserratSemiBold"
-                FontSize="16"
-                HeightRequest="50"
-                CornerRadius="10"
-                Margin="0,15,0,0" />
+            </VerticalStackLayout>
+          </Frame>
 
-            <!-- Visual Hint (Issue #14) -->
-            <Frame x:Name="SaveHintFrame"
-               BackgroundColor="#FFF3E0"
-               BorderColor="#FE64A3"
-               CornerRadius="8"
-               Padding="12"
-               HasShadow="False"
-               Margin="0,10,0,0"
-               IsVisible="False">
-              <HorizontalStackLayout Spacing="8">
-                <Label Text="✨"
-                   FontSize="20"
+          <Grid ColumnDefinitions="*,*"
+                ColumnSpacing="15"
+                Margin="0,10,0,0">
+
+            <!-- Decrease Button -->
+            <Button Grid.Column="0"
+                    Style="{StaticResource DecreaseButton}"
+                    Command="{Binding DecrementCommand}" />
+
+            <!-- Increase Button -->
+            <Button Grid.Column="1"
+                    Style="{StaticResource IncreaseButton}"
+                    Command="{Binding IncrementCommand}" />
+          </Grid>
+
+          <Grid ColumnDefinitions="*,*"
+                ColumnSpacing="15"
+                Margin="0,5,0,0">
+
+            <Button Grid.Column="0"
+                    Text="↩️ Undo"
+                    Style="{StaticResource TextButton}"
+                    HorizontalOptions="Center" />
+
+            <Button Grid.Column="1"
+                    Text="↻ Reset"
+                    Style="{StaticResource TextButton}"
+                    Command="{Binding ResetCommand}"
+                    HorizontalOptions="Center" />
+          </Grid>
+
+          <HorizontalStackLayout Spacing="8"
+                                HorizontalOptions="Center"
+                                Margin="0,15,0,0">
+            <Label Text="💡"
+                   FontSize="16"
                    VerticalOptions="Center" />
-                <Label x:Name="SaveHintLabel"
-                   Text="Saved! Check the Projects tab to continue."
+            <Label FontSize="11"
                    FontFamily="MontserratMedium"
-                   FontSize="12"
-                   TextColor="#424B54"
+                   TextColor="{StaticResource TextSecondary}"
+                   HorizontalTextAlignment="Center"
                    VerticalOptions="Center"
                    LineBreakMode="WordWrap"
-                   HorizontalOptions="FillAndExpand" />
-              </HorizontalStackLayout>
-            </Frame>
+                   MaximumWidthRequest="280">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="Tip: " FontAttributes="Bold" />
+                  <Span Text="Tap &quot;Save to Project&quot; below to keep this counter" />
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+          </HorizontalStackLayout>
 
-            <!-- Tip Text -->
-            <Label Text="💡 Tap 'Save to Project' to keep this counter permanently"
-                       FontSize="12"
-                       TextColor="#424B54"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"
-                       Margin="0,10,0,0"
-                       LineBreakMode="WordWrap" />
+          <Button Text="💾 Save to project"
+                  Style="{StaticResource OutlineButton}"
+                  Command="{Binding SaveToProjectCommand}"
+                  Margin="0,10,0,10" />
 
-          </VerticalStackLayout>
-        </Frame>
+          <Border x:Name="SaveHintFrame"
+                  BackgroundColor="#FFF3E0"
+                  Stroke="{StaticResource StitchPink}"
+                  StrokeThickness="2"
+                  Padding="15"
+                  Margin="0,5,0,20"
+                  IsVisible="False"
+                  Opacity="0">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <HorizontalStackLayout Spacing="10">
+              <Label Text="✨"
+                     FontSize="20"
+                     VerticalOptions="Center" />
+              <Label Text="Saved! Check the Projects tab to continue."
+                     FontFamily="MontserratMedium"
+                     FontSize="12"
+                     TextColor="{StaticResource TextPrimary}"
+                     VerticalOptions="Center"
+                     LineBreakMode="WordWrap"
+                     HorizontalOptions="Fill" />
+            </HorizontalStackLayout>
+          </Border>
+
+        </VerticalStackLayout>
       </ScrollView>
 
-      <!-- Bottom Navigation Note -->
-      <Label Grid.Row="2"
-             Text="Use the tabs below to access Projects, Sessions, Export, and Settings"
-             FontSize="10"
-             TextColor="#999"
-             HorizontalOptions="Center"
-             Margin="0,0,0,10" />
-
-    </Grid>
-
-    <!-- Onboarding Overlay (shown only on first launch) -->
-    <!-- Commands are bound inside OnboardingCard.xaml, not here -->
-    <controls:OnboardingCard IsVisible="{Binding ShowOnboarding}" />
+    </Border>
 
   </Grid>
 
