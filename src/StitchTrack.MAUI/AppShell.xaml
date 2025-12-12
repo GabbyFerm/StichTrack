@@ -1,60 +1,64 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
-  x:Class="StitchTrack.MAUI.AppShell"
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-  xmlns:local="clr-namespace:StitchTrack.MAUI.Views"
+  xmlns:views="clr-namespace:StitchTrack.MAUI.Views"
+  x:Class="StitchTrack.MAUI.AppShell"
   Shell.FlyoutBehavior="Disabled"
-  Shell.NavBarIsVisible="True">
+  BackgroundColor="{DynamicResource PageBackground}"
+  Shell.TabBarBackgroundColor="{DynamicResource TabBarBackground}"
+  Shell.TabBarForegroundColor="{DynamicResource TabBarForeground}"
+  Shell.TabBarUnselectedColor="{DynamicResource TabBarUnselected}"
+  Shell.TabBarTitleColor="{DynamicResource TabBarTitle}"> 
 
-  <!-- Custom header with sync status -->
-  <Shell.TitleView>
-    <Grid ColumnDefinitions="*, Auto" Padding="10,0">
-      <Label Grid.Column="0" 
-             Text="StitchTrack" 
-             FontSize="18" 
-             FontAttributes="Bold"
-             VerticalOptions="Center"/>
-      <Image Grid.Column="1"
-             Source="cloud_off.png"
-             WidthRequest="24"
-             HeightRequest="24"
-             VerticalOptions="Center"/>
-    </Grid>
-  </Shell.TitleView>
+  <Shell.Resources>
+    <ResourceDictionary>
+      <!-- Put your SVG filenames here (Resources/Images, BuildAction = MauiImage) -->
+      <FileImageSource x:Key="IconCounter" File="counter.svg" />
+      <FileImageSource x:Key="IconProjects" File="projects.svg" />
+      <FileImageSource x:Key="IconSession" File="session.svg" />
+      <FileImageSource x:Key="IconExport" File="export.svg" />
+      <FileImageSource x:Key="IconSettings" File="settings.svg" />
+    </ResourceDictionary>
+  </Shell.Resources>
 
   <TabBar>
-    <!-- Quick Counter Tab -->
+
+    <!-- Counter Tab -->
     <ShellContent
-      Title="Quick Counter"
-      Icon="counter_icon.png"
-      ContentTemplate="{DataTemplate local:QuickCounterPage}"
-      Route="QuickCounterPage" />
+      Title="COUNTER"
+      ContentTemplate="{DataTemplate views:QuickCounterPage}"
+      Route="QuickCounterPage"
+      Icon="{StaticResource IconCounter}" />
 
     <!-- Projects Tab -->
     <ShellContent
-      Title="Projects"
-      Icon="projects_icon.png"
-      ContentTemplate="{DataTemplate local:ProjectsPage}"
-      Route="ProjectsPage" />
+      Title="PROJECTS"
+      ContentTemplate="{DataTemplate views:ProjectsPage}"
+      Route="ProjectsPage"
+      Icon="{StaticResource IconProjects}" />
 
+    <!-- Session Tab (Placeholder) -->
     <ShellContent
-      Title="Sessions"
-      Icon="timer_icon.png"
-      ContentTemplate="{DataTemplate local:SessionsPage}"
-      Route="Sessions" />
+        Title="SESSION"
+        ContentTemplate="{DataTemplate views:SessionsPage}"
+        Route="SessionPage"
+        Icon="{StaticResource IconSession}" />
 
+    <!-- Export Tab (Placeholder) -->
     <ShellContent
-      Title="Export"
-      Icon="export_icon.png"
-      ContentTemplate="{DataTemplate local:ExportPage}"
-      Route="Export" />
+      Title="EXPORT"
+      ContentTemplate="{DataTemplate views:ExportPage}"
+      Route="ExportPage"
+      Icon="{StaticResource IconExport}" />
 
+    <!-- Settings Tab (Placeholder) -->
     <ShellContent
-      Title="Settings"
-      Icon="settings_icon.png"
-      ContentTemplate="{DataTemplate local:SettingsPage}"
-      Route="Settings" />
+      Title="SETTINGS"
+      ContentTemplate="{DataTemplate views:SettingsPage}"
+      Route="SettingsPage"
+      Icon="{StaticResource IconSettings}" />
+
   </TabBar>
 
 </Shell>

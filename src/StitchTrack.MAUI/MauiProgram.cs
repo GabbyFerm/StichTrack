@@ -8,7 +8,7 @@ using StitchTrack.Infrastructure.Repositories;
 using StitchTrack.MAUI.Data;
 using StitchTrack.MAUI.Services;
 using StitchTrack.MAUI.Views;
-
+using CommunityToolkit.Maui;
 namespace StitchTrack.MAUI;
 
 public static class MauiProgram
@@ -16,6 +16,11 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
+
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit();
+
         builder
             .UseMauiApp<App>()
             .ConfigureFonts(fonts =>
@@ -30,6 +35,7 @@ public static class MauiProgram
                 fonts.AddFont("Montserrat-ExtraBold.ttf", "MontserratExtraBold");
                 fonts.AddFont("Montserrat-Bold.ttf", "MontserratBold");
             });
+
 
         // Register database context
         builder.Services.AddDbContext<AppDbContext>(options =>

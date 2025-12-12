@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Class="StitchTrack.MAUI.Controls.OnboardingPopup">
+
+  <Grid BackgroundColor="#80000000" Padding="20" HorizontalOptions="Fill" VerticalOptions="Fill">
+
+    <Frame
+        BackgroundColor="{DynamicResource CardBackground}"
+        CornerRadius="16"
+        Padding="20"
+        HasShadow="True"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        MaximumWidthRequest="420">
+      <VerticalStackLayout Spacing="12">
+
+        <!-- Reuse your onboarding copy; the commands are invoked from code-behind -->
+        <Label Text="Welcome to StitchTrack" FontFamily="MontserratBold" FontSize="20" />
+        <Label Text="Short onboarding text..." FontSize="14" />
+
+        <VerticalStackLayout Spacing="8">
+          <Button x:Name="BtnGetStarted"
+                  Text="Get Started 🚀"
+                  BackgroundColor="{StaticResource StitchGold}"
+                  TextColor="White"
+                  HeightRequest="48"
+                  CornerRadius="10" />
+
+          <Button x:Name="BtnEnableSync"
+                  Text="Enable Backup &amp; Sync ☁️"
+                  BackgroundColor="Transparent"
+                  BorderColor="{StaticResource StitchPink}"
+                  BorderWidth="2"
+                  TextColor="{StaticResource StitchPink}"
+                  HeightRequest="44"
+                  CornerRadius="10" />
+
+          <Button x:Name="BtnMaybeLater"
+                  Text="Maybe Later"
+                  BackgroundColor="Transparent"
+                  TextColor="#999"
+                  HeightRequest="40" />
+        </VerticalStackLayout>
+
+        <Label Text="(Cloud sync coming in Phase 3)" FontFamily="MontserratMedium" FontSize="10" TextColor="#999" HorizontalOptions="Center" Margin="0,8,0,0" />
+
+      </VerticalStackLayout>
+    </Frame>
+  </Grid>
+</toolkit:Popup>

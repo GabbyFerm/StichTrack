@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  x:Class="StitchTrack.MAUI.Resources.Styles.DarkColors">
+
+  <!-- Brand (same) -->
+  <Color x:Key="StitchGold">#D4A847</Color>
+  <Color x:Key="StitchPink">#FE64A3</Color>
+
+  <!-- Role-based dark palette -->
+  <Color x:Key="PageBackground">#424B54</Color>
+  <Color x:Key="CardBackground">#686F76</Color>
+  <Color x:Key="CounterBackground">#424B54</Color>
+
+  <!-- Text -->
+  <Color x:Key="TextPrimary">#E6E6E6</Color>
+  <Color x:Key="TextSecondary">#B0B0B0</Color>
+  <Color x:Key="TextOnGold">#ffffff</Color>
+
+  <!-- Buttons -->
+  <Color x:Key="ButtonIncrease">#FF69B4</Color>
+  <Color x:Key="ButtonDecrease">#3D4A54</Color>
+
+  <!-- Tab bar / navigation role colors -->
+  <Color x:Key="TabBarBackground">#424B54</Color>
+  <Color x:Key="TabBarForeground">#D4A847</Color>
+  <Color x:Key="TabBarUnselected">#e6e6e6</Color>
+  <Color x:Key="TabBarTitle">#D4A847</Color>
+
+  <!-- Status / tags / etc. -->
+  <Color x:Key="SuccessGreen">#2ECC71</Color>
+  <Color x:Key="WarningYellow">#F39C12</Color>
+  <Color x:Key="ErrorRed">#E74C3C</Color>
+
+  <!-- Brushes -->
+  <SolidColorBrush x:Key="PageBackgroundBrush" Color="{DynamicResource PageBackground}" />
+  <SolidColorBrush x:Key="CardBackgroundBrush" Color="{DynamicResource CardBackground}" />
+  <SolidColorBrush x:Key="StitchGoldBrush" Color="{StaticResource StitchGold}" />
+  <SolidColorBrush x:Key="StitchPinkBrush" Color="{StaticResource StitchPink}" />
+
+</ResourceDictionary>

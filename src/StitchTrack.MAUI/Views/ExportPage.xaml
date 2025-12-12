@@ -2,13 +2,14 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StitchTrack.MAUI.Views.ExportPage"
-             Title="Exports">
+             Title="Exports"
+             BackgroundColor="{DynamicResource PageBackground}">
   <VerticalStackLayout Padding="20" Spacing="10">
-    <Label Text="Export List" 
-           FontSize="24" 
+    <Label Text="Export List"
+           FontSize="24"
            FontAttributes="Bold"/>
-    <Label Text="Coming soon in Phase 2!" 
-           FontSize="14" 
+    <Label Text="Coming soon in Phase 2!"
+           FontSize="14"
            TextColor="Gray"/>
   </VerticalStackLayout>
 </ContentPage>

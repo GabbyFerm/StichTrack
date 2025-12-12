@@ -10,8 +10,16 @@ public partial class App : Microsoft.Maui.Controls.Application
     {
         InitializeComponent();
 
-        // Initialize database with detailed logging
-        InitializeDatabaseAsync(dbContext).GetAwaiter().GetResult();
+        // Initialize database with logging. Don't crash the UI while debugging DB issues.
+        try
+        {
+            InitializeDatabaseAsync(dbContext).GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            // TEMP: log and continue so the UI can start while we fix DB issues
+            System.Diagnostics.Debug.WriteLine($"❌ DATABASE INITIALIZATION FAILED (TEMP SWALLOW): {ex}");
+        }
 
         MainPage = new AppShell();
     }
@@ -24,11 +32,26 @@ public partial class App : Microsoft.Maui.Controls.Application
             System.Diagnostics.Debug.WriteLine($"Database Path: {DatabaseConfig.DatabasePath}");
             System.Diagnostics.Debug.WriteLine($"App Data Directory: {FileSystem.AppDataDirectory}");
 
+            // Try to apply EF Core migrations (recommended)
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("Attempting to apply EF Core migrations...");
+                await dbContext.Database.MigrateAsync().ConfigureAwait(false);
+                System.Diagnostics.Debug.WriteLine("Migrations applied successfully.");
+            }
+            catch (Exception migrateEx)
+            {
+                // If migrations are not available or fail, fall back to EnsureCreated (development only)
+                System.Diagnostics.Debug.WriteLine($"MigrateAsync failed: {migrateEx.Message}. Falling back to EnsureCreatedAsync...");
+                await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
+                System.Diagnostics.Debug.WriteLine("EnsureCreatedAsync completed (fallback).");
+            }
+
+            // Run any seeding logic after migrations/creation
             await DbInitializer.InitializeAsync(dbContext).ConfigureAwait(false);
 
             System.Diagnostics.Debug.WriteLine("=== DATABASE INITIALIZATION COMPLETED ===");
 
-            // Verify database file exists
             if (File.Exists(DatabaseConfig.DatabasePath))
             {
                 var fileInfo = new FileInfo(DatabaseConfig.DatabasePath);
@@ -42,21 +65,19 @@ public partial class App : Microsoft.Maui.Controls.Application
         }
         catch (DbUpdateException dbEx)
         {
-            // Database-specific errors (CA1031: Catch specific exception)
             System.Diagnostics.Debug.WriteLine($"❌ DATABASE UPDATE ERROR: {dbEx.Message}");
             System.Diagnostics.Debug.WriteLine($"Stack Trace: {dbEx.StackTrace}");
             if (dbEx.InnerException != null)
             {
                 System.Diagnostics.Debug.WriteLine($"Inner Exception: {dbEx.InnerException.Message}");
             }
-            throw; // Re-throw to prevent app from running with broken database
+            throw; // rethrow so outer try/catch can log and continue (temporary)
         }
         catch (InvalidOperationException ioEx)
         {
-            // Configuration errors (CA1031: Catch specific exception)
             System.Diagnostics.Debug.WriteLine($"❌ CONFIGURATION ERROR: {ioEx.Message}");
             System.Diagnostics.Debug.WriteLine($"Stack Trace: {ioEx.StackTrace}");
-            throw; // Re-throw to prevent app from running with broken database
+            throw;
         }
     }
 }

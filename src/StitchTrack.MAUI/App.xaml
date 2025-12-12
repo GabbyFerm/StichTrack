@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:styles="clr-namespace:StitchTrack.MAUI.Resources.Styles"
              xmlns:local="clr-namespace:StitchTrack.MAUI"
              xmlns:converters="clr-namespace:StitchTrack.MAUI.Converters"
              x:Class="StitchTrack.MAUI.App">
   <Application.Resources>
     <ResourceDictionary>
 
-      <!-- Keep the default MAUI styles -->
+      <!-- Merge the light theme dictionary by default (swap to DarkColors at runtime) -->
       <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+        <styles:LightColors />
         <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
       </ResourceDictionary.MergedDictionaries>
 
