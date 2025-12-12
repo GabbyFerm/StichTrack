@@ -1,178 +1,194 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:StitchTrack.MAUI.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="StitchTrack.MAUI.Views.QuickCounterPage"
-             BackgroundColor="#E8E8E8"
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
              Shell.NavBarIsVisible="False">
 
-  <!-- BindingContext set in code-behind via constructor injection -->
+  <!-- 
+  QUICK COUNTER PAGE - Minimalist Design
+  - Flat layout (no golden header, no card shadows)
+  - Session timer with Play/Pause
+  - Large counter display
+  - Decrease/Increase buttons (gray/golden)
+  - Undo/Reset text buttons
+  - Save to project outline button
+  -->
 
-  <Grid>
+  <Grid RowDefinitions="Auto,*,Auto"
+        RowSpacing="0">
 
-    <!-- Main Content -->
-    <Grid RowDefinitions="Auto,*,Auto">
+    <!-- ============================================ -->
+    <!-- TOP BAR: Logo + Sync Icon                    -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="0"
+          BackgroundColor="{StaticResource AppBackground}"
+          Padding="20,15"
+          ColumnDefinitions="*,Auto"
+          ColumnSpacing="15">
 
-      <!-- Header with Logo -->
-      <VerticalStackLayout Grid.Row="0" 
-                           Padding="20,30,20,20"
-                           Spacing="5">
-        <Image Source="logo.svg"
-       HeightRequest="80"
-       HorizontalOptions="Center" />
-        <Label Text="NEVER MISS A ROW"
-                   FontSize="12"
-                   FontFamily="MontserratMedium"
-                   TextColor="#000"
-                   HorizontalOptions="Center"
-                   CharacterSpacing="8" />
-      </VerticalStackLayout>
+      <!-- Logo -->
+      <Image Grid.Column="0"
+             Source="logo_white.svg"
+             HeightRequest="30"
+             HorizontalOptions="Start"
+             Aspect="AspectFit">
+        <Image.Behaviors>
+          <toolkit:IconTintColorBehavior TintColor="White" />
+        </Image.Behaviors>
+      </Image>
 
-      <!-- Counter Card with ScrollView -->
-      <ScrollView Grid.Row="1">
-        <Frame Margin="20,10,20,10"
-           Padding="20"
-           CornerRadius="15"
-           BackgroundColor="White"
-           HasShadow="True">
-
-          <VerticalStackLayout Spacing="10">
-
-            <!-- Title -->
-            <Label Text="Quick Row Counter"
-                       FontSize="20"
-                       FontAttributes="Bold"
-                       TextColor="#000"
-                       HorizontalOptions="Center" />
-
-            <Label Text="No login required - perfect for quick counting!"
-                       FontSize="12"
-                       TextColor="#000"
-                       HorizontalOptions="Center"
-                       Margin="0,0,0,10" />
-
-            <!-- Current Row Display with grey background -->
-            <Frame BackgroundColor="#F1F1F1"
-               CornerRadius="10"
-               Padding="10,5"
-               HasShadow="False"
-               BorderColor="Transparent">
-              <VerticalStackLayout Spacing="0">
-                <Label Text="Current Row"
-                      FontSize="14"
-                      TextColor="#000"
-                      HorizontalOptions="Center"
-                      Margin="0,10,0,0" />
-
-                <!-- The actual counter number -->
-                <Label Text="{Binding CurrentCount}"
-                     FontSize="90"
-                     FontFamily="MontserratExtraBold"
-                     TextColor="#424B54"
-                     HorizontalOptions="Center"
-                     LineHeight="0.8"
-                     Margin="0,-5,0,-5" />
-              </VerticalStackLayout>
-            </Frame>
-
-            <!-- Buttons -->
-            <Grid ColumnDefinitions="*,*" 
-                      ColumnSpacing="15"
-                      Margin="0,15,0,0">
-
-              <!-- Decrement Button -->
-              <Button Grid.Column="0"
-                            Text="- DECREASE"
-                            Command="{Binding DecrementCommand}"
-                            BackgroundColor="#424B54"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            HeightRequest="50"
-                            CornerRadius="10" />
-
-              <!-- Increment Button -->
-              <Button Grid.Column="1"
-                            Text="+ INCREASE"
-                            Command="{Binding IncrementCommand}"
-                            BackgroundColor="#E1AD37"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            HeightRequest="50"
-                            CornerRadius="10" />
-            </Grid>
-
-            <!-- Reset Button -->
-            <Button Text="↻ Reset Counter"
-                        Command="{Binding ResetCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="#424B54"
-                        FontAttributes="Bold"
-                        FontSize="14"
-                        Margin="0,10,0,0" />
-
-            <!-- Save to Project Button (Issue #12) -->
-            <Button Text="💾 Save to Project"
-                Command="{Binding SaveToProjectCommand}"
-                BackgroundColor="Transparent"
-                TextColor="#FE64A3"
-                BorderColor="#FE64A3"
-                BorderWidth="2"
-                FontFamily="MontserratSemiBold"
-                FontSize="16"
-                HeightRequest="50"
-                CornerRadius="10"
-                Margin="0,15,0,0" />
-
-            <!-- Visual Hint (Issue #14) -->
-            <Frame x:Name="SaveHintFrame"
-               BackgroundColor="#FFF3E0"
-               BorderColor="#FE64A3"
-               CornerRadius="8"
-               Padding="12"
-               HasShadow="False"
-               Margin="0,10,0,0"
-               IsVisible="False">
-              <HorizontalStackLayout Spacing="8">
-                <Label Text="✨"
-                   FontSize="20"
-                   VerticalOptions="Center" />
-                <Label x:Name="SaveHintLabel"
-                   Text="Saved! Check the Projects tab to continue."
-                   FontFamily="MontserratMedium"
-                   FontSize="12"
-                   TextColor="#424B54"
-                   VerticalOptions="Center"
-                   LineBreakMode="WordWrap"
-                   HorizontalOptions="FillAndExpand" />
-              </HorizontalStackLayout>
-            </Frame>
-
-            <!-- Tip Text -->
-            <Label Text="💡 Tap 'Save to Project' to keep this counter permanently"
-                       FontSize="12"
-                       TextColor="#424B54"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"
-                       Margin="0,10,0,0"
-                       LineBreakMode="WordWrap" />
-
-          </VerticalStackLayout>
-        </Frame>
-      </ScrollView>
-
-      <!-- Bottom Navigation Note -->
-      <Label Grid.Row="2"
-             Text="Use the tabs below to access Projects, Sessions, Export, and Settings"
-             FontSize="10"
-             TextColor="#999"
-             HorizontalOptions="Center"
-             Margin="0,0,0,10" />
+      <!-- Sync Icon (Optional) -->
+      <Image Grid.Column="1"
+             Source="refresh.svg"
+             HeightRequest="24"
+             WidthRequest="24"
+             HorizontalOptions="End"
+             VerticalOptions="Center">
+        <Image.Behaviors>
+          <toolkit:IconTintColorBehavior TintColor="White" />
+        </Image.Behaviors>
+        <Image.GestureRecognizers>
+          <TapGestureRecognizer Tapped="OnSyncTapped" />
+        </Image.GestureRecognizers>
+      </Image>
 
     </Grid>
 
-    <!-- Onboarding Overlay (shown only on first launch) -->
-    <!-- Commands are bound inside OnboardingCard.xaml, not here -->
-    <controls:OnboardingCard IsVisible="{Binding ShowOnboarding}" />
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT                                 -->
+    <!-- ============================================ -->
+    <ScrollView Grid.Row="1">
+      <VerticalStackLayout Spacing="20" Padding="20,20,20,20">
+
+        <!-- Page Title -->
+        <Label Text="QUICK ROW COUNTER"
+               Style="{StaticResource PageTitleLabel}" />
+
+        <!-- Session Timer & Play/Pause -->
+        <Grid ColumnDefinitions="*,Auto"
+              ColumnSpacing="10"
+              Margin="0,5,0,10">
+
+          <!-- Session Timer -->
+          <HorizontalStackLayout Grid.Column="0"
+                                Spacing="8"
+                                VerticalOptions="Center">
+            <Image Source="clock.svg"
+                   HeightRequest="18"
+                   WidthRequest="18">
+              <Image.Behaviors>
+                <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+              </Image.Behaviors>
+            </Image>
+            <Label Text="SESSION: "
+                   FontFamily="MontserratBold"
+                   FontSize="12"
+                   TextColor="{StaticResource TextSecondary}"
+                   VerticalOptions="Center" />
+            <Label Text="0h 0m"
+                   x:Name="SessionTimerLabel"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="12"
+                   TextColor="{StaticResource TextSecondary}"
+                   VerticalOptions="Center" />
+          </HorizontalStackLayout>
+
+          <!-- Play/Pause Button -->
+          <Button Grid.Column="1"
+                  x:Name="SessionButton"
+                  Text="▶ PLAY"
+                  Style="{StaticResource SmallButton}"
+                  Clicked="OnSessionButtonClicked" />
+
+        </Grid>
+
+        <!-- Counter Display -->
+        <Frame Style="{StaticResource CounterCard}">
+          <VerticalStackLayout Spacing="10">
+
+            <Label Text="Current Row"
+                   Style="{StaticResource SecondaryLabel}"
+                   HorizontalOptions="Center" />
+
+            <Label Text="{Binding CurrentCount}"
+                   Style="{StaticResource CounterLabel}"
+                   Margin="0,10" />
+
+          </VerticalStackLayout>
+        </Frame>
+
+        <!-- Increase / Decrease Buttons -->
+        <Grid ColumnDefinitions="*,*"
+              ColumnSpacing="15"
+              Margin="0,10,0,0">
+
+          <!-- Decrease Button -->
+          <Button Grid.Column="0"
+                  Text="- DECREASE"
+                  Style="{StaticResource SecondaryButton}"
+                  Command="{Binding DecrementCommand}" />
+
+          <!-- Increase Button -->
+          <Button Grid.Column="1"
+                  Text="+ INCREASE"
+                  Style="{StaticResource PrimaryButton}"
+                  Command="{Binding IncrementCommand}" />
+
+        </Grid>
+
+        <!-- Undo & Reset -->
+        <Grid ColumnDefinitions="*,*"
+              ColumnSpacing="15"
+              Margin="0,5,0,0">
+
+          <Button Grid.Column="0"
+                  Text="↩ Undo"
+                  Style="{StaticResource TextButton}"
+                  HorizontalOptions="Center" />
+
+          <Button Grid.Column="1"
+                  Text="↻ Reset"
+                  Style="{StaticResource TextButton}"
+                  Command="{Binding ResetCommand}"
+                  HorizontalOptions="Center" />
+
+        </Grid>
+
+        <!-- Tip -->
+        <HorizontalStackLayout Spacing="8"
+                              HorizontalOptions="Center"
+                              Margin="0,15,0,0">
+          <Label Text="💡"
+                 FontSize="16"
+                 VerticalOptions="Center" />
+          <Label Style="{StaticResource CaptionLabel}"
+                 LineBreakMode="WordWrap"
+                 MaximumWidthRequest="280"
+                 VerticalOptions="Center">
+            <Label.FormattedText>
+              <FormattedString>
+                <Span Text="Tip: " FontAttributes="Bold" />
+                <Span Text="Tap 'Save to Project' to keep this counter" />
+              </FormattedString>
+            </Label.FormattedText>
+          </Label>
+        </HorizontalStackLayout>
+
+        <!-- Save to Project Button -->
+        <Button Text="💾 Save to project"
+                Style="{StaticResource OutlineButton}"
+                Command="{Binding SaveToProjectCommand}"
+                Margin="0,10,0,20" />
+
+      </VerticalStackLayout>
+    </ScrollView>
+
+    <!-- ============================================ -->
+    <!-- BOTTOM NAVIGATION (Managed by AppShell)      -->
+    <!-- ============================================ -->
+    <!-- TabBar will appear here automatically -->
 
   </Grid>
 

@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StitchTrack.Application.Interfaces;
@@ -5,6 +6,7 @@ using StitchTrack.Application.ViewModels;
 using StitchTrack.Domain.Interfaces;
 using StitchTrack.Infrastructure.Data;
 using StitchTrack.Infrastructure.Repositories;
+using StitchTrack.MAUI.Controls;
 using StitchTrack.MAUI.Data;
 using StitchTrack.MAUI.Services;
 using StitchTrack.MAUI.Views;
@@ -16,39 +18,54 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
+
         builder
             .UseMauiApp<App>()
+            // ✨ Add Community Toolkit
+            .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
+                // Default fonts
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 
-                // Montserrat
-                fonts.AddFont("Montserrat-Medium.ttf", "MontserratMedium");
+                // Montserrat font family
                 fonts.AddFont("Montserrat-Regular.ttf", "MontserratRegular");
+                fonts.AddFont("Montserrat-Medium.ttf", "MontserratMedium");
                 fonts.AddFont("Montserrat-SemiBold.ttf", "MontserratSemiBold");
-                fonts.AddFont("Montserrat-ExtraBold.ttf", "MontserratExtraBold");
                 fonts.AddFont("Montserrat-Bold.ttf", "MontserratBold");
+                fonts.AddFont("Montserrat-ExtraBold.ttf", "MontserratExtraBold");
             });
 
-        // Register database context
+
+
+        // DATABASE
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(DatabaseConfig.ConnectionString));
 
-        // Register repositories
-        builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
+        // REPOSITORIES
         builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+        builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
 
-        // Register services
+        // SERVICES
         builder.Services.AddSingleton<IDialogService, MauiDialogService>();
 
-        // Register ViewModels
+        // VIEWMODELS
         builder.Services.AddTransient<QuickCounterViewModel>();
         builder.Services.AddTransient<ProjectsViewModel>();
+        // TODO: Add other ViewModels as we create them
+        // builder.Services.AddTransient<SessionViewModel>();
+        // builder.Services.AddTransient<SettingsViewModel>();
 
-        // Register Pages (for constructor injection)
+        // PAGES
         builder.Services.AddTransient<QuickCounterPage>();
         builder.Services.AddTransient<ProjectsPage>();
+        // TODO: Add other Pages as we create them
+        // builder.Services.AddTransient<SessionPage>();
+        // builder.Services.AddTransient<SettingsPage>();
+
+        // POPUPS (Community Toolkit)
+        builder.Services.AddTransient<OnboardingPopup>();
 
 #if DEBUG
         builder.Logging.AddDebug();
