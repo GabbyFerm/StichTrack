@@ -1,60 +1,76 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
-  x:Class="StitchTrack.MAUI.AppShell"
-  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-  xmlns:local="clr-namespace:StitchTrack.MAUI.Views"
-  Shell.FlyoutBehavior="Disabled"
-  Shell.NavBarIsVisible="True">
+    x:Class="StitchTrack.MAUI.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:StitchTrack.MAUI.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarBackgroundColor="#E1AD37"
+    Shell.TabBarForegroundColor="#424B54"
+    Shell.TabBarTitleColor="#424B54"
+    Shell.TabBarUnselectedColor="White">
 
-  <!-- Custom header with sync status -->
-  <Shell.TitleView>
-    <Grid ColumnDefinitions="*, Auto" Padding="10,0">
-      <Label Grid.Column="0" 
-             Text="StitchTrack" 
-             FontSize="18" 
-             FontAttributes="Bold"
-             VerticalOptions="Center"/>
-      <Image Grid.Column="1"
-             Source="cloud_off.png"
-             WidthRequest="24"
-             HeightRequest="24"
-             VerticalOptions="Center"/>
-    </Grid>
-  </Shell.TitleView>
+  <!-- 
+  BOTTOM NAVIGATION STYLING:
+  - Background: Golden (#E1AD37)
+  - Unselected: White text + icons
+  - Selected: Dark gray (#424B54) text + icons
+  - Shadow on top: Subtle (handled by platform)
+  -->
 
   <TabBar>
-    <!-- Quick Counter Tab -->
-    <ShellContent
-      Title="Quick Counter"
-      Icon="counter_icon.png"
-      ContentTemplate="{DataTemplate local:QuickCounterPage}"
-      Route="QuickCounterPage" />
 
-    <!-- Projects Tab -->
+    <!-- COUNTER TAB -->
     <ShellContent
-      Title="Projects"
-      Icon="projects_icon.png"
-      ContentTemplate="{DataTemplate local:ProjectsPage}"
-      Route="ProjectsPage" />
+        Title="COUNTER"
+        ContentTemplate="{DataTemplate local:QuickCounterPage}"
+        Route="QuickCounterPage">
+      <ShellContent.Icon>
+        <FontImageSource FontFamily="MaterialIcons" Glyph="📊" Size="24" />
+      </ShellContent.Icon>
+    </ShellContent>
 
+    <!-- PROJECTS TAB -->
     <ShellContent
-      Title="Sessions"
-      Icon="timer_icon.png"
-      ContentTemplate="{DataTemplate local:SessionsPage}"
-      Route="Sessions" />
+        Title="PROJECTS"
+        ContentTemplate="{DataTemplate local:ProjectsPage}"
+        Route="ProjectsPage">
+      <ShellContent.Icon>
+        <FontImageSource FontFamily="MaterialIcons" Glyph="🏷️" Size="24" />
+      </ShellContent.Icon>
+    </ShellContent>
 
+    <!-- SESSION TAB -->
     <ShellContent
-      Title="Export"
-      Icon="export_icon.png"
-      ContentTemplate="{DataTemplate local:ExportPage}"
-      Route="Export" />
+        Title="SESSION"
+        ContentTemplate="{DataTemplate local:SessionsPage}"
+        Route="SessionPage">
+      <ShellContent.Icon>
+        <FontImageSource FontFamily="MaterialIcons" Glyph="📈" Size="24" />
+      </ShellContent.Icon>
+    </ShellContent>
 
+    <!-- EXPORT TAB -->
     <ShellContent
-      Title="Settings"
-      Icon="settings_icon.png"
-      ContentTemplate="{DataTemplate local:SettingsPage}"
-      Route="Settings" />
+        Title="EXPORT"
+        ContentTemplate="{DataTemplate local:ExportPage}"
+        Route="ExportPage">
+      <ShellContent.Icon>
+        <FontImageSource FontFamily="MaterialIcons" Glyph="📤" Size="24" />
+      </ShellContent.Icon>
+    </ShellContent>
+
+    <!-- SETTINGS TAB -->
+    <ShellContent
+        Title="SETTINGS"
+        ContentTemplate="{DataTemplate local:SettingsPage}"
+        Route="SettingsPage">
+      <ShellContent.Icon>
+        <FontImageSource FontFamily="MaterialIcons" Glyph="⚙️" Size="24" />
+      </ShellContent.Icon>
+    </ShellContent>
+
   </TabBar>
 
 </Shell>
