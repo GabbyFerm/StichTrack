@@ -30,12 +30,12 @@ public partial class App : Microsoft.Maui.Controls.Application
 
             // Step 1: DELETE existing database
             System.Diagnostics.Debug.WriteLine("\n🗑️  Step 1: Deleting existing database...");
-            var deleted = await dbContext.Database.EnsureDeletedAsync();
+            var deleted = await dbContext.Database.EnsureDeletedAsync().ConfigureAwait(false);
             System.Diagnostics.Debug.WriteLine($"   Database deleted: {deleted}");
 
             // Step 2: Check for pending migrations
             System.Diagnostics.Debug.WriteLine("\n📋 Step 2: Checking for migrations...");
-            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false);
             var pendingList = pendingMigrations.ToList();
 
             if (pendingList.Any())
@@ -54,12 +54,12 @@ public partial class App : Microsoft.Maui.Controls.Application
 
             // Step 3: Apply migrations
             System.Diagnostics.Debug.WriteLine("\n📦 Step 3: Applying migrations...");
-            await dbContext.Database.MigrateAsync();
+            await dbContext.Database.MigrateAsync().ConfigureAwait(false);
             System.Diagnostics.Debug.WriteLine("   ✅ MigrateAsync completed");
 
             // Step 4: Verify database was created
             System.Diagnostics.Debug.WriteLine("\n🔍 Step 4: Verifying database...");
-            var canConnect = await dbContext.Database.CanConnectAsync();
+            var canConnect = await dbContext.Database.CanConnectAsync().ConfigureAwait(false);
             System.Diagnostics.Debug.WriteLine($"   Can connect: {canConnect}");
 
             if (!canConnect)
@@ -72,7 +72,7 @@ public partial class App : Microsoft.Maui.Controls.Application
             System.Diagnostics.Debug.WriteLine("\n📊 Step 5: Checking Projects table...");
             try
             {
-                var projectCount = await dbContext.Projects.CountAsync();
+                var projectCount = await dbContext.Projects.CountAsync().ConfigureAwait(false);
                 System.Diagnostics.Debug.WriteLine($"   ✅ Projects table exists! Count: {projectCount}");
             }
             catch (Exception ex)
@@ -84,7 +84,7 @@ public partial class App : Microsoft.Maui.Controls.Application
 
             // Step 6: List applied migrations
             System.Diagnostics.Debug.WriteLine("\n✅ Step 6: Migrations applied:");
-            var appliedMigrations = await dbContext.Database.GetAppliedMigrationsAsync();
+            var appliedMigrations = await dbContext.Database.GetAppliedMigrationsAsync().ConfigureAwait(false);
             foreach (var migration in appliedMigrations)
             {
                 System.Diagnostics.Debug.WriteLine($"   ✓ {migration}");

@@ -50,7 +50,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
             {
                 _isEmpty = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(HasProjects)); 
+                OnPropertyChanged(nameof(HasProjects));
             }
         }
     }
