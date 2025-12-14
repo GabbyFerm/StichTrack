@@ -9,10 +9,6 @@ public partial class App : Microsoft.Maui.Controls.Application
     {
         InitializeComponent();
 
-        // TEMPORARY: Force delete and recreate database on every launch
-        // REMOVE THIS after confirming migrations work!
-        ForceRecreateDatabaseAsync(dbContext).GetAwaiter().GetResult();
-
         MainPage = new AppShell();
     }
 

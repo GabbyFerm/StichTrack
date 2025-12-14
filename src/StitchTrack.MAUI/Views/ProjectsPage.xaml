@@ -97,8 +97,7 @@
                            TextColor="White" />
                   </Frame>
 
-                  <!-- Last Updated (Issue #19) -->
-                  <!-- FIXED: Removed RelativeTimeConverter - just show raw date for now -->
+                  <!-- Show raw date -->
                   <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                          Text="{Binding UpdatedAt, StringFormat='Updated {0:g}'}"
                          FontFamily="MontserratMedium"
