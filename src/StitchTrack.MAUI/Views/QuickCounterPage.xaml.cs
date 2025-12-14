@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using StitchTrack.Application.ViewModels;
+using StitchTrack.Domain.Interfaces;
 using StitchTrack.MAUI.Controls;
 
 namespace StitchTrack.MAUI.Views;
@@ -7,39 +8,55 @@ namespace StitchTrack.MAUI.Views;
 public partial class QuickCounterPage : ContentPage
 {
     private readonly QuickCounterViewModel _viewModel;
+    private readonly IAppSettingsRepository _appSettingsRepository;
     private System.Timers.Timer? _sessionTimer;
     private TimeSpan _sessionDuration;
     private bool _isSessionRunning;
 
-    public QuickCounterPage(QuickCounterViewModel viewModel)
+    public QuickCounterPage(
+        QuickCounterViewModel viewModel,
+        IAppSettingsRepository appSettingsRepository)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
+        _appSettingsRepository = appSettingsRepository;
         BindingContext = _viewModel;
-
-        // Check if onboarding should be shown
-        CheckAndShowOnboarding();
     }
 
     /// <summary>
     /// Check if this is first launch and show onboarding popup.
     /// </summary>
-    private async void CheckAndShowOnboarding()
+    protected override async void OnAppearing()
     {
-        // TODO: Check AppSettings for HasSeenOnboarding
-        // For now, always show on first page load (you'll wire up the repo check)
+        base.OnAppearing();
 
-        bool hasSeenOnboarding = false; // TODO: Load from AppSettingsRepository
-
-        if (!hasSeenOnboarding)
+        try
         {
-            await Task.Delay(300); // Small delay for page to settle
+            // Check if user has seen onboarding - use correct method name
+            var settings = await _appSettingsRepository.GetAppSettingsAsync();
+            if (settings?.IsFirstRun == true)
+            {
+                System.Diagnostics.Debug.WriteLine("🎉 First run detected - showing onboarding");
 
-            var popup = new OnboardingPopup();
-            await this.ShowPopupAsync(popup);
+                // Small delay for page to settle
+                await Task.Delay(300);
 
-            // TODO: Save HasSeenOnboarding = true to AppSettingsRepository
+                // Create and show popup (DI will inject AppSettingsRepository)
+                var popup = new OnboardingPopup(_appSettingsRepository);
+                await this.ShowPopupAsync(popup);
+
+                System.Diagnostics.Debug.WriteLine("✅ Onboarding popup closed");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("✅ Not first run - skipping onboarding");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error checking first run: {ex.Message}");
+            // Don't crash if this fails - just don't show the popup
         }
     }
 
@@ -66,7 +83,7 @@ public partial class QuickCounterPage : ContentPage
     private void StartSession()
     {
         _isSessionRunning = true;
-        SessionButton.Text = "⏸ PAUSE";
+        SessionButton.Text = "⸜ PAUSE";
 
         // Create timer if not exists
         if (_sessionTimer == null)

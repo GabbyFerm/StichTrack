@@ -28,9 +28,9 @@
           ColumnDefinitions="*,Auto"
           ColumnSpacing="15">
 
-      <!-- Logo -->
+      <!-- Logo (Use logo.svg and tint it white) -->
       <Image Grid.Column="0"
-             Source="logo_white.svg"
+             Source="logo.svg"
              HeightRequest="30"
              HorizontalOptions="Start"
              Aspect="AspectFit">
@@ -39,7 +39,7 @@
         </Image.Behaviors>
       </Image>
 
-      <!-- Sync Icon (Optional) -->
+      <!-- Sync Icon -->
       <Image Grid.Column="1"
              Source="refresh.svg"
              HeightRequest="24"

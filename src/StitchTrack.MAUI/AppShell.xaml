@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
-    x:Class="StitchTrack.MAUI.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:StitchTrack.MAUI.Views"
-    Shell.FlyoutBehavior="Disabled"
-    Shell.NavBarIsVisible="False"
-    Shell.TabBarBackgroundColor="#E1AD37"
-    Shell.TabBarForegroundColor="#424B54"
-    Shell.TabBarTitleColor="#424B54"
-    Shell.TabBarUnselectedColor="White">
+  x:Class="StitchTrack.MAUI.AppShell"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  xmlns:local="clr-namespace:StitchTrack.MAUI.Views"
+  Shell.FlyoutBehavior="Disabled"
+  Shell.NavBarIsVisible="False"
+  Shell.TabBarBackgroundColor="#E1AD37"
+  Shell.TabBarForegroundColor="#424B54"
+  Shell.TabBarTitleColor="#424B54"
+  Shell.TabBarUnselectedColor="White">
 
   <!-- 
   BOTTOM NAVIGATION STYLING:
@@ -23,53 +23,38 @@
 
     <!-- COUNTER TAB -->
     <ShellContent
-        Title="COUNTER"
-        ContentTemplate="{DataTemplate local:QuickCounterPage}"
-        Route="QuickCounterPage">
-      <ShellContent.Icon>
-        <FontImageSource FontFamily="MaterialIcons" Glyph="📊" Size="24" />
-      </ShellContent.Icon>
-    </ShellContent>
+      Title="COUNTER"
+      ContentTemplate="{DataTemplate local:QuickCounterPage}"
+      Route="QuickCounterPage"
+      Icon="counter.svg" />
 
     <!-- PROJECTS TAB -->
     <ShellContent
-        Title="PROJECTS"
-        ContentTemplate="{DataTemplate local:ProjectsPage}"
-        Route="ProjectsPage">
-      <ShellContent.Icon>
-        <FontImageSource FontFamily="MaterialIcons" Glyph="🏷️" Size="24" />
-      </ShellContent.Icon>
-    </ShellContent>
+      Title="PROJECTS"
+      ContentTemplate="{DataTemplate local:ProjectsPage}"
+      Route="ProjectsPage"
+      Icon="projects.svg" />
 
     <!-- SESSION TAB -->
     <ShellContent
-        Title="SESSION"
-        ContentTemplate="{DataTemplate local:SessionsPage}"
-        Route="SessionPage">
-      <ShellContent.Icon>
-        <FontImageSource FontFamily="MaterialIcons" Glyph="📈" Size="24" />
-      </ShellContent.Icon>
-    </ShellContent>
+      Title="SESSION"
+      ContentTemplate="{DataTemplate local:SessionsPage}"
+      Route="SessionPage"
+      Icon="session.svg" />
 
     <!-- EXPORT TAB -->
     <ShellContent
-        Title="EXPORT"
-        ContentTemplate="{DataTemplate local:ExportPage}"
-        Route="ExportPage">
-      <ShellContent.Icon>
-        <FontImageSource FontFamily="MaterialIcons" Glyph="📤" Size="24" />
-      </ShellContent.Icon>
-    </ShellContent>
+      Title="EXPORT"
+      ContentTemplate="{DataTemplate local:ExportPage}"
+      Route="ExportPage"
+      Icon="export.svg" />
 
     <!-- SETTINGS TAB -->
     <ShellContent
-        Title="SETTINGS"
-        ContentTemplate="{DataTemplate local:SettingsPage}"
-        Route="SettingsPage">
-      <ShellContent.Icon>
-        <FontImageSource FontFamily="MaterialIcons" Glyph="⚙️" Size="24" />
-      </ShellContent.Icon>
-    </ShellContent>
+      Title="SETTINGS"
+      ContentTemplate="{DataTemplate local:SettingsPage}"
+      Route="SettingsPage"
+      Icon="settings.svg" />
 
   </TabBar>
 
