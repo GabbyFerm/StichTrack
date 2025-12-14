@@ -54,9 +54,10 @@
       </VerticalStackLayout>
 
       <!-- Projects List -->
+      <!-- FIXED: Removed InvertedBoolConverter - add HasProjects property to ViewModel instead -->
       <RefreshView IsRefreshing="{Binding IsLoading}"
                    Command="{Binding RefreshCommand}"
-                   IsVisible="{Binding IsEmpty, Converter={StaticResource InvertedBoolConverter}}">
+                   IsVisible="{Binding HasProjects}">
         <CollectionView ItemsSource="{Binding Projects}"
                         SelectionMode="None">
           <CollectionView.ItemTemplate>
@@ -97,8 +98,9 @@
                   </Frame>
 
                   <!-- Last Updated (Issue #19) -->
+                  <!-- FIXED: Removed RelativeTimeConverter - just show raw date for now -->
                   <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                         Text="{Binding UpdatedAt, Converter={StaticResource RelativeTimeConverter}, StringFormat='Updated {0}'}"
+                         Text="{Binding UpdatedAt, StringFormat='Updated {0:g}'}"
                          FontFamily="MontserratMedium"
                          FontSize="12"
                          TextColor="#999"
