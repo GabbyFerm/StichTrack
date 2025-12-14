@@ -50,9 +50,12 @@ public class ProjectsViewModel : INotifyPropertyChanged
             {
                 _isEmpty = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HasProjects));
             }
         }
     }
+
+    public bool HasProjects => !IsEmpty;
 
     // Commands
     public ICommand LoadProjectsCommand { get; }

@@ -8,11 +8,11 @@ using StitchTrack.Infrastructure.Data;
 
 #nullable disable
 
-namespace StitchTrack.Infrastructure.Migrations
+namespace StitchTrack.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251209172832_AddSyncFieldsAndAppSettings")]
-    partial class AddSyncFieldsAndAppSettings
+    [Migration("20251214144102_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
