@@ -15,7 +15,7 @@ public class AppDelegate : MauiUIApplicationDelegate
         // Add subtle shadow on top
         var tabBarAppearance = new UITabBarAppearance();
         tabBarAppearance.ConfigureWithDefaultBackground();
-        tabBarAppearance.BackgroundColor = UIColor.FromRGB(225, 173, 55); 
+        tabBarAppearance.BackgroundColor = UIColor.FromRGB(225, 173, 55);
         tabBarAppearance.ShadowColor = UIColor.Black.ColorWithAlpha(0.1f); // Subtle shadow
 
         UITabBar.Appearance.StandardAppearance = tabBarAppearance;

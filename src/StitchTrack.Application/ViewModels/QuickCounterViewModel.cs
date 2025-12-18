@@ -288,7 +288,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     {
         await _dialogService.ShowToastAsync(message).ConfigureAwait(false);
     }
-    
+
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
