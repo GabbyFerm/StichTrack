@@ -10,16 +10,16 @@ namespace StitchTrack.Application.ViewModels;
 
 /// <summary>
 /// ViewModel for Quick Counter - temporary counting that can be saved to a project.
-/// Manages onboarding display and counter functionality.
 /// </summary>
 public class QuickCounterViewModel : INotifyPropertyChanged
 {
     private readonly Project _project;
-    private readonly IAppSettingsRepository _settingsRepository;
     private readonly IProjectRepository _projectRepository;
     private readonly IDialogService _dialogService;
-    private readonly SynchronizationContext? _syncContext;
-    private bool _showOnboarding;
+
+    // Undo stack to track actions
+    private readonly Stack<CounterAction> _undoStack = new Stack<CounterAction>();
+    private const int MaxUndoStackSize = 50; // Limit undo history
 
     // PropertyChanged event for data binding
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -27,50 +27,29 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     // Action to trigger haptic feedback (injected from UI layer)
     public Action? TriggerHapticFeedback { get; set; }
 
-    // Controls whether onboarding card is visible
-    public bool ShowOnboarding
-    {
-        get => _showOnboarding;
-        private set
-        {
-            if (_showOnboarding != value)
-            {
-                _showOnboarding = value;
-                OnPropertyChanged();
-                System.Diagnostics.Debug.WriteLine($"🔄 ShowOnboarding changed to: {value}");
-            }
-        }
-    }
-
     // Current row count displayed to user
     public int CurrentCount => _project.CurrentCount;
 
     // Whether the Save button should be enabled
     public bool CanSave => CurrentCount > 0;
 
+    // Whether undo is available
+    public bool CanUndo => _undoStack.Count > 0;
+
     // Commands
     public ICommand IncrementCommand { get; }
     public ICommand DecrementCommand { get; }
+    public ICommand UndoCommand { get; }
     public ICommand ResetCommand { get; }
-    public ICommand GetStartedCommand { get; }
-    public ICommand EnableSyncCommand { get; }
-    public ICommand MaybeLaterCommand { get; }
     public ICommand SaveToProjectCommand { get; }
 
-    // Add this property to QuickCounterViewModel to fix CS1061
+    // Callback when project is saved (for navigation)
     public Func<Task>? OnProjectSaved { get; set; }
 
-    public QuickCounterViewModel(
-        IAppSettingsRepository settingsRepository,
-        IProjectRepository projectRepository,
-        IDialogService dialogService)
+    public QuickCounterViewModel(IProjectRepository projectRepository, IDialogService dialogService)
     {
-        _settingsRepository = settingsRepository ?? throw new ArgumentNullException(nameof(settingsRepository));
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-
-        // Capture the UI synchronization context for cross-thread updates
-        _syncContext = SynchronizationContext.Current;
 
         // Create in-memory project (not saved to database yet)
         _project = Project.CreateProject("Quick Counter");
@@ -78,93 +57,131 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         // Initialize commands
         IncrementCommand = new RelayCommand(OnIncrement);
         DecrementCommand = new RelayCommand(OnDecrement);
+        UndoCommand = new RelayCommand(OnUndo);
         ResetCommand = new RelayCommand(OnReset);
-        GetStartedCommand = new RelayCommand(OnGetStarted);
-        EnableSyncCommand = new RelayCommand(OnEnableSync);
-        MaybeLaterCommand = new RelayCommand(OnMaybeLater);
         SaveToProjectCommand = new RelayCommand(OnSaveToProject);
 
-        System.Diagnostics.Debug.WriteLine("✅ QuickCounterViewModel created, commands initialized");
-
-        // Ensure initial CanSave state is propagated
-        UpdateOnUiThread(() => OnPropertyChanged(nameof(CanSave)));
-
-        // Check if we should show onboarding
-        _ = CheckAndShowOnboardingAsync();
-    }
-
-    private async Task CheckAndShowOnboardingAsync()
-    {
-        try
-        {
-            System.Diagnostics.Debug.WriteLine("🔍 Checking if should show onboarding...");
-            var settings = await _settingsRepository.GetAppSettingsAsync().ConfigureAwait(false);
-
-            System.Diagnostics.Debug.WriteLine($"📋 Settings loaded: IsFirstRun = {settings.IsFirstRun}");
-
-            // Update ShowOnboarding on UI thread
-            UpdateOnUiThread(() => ShowOnboarding = settings.IsFirstRun);
-        }
-        catch (InvalidOperationException ex)
-        {
-            // Database not initialized yet
-            System.Diagnostics.Debug.WriteLine($"⚠️ Database error loading settings: {ex.Message}");
-            UpdateOnUiThread(() => ShowOnboarding = false);
-        }
-        catch (ArgumentException ex)
-        {
-            // Invalid data in database
-            System.Diagnostics.Debug.WriteLine($"⚠️ Invalid settings data: {ex.Message}");
-            UpdateOnUiThread(() => ShowOnboarding = false);
-        }
+        System.Diagnostics.Debug.WriteLine("✅ QuickCounterViewModel created");
     }
 
     private void OnIncrement()
     {
         _project.IncrementCount();
+        AddToUndoStack(CounterAction.Increment);
         TriggerHapticFeedback?.Invoke();
-        OnPropertyChanged(nameof(CurrentCount));
-        OnPropertyChanged(nameof(CanSave));
+        NotifyCountChanged();
+        System.Diagnostics.Debug.WriteLine($"➕ Incremented to {CurrentCount}");
     }
 
     private void OnDecrement()
     {
-        _project.DecrementCount();
+        if (CurrentCount > 0)
+        {
+            _project.DecrementCount();
+            AddToUndoStack(CounterAction.Decrement);
+            TriggerHapticFeedback?.Invoke();
+            NotifyCountChanged();
+            System.Diagnostics.Debug.WriteLine($"➖ Decremented to {CurrentCount}");
+        }
+    }
+
+    private void OnUndo()
+    {
+        if (_undoStack.Count == 0)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ Nothing to undo");
+            return;
+        }
+
+        var lastAction = _undoStack.Pop();
+
+        // Reverse the last action
+        switch (lastAction)
+        {
+            case CounterAction.Increment:
+                _project.DecrementCount();
+                System.Diagnostics.Debug.WriteLine($"↩️ Undid increment, now at {CurrentCount}");
+                break;
+
+            case CounterAction.Decrement:
+                _project.IncrementCount();
+                System.Diagnostics.Debug.WriteLine($"↩️ Undid decrement, now at {CurrentCount}");
+                break;
+
+            case CounterAction.Reset:
+                // For reset, we need to store the previous count
+                // This is handled differently - see OnReset
+                break;
+        }
+
         TriggerHapticFeedback?.Invoke();
-        OnPropertyChanged(nameof(CurrentCount));
-        OnPropertyChanged(nameof(CanSave));
+        NotifyCountChanged();
     }
 
     private void OnReset()
     {
-        _project.ResetCount();
-        TriggerHapticFeedback?.Invoke();
-        OnPropertyChanged(nameof(CurrentCount));
-        OnPropertyChanged(nameof(CanSave));
-    }
+        if (CurrentCount > 0)
+        {
+            // Store current count before reset for potential undo
+            var previousCount = CurrentCount;
+            AddToUndoStack(CounterAction.Reset, previousCount);
 
-    private void OnGetStarted()
-    {
-        System.Diagnostics.Debug.WriteLine("🚀 Get Started tapped");
-        _ = CompleteOnboardingAsync();
-    }
-
-    private void OnEnableSync()
-    {
-        System.Diagnostics.Debug.WriteLine("☁️ Enable Sync tapped - Phase 3 feature");
-        _ = CompleteOnboardingAsync();
-    }
-
-    private void OnMaybeLater()
-    {
-        System.Diagnostics.Debug.WriteLine("⏭️ Maybe Later tapped");
-        _ = CompleteOnboardingAsync();
+            _project.ResetCount();
+            TriggerHapticFeedback?.Invoke();
+            NotifyCountChanged();
+            System.Diagnostics.Debug.WriteLine($"🔄 Reset from {previousCount} to 0");
+        }
     }
 
     private void OnSaveToProject()
     {
         System.Diagnostics.Debug.WriteLine("💾 Save to Project tapped");
         _ = SaveToProjectAsync();
+    }
+
+    /// <summary>
+    /// Adds an action to the undo stack with size limit.
+    /// </summary>
+    private void AddToUndoStack(CounterAction action, int? previousValue = null)
+    {
+        _undoStack.Push(action);
+
+        // Limit stack size to prevent memory issues
+        if (_undoStack.Count > MaxUndoStackSize)
+        {
+            // Convert to list, remove oldest, convert back
+            var items = _undoStack.ToList();
+            items.RemoveAt(items.Count - 1);
+            _undoStack.Clear();
+            foreach (var item in items.AsEnumerable().Reverse())
+            {
+                _undoStack.Push(item);
+            }
+        }
+
+        OnPropertyChanged(nameof(CanUndo));
+
+        // Refresh command state
+        if (UndoCommand is RelayCommand undoCmd)
+        {
+            undoCmd.RaiseCanExecuteChanged();
+        }
+    }
+
+    /// <summary>
+    /// Notifies UI of count-related property changes. 
+    /// </summary>
+    private void NotifyCountChanged()
+    {
+        OnPropertyChanged(nameof(CurrentCount));
+        OnPropertyChanged(nameof(CanSave));
+        OnPropertyChanged(nameof(CanUndo));
+
+        // Refresh command state
+        if (UndoCommand is RelayCommand undoCmd)
+        {
+            undoCmd.RaiseCanExecuteChanged();
+        }
     }
 
     /// <summary>
@@ -197,8 +214,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
             // Create new project with current counter state
             var newProject = Project.CreateProject(projectName.Trim());
 
-            // Transfer the current count
-            // Set the counter to match current count by incrementing
+            // Transfer the current count by incrementing
             for (int i = 0; i < _project.CurrentCount; i++)
             {
                 newProject.IncrementCount();
@@ -217,14 +233,8 @@ public class QuickCounterViewModel : INotifyPropertyChanged
 
             // Reset quick counter for next use
             _project.ResetCount();
-            UpdateOnUiThread(() =>
-            {
-                OnPropertyChanged(nameof(CurrentCount));
-                OnPropertyChanged(nameof(CanSave));
-            });
-
-            // Navigate to Projects tab (Phase 1: just show message for now)
-            System.Diagnostics.Debug.WriteLine("📱 TODO: Navigate to Projects tab");
+            OnPropertyChanged(nameof(CurrentCount));
+            OnPropertyChanged(nameof(CanSave));
 
             // Notify that the project was saved
             if (OnProjectSaved != null)
@@ -248,7 +258,6 @@ public class QuickCounterViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// Shows a dialog prompting the user to enter a project name.
-    /// Returns the entered name or empty string if cancelled.
     /// </summary>
     private async Task<string> ShowProjectNameDialogAsync()
     {
@@ -273,59 +282,25 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Shows a brief toast message (simulated with DisplayAlert for Phase 1).
+    /// Shows a brief toast message
     /// </summary>
     private async Task ShowToastAsync(string message)
     {
         await _dialogService.ShowToastAsync(message).ConfigureAwait(false);
     }
-
-    private async Task CompleteOnboardingAsync()
-    {
-        try
-        {
-            System.Diagnostics.Debug.WriteLine("💾 Completing onboarding...");
-
-            var settings = await _settingsRepository.GetAppSettingsAsync().ConfigureAwait(false);
-            settings.CompleteFirstRun();
-            await _settingsRepository.SaveAppSettingsAsync(settings).ConfigureAwait(false);
-
-            System.Diagnostics.Debug.WriteLine("✅ Onboarding completed, hiding card");
-
-            // Update UI on main thread
-            UpdateOnUiThread(() => ShowOnboarding = false);
-        }
-        catch (InvalidOperationException ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"❌ Database error completing onboarding: {ex.Message}");
-            UpdateOnUiThread(() => ShowOnboarding = false); // Hide anyway to not block user
-        }
-        catch (ArgumentException ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"❌ Invalid data completing onboarding: {ex.Message}");
-            UpdateOnUiThread(() => ShowOnboarding = false);
-        }
-    }
-
-    /// <summary>
-    /// Executes an action on the UI thread using SynchronizationContext.
-    /// Falls back to direct execution if no sync context is available.
-    /// </summary>
-    private void UpdateOnUiThread(Action action)
-    {
-        if (_syncContext != null)
-        {
-            _syncContext.Post(_ => action(), null);
-        }
-        else
-        {
-            // Fallback: execute directly (might be in test environment)
-            action();
-        }
-    }
-
+    
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Enum representing counter actions for undo functionality. 
+    /// </summary>
+    private enum CounterAction
+    {
+        Increment,
+        Decrement,
+        Reset
     }
 }

@@ -33,25 +33,41 @@ public partial class QuickCounterPage : ContentPage
 
         try
         {
-            // Check if user has seen onboarding - use correct method name
-            var settings = await _appSettingsRepository.GetAppSettingsAsync();
-            if (settings?.IsFirstRun == true)
-            {
-                System.Diagnostics.Debug.WriteLine("🎉 First run detected - showing onboarding");
+            System.Diagnostics.Debug.WriteLine("🎉 TESTING MODE: Always showing onboarding popup");
 
-                // Small delay for page to settle
-                await Task.Delay(300);
+            // Small delay for page to settle
+            await Task.Delay(300);
 
-                // Create and show popup (DI will inject AppSettingsRepository)
-                var popup = new OnboardingPopup(_appSettingsRepository);
-                await this.ShowPopupAsync(popup);
+            // TEMPORARY: Always show popup for testing
+            var popup = new OnboardingPopup(_appSettingsRepository);
+            await this.ShowPopupAsync(popup);
 
-                System.Diagnostics.Debug.WriteLine("✅ Onboarding popup closed");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("✅ Not first run - skipping onboarding");
-            }
+            System.Diagnostics.Debug.WriteLine("✅ Onboarding popup closed");
+
+            // TODO: Restore database check when done testing
+            /*
+            
+            */
+
+            //// Check if user has seen onboarding - use correct method name
+            //var settings = await _appSettingsRepository.GetAppSettingsAsync();
+            //if (settings?.IsFirstRun == true)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("🎉 First run detected - showing onboarding");
+
+            //    // Small delay for page to settle
+            //    await Task.Delay(300);
+
+            //    // Create and show popup (DI will inject AppSettingsRepository)
+            //    var popup = new OnboardingPopup(_appSettingsRepository);
+            //    await this.ShowPopupAsync(popup);
+
+            //    System.Diagnostics.Debug.WriteLine("✅ Onboarding popup closed");
+            //}
+            //else
+            //{
+            //    System.Diagnostics.Debug.WriteLine("✅ Not first run - skipping onboarding");
+            //}
         }
         catch (Exception ex)
         {
@@ -83,7 +99,10 @@ public partial class QuickCounterPage : ContentPage
     private void StartSession()
     {
         _isSessionRunning = true;
-        SessionButton.Text = "⸜ PAUSE";
+
+        // Update button to show PAUSE
+        SessionLabel.Text = "PAUSE";
+        SessionIcon.Source = "pause.svg";
 
         // Create timer if not exists
         if (_sessionTimer == null)
@@ -101,7 +120,11 @@ public partial class QuickCounterPage : ContentPage
     private void PauseSession()
     {
         _isSessionRunning = false;
-        SessionButton.Text = "▶ PLAY";
+
+        // Update button to show PLAY
+        SessionLabel.Text = "PLAY";
+        SessionIcon.Source = "play.svg";
+
         _sessionTimer?.Stop();
     }
 

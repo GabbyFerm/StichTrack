@@ -4,34 +4,47 @@
   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
   xmlns:local="clr-namespace:StitchTrack.MAUI.Views"
+  xmlns:views="clr-namespace:StitchTrack.MAUI.Views"
   Shell.FlyoutBehavior="Disabled"
-  Shell.NavBarIsVisible="False"
-  Shell.TabBarBackgroundColor="#E1AD37"
-  Shell.TabBarForegroundColor="#424B54"
-  Shell.TabBarTitleColor="#424B54"
-  Shell.TabBarUnselectedColor="White">
+  Shell.NavBarIsVisible="False">
 
-  <!-- 
+  <!-- Apply theme-aware colors -->
+  <Shell.TabBarBackgroundColor>
+    <AppThemeBinding Light="#E1AD37" Dark="#424B54" />
+  </Shell.TabBarBackgroundColor>
+
+  <Shell.TabBarForegroundColor>
+    <AppThemeBinding Light="#424B54" Dark="#E1AD37" />
+  </Shell.TabBarForegroundColor>
+
+  <Shell.TabBarTitleColor>
+    <AppThemeBinding Light="#424B54" Dark="#E1AD37" />
+    </Shell.TabBarTitleColor>
+
+    <Shell.TabBarUnselectedColor>
+      <AppThemeBinding Light="#FFFFFF" Dark="#D1D5DB" />
+    </Shell.TabBarUnselectedColor>
+
+    <!-- 
   BOTTOM NAVIGATION STYLING:
-  - Background: Golden (#E1AD37)
-  - Unselected: White text + icons
-  - Selected: Dark gray (#424B54) text + icons
+  - Light Mode: Golden background, dark selected, white unselected
+  - Dark Mode:  Dark grey background, white selected, light grey unselected
   - Shadow on top: Subtle (handled by platform)
   -->
 
-  <TabBar>
+    <TabBar>
 
     <!-- COUNTER TAB -->
     <ShellContent
       Title="COUNTER"
-      ContentTemplate="{DataTemplate local:QuickCounterPage}"
+      ContentTemplate="{DataTemplate views:QuickCounterPage}"
       Route="QuickCounterPage"
       Icon="counter.svg" />
 
     <!-- PROJECTS TAB -->
     <ShellContent
       Title="PROJECTS"
-      ContentTemplate="{DataTemplate local:ProjectsPage}"
+      ContentTemplate="{DataTemplate views:ProjectsPage}"
       Route="ProjectsPage"
       Icon="projects.svg" />
 

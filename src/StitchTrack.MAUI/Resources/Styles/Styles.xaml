@@ -17,6 +17,15 @@
     <Setter Property="Margin" Value="0,15,0,10" />
   </Style>
 
+  <!-- Header Title for colored header bars (always white text) -->
+  <Style x:Key="HeaderTitle" TargetType="Label">
+    <Setter Property="FontFamily" Value="MontserratBold" />
+    <Setter Property="FontSize" Value="18" />
+    <Setter Property="TextColor" Value="White" />
+    <Setter Property="HorizontalOptions" Value="Center" />
+    <Setter Property="VerticalOptions" Value="Center" />
+  </Style>
+
   <!-- Section Header (e.g., "Active projects", "Your stats") -->
   <Style x:Key="SectionHeaderLabel" TargetType="Label">
     <Setter Property="FontFamily" Value="MontserratSemiBold" />
@@ -43,15 +52,15 @@
 
   <!-- Secondary Text (timestamps, metadata) -->
   <Style x:Key="SecondaryLabel" TargetType="Label">
-    <Setter Property="FontFamily" Value="MontserratRegular" />
-    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontFamily" Value="MontserratMedium" />
+    <Setter Property="FontSize" Value="12" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
   </Style>
 
   <!-- Counter Display (Large Number) -->
   <Style x:Key="CounterLabel" TargetType="Label">
     <Setter Property="FontFamily" Value="MontserratExtraBold" />
-    <Setter Property="FontSize" Value="72" />
+    <Setter Property="FontSize" Value="96" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
     <Setter Property="HorizontalOptions" Value="Center" />
     <Setter Property="VerticalOptions" Value="Center" />
@@ -60,8 +69,8 @@
   <!-- Caption Text (hints, tips) -->
   <Style x:Key="CaptionLabel" TargetType="Label">
     <Setter Property="FontFamily" Value="MontserratMedium" />
-    <Setter Property="FontSize" Value="10" />
-    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextSecondary}}" />
     <Setter Property="HorizontalTextAlignment" Value="Center" />
   </Style>
 
@@ -112,12 +121,24 @@
   <!-- Text Button (Undo, Reset, small actions) -->
   <Style x:Key="TextButton" TargetType="Button">
     <Setter Property="BackgroundColor" Value="Transparent" />
-    <Setter Property="TextColor" Value="{StaticResource LinkColor}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
     <Setter Property="FontFamily" Value="MontserratSemiBold" />
     <Setter Property="FontSize" Value="13" />
     <Setter Property="Padding" Value="10,5" />
     <Setter Property="HeightRequest" Value="35" />
   </Style>
+
+  <!-- Light Text Button (Undo, Reset in dark mode) -->
+  <Style x:Key="LightTextButton" TargetType="Button">
+    <Setter Property="BackgroundColor" Value="Transparent" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
+    <Setter Property="FontFamily" Value="MontserratSemiBold" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Padding" Value="10,5" />
+    <Setter Property="HeightRequest" Value="35" />
+  </Style>
+
+
 
   <!-- Icon Button (Small circular buttons) -->
   <Style x:Key="IconButton" TargetType="Button">
@@ -133,8 +154,8 @@
   <!-- Outline Button (Save to project, Continue counting) -->
   <Style x:Key="OutlineButton" TargetType="Button">
     <Setter Property="BackgroundColor" Value="Transparent" />
-    <Setter Property="TextColor" Value="{StaticResource LinkColor}" />
-    <Setter Property="BorderColor" Value="{StaticResource LinkColor}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource BrandSave}, Dark={StaticResource BrandGold}}" />
+    <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource BrandSave}, Dark={StaticResource BrandGold}}" />
     <Setter Property="BorderWidth" Value="2" />
     <Setter Property="FontFamily" Value="MontserratBold" />
     <Setter Property="FontSize" Value="14" />
@@ -143,18 +164,19 @@
     <Setter Property="Margin" Value="0,5" />
   </Style>
 
+
   <!-- Small Button (Pause, Play) -->
   <Style x:Key="SmallButton" TargetType="Button">
-    <Setter Property="BackgroundColor" Value="Transparent" />
-    <Setter Property="TextColor" Value="{StaticResource LinkColor}" />
-    <Setter Property="BorderColor" Value="{StaticResource LinkColor}" />
-    <Setter Property="BorderWidth" Value="1" />
-    <Setter Property="FontFamily" Value="MontserratSemiBold" />
+    <Setter Property="BackgroundColor" Value="{StaticResource ButtonIncrease}" />
+    <Setter Property="TextColor" Value="White" />
+    <Setter Property="FontFamily" Value="MontserratBold" />
     <Setter Property="FontSize" Value="11" />
     <Setter Property="HeightRequest" Value="32" />
     <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Padding" Value="10,5" />
+    <Setter Property="Padding" Value="15,0" />
   </Style>
+
+
 
   <!-- ============================================ -->
   <!-- CARD & FRAME STYLES                          -->
@@ -172,13 +194,14 @@
 
   <!-- Counter Display Card -->
   <Style x:Key="CounterCard" TargetType="Frame">
-    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightCounterCardBackground}, Dark={StaticResource DarkCardBackground}}" />
     <Setter Property="BorderColor" Value="Transparent" />
     <Setter Property="CornerRadius" Value="16" />
     <Setter Property="Padding" Value="20" />
     <Setter Property="Margin" Value="0,10" />
     <Setter Property="HasShadow" Value="False" />
   </Style>
+
 
   <!-- Project Image Frame -->
   <Style x:Key="ProjectImageFrame" TargetType="Frame">
