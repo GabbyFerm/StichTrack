@@ -4,156 +4,239 @@
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                x:Class="StitchTrack.MAUI.Controls.OnboardingPopup"
                Color="Transparent"
-               CanBeDismissedByTappingOutsideOfPopup="False">
+               CanBeDismissedByTappingOutsideOfPopup="False"
+               Size="{OnPlatform Default='1000,1000', Android='1000,1000', iOS='1000,1000'}">
 
-  <!-- Main Frame -->
-  <Frame BackgroundColor="{AppThemeBinding Light=#FDFBF5, Dark=#424B54}"
-         CornerRadius="20"
-         Padding="0"
-         HasShadow="True"
-         BorderColor="Transparent"
-         WidthRequest="340"
-         MaximumHeightRequest="600">
+  <!-- Main Container - FULL SCREEN -->
+  <Grid HorizontalOptions="Fill"
+        VerticalOptions="Fill">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <!-- Background Image -->
+    <Image Source="onboarding.jpg"
+           Aspect="AspectFill"
+           HorizontalOptions="Fill"
+           VerticalOptions="Fill" />
+
+    <!-- Dark Overlay for readability -->
+    <BoxView BackgroundColor="#80000000"
+             Opacity="0.6" />
+
+    <!-- Content Grid with Safe Area -->
+    <Grid RowDefinitions="Auto,*,Auto"
+          Padding="0"
+          Margin="0,40,0,0">
 
       <!-- ============================================ -->
-      <!-- HEADER: Logo + Close Button                 -->
+      <!-- HEADER: Close Button (Top Right)            -->
       <!-- ============================================ -->
-      <Grid Grid.Row="0"
-            ColumnDefinitions="*,Auto"
-            Padding="20,15,15,10">
+      <ImageButton Grid.Row="0"
+                   Source="close.svg"
+                   WidthRequest="32"
+                   HeightRequest="32"
+                   CornerRadius="16"
+                   BackgroundColor="#40FFFFFF"
+                   Padding="6"
+                   Margin="15,15,15,0"
+                   Clicked="OnCloseClicked"
+                   HorizontalOptions="End"
+                   VerticalOptions="Start">
+        <ImageButton.Behaviors>
+          <toolkit:IconTintColorBehavior TintColor="White" />
+        </ImageButton.Behaviors>
+      </ImageButton>
 
-        <!-- Logo (Tinted Golden) -->
+      <!-- ============================================ -->
+      <!-- CONTENT: Logo, Title, Features              -->
+      <!-- ============================================ -->
+      <VerticalStackLayout Grid.Row="1"
+                          Spacing="20"
+                          Padding="30,20,30,20"
+                          VerticalOptions="Center">
+
+        <!-- "Welcome to" Text -->
+        <Label Text="Welcome to"
+               FontFamily="MontserratRegular"
+               FontSize="16"
+               TextColor="White"
+               HorizontalOptions="Center"
+               Opacity="0.9" />
+
+        <!-- Logo  -->
         <Image Grid.Column="0"
                Source="logo.svg"
-               HeightRequest="40"
-               HorizontalOptions="Start"
+               HeightRequest="50"
+               HorizontalOptions="Center"
                VerticalOptions="Center">
           <Image.Behaviors>
-            <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
+            <toolkit:IconTintColorBehavior TintColor="{StaticResource TextWhite}" />
           </Image.Behaviors>
+
         </Image>
 
-        <!-- Close Button -->
-        <ImageButton Grid.Column="1"
-                     Source="close.svg"
-                     WidthRequest="32"
-                     HeightRequest="32"
-                     CornerRadius="16"
-                     BackgroundColor="Transparent"
-                     Padding="6"
-                     Clicked="OnCloseClicked"
-                     VerticalOptions="Start">
-          <ImageButton.Behaviors>
-            <toolkit:IconTintColorBehavior TintColor="#999" />
-          </ImageButton.Behaviors>
-        </ImageButton>
+        <!-- Subtitle -->
+        <Label Text="Start counting rows effortlessly"
+               FontFamily="MontserratMedium"
+               FontSize="15"
+               TextColor="White"
+               HorizontalOptions="Center"
+               HorizontalTextAlignment="Center"
+               Margin="0,5,0,0"
+               Opacity="0.95" />
 
-      </Grid>
+        <!-- Description -->
+        <Label Text="Your projects are saved locally and&#10;you always have access to them."
+               FontFamily="MontserratRegular"
+               FontSize="15"
+               TextColor="White"
+               HorizontalOptions="Center"
+               HorizontalTextAlignment="Center"
+               LineBreakMode="WordWrap"
+               Margin="0,0,0,15"
+               Opacity="0.9" />
 
-      <!-- ============================================ -->
-      <!-- CONTENT: Welcome message + Features         -->
-      <!-- ============================================ -->
-      <ScrollView Grid.Row="1" Padding="30,10,30,20">
-        <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
+        <!-- Features List -->
+        <VerticalStackLayout Spacing="12"
+                            Margin="0,0,0,10">
 
-          <!-- Yarn Ball Icon -->
-          <Image Source="ball_of_wool.svg"
-                 HeightRequest="70"
-                 WidthRequest="70"
-                 HorizontalOptions="Center">
-            <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
-            </Image.Behaviors>
-          </Image>
+          <!-- Feature 1 -->
+          <HorizontalStackLayout Spacing="12"
+                                 HorizontalOptions="Center">
+            <Label Text="✓"
+                   FontFamily="MontserratBold"
+                   FontSize="20"
+                   TextColor="{StaticResource BrandGold}"
+                   VerticalOptions="Center" />
+            <Label Text="Track multiple projects"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   TextColor="White"
+                   VerticalOptions="Center"
+                   Opacity="0.95" />
+          </HorizontalStackLayout>
 
-          <!-- Welcome Title -->
-          <Label Text="Welcome to StitchTrack!"
-                 FontFamily="MontserratBold"
-                 FontSize="24"
-                 TextColor="{StaticResource TextPrimary}"
-                 HorizontalOptions="Center" />
+          <!-- Feature 2 -->
+          <HorizontalStackLayout Spacing="12"
+                                 HorizontalOptions="Center">
+            <Label Text="✓"
+                   FontFamily="MontserratBold"
+                   FontSize="20"
+                   TextColor="{StaticResource BrandGold}"
+                   VerticalOptions="Center" />
+            <Label Text="Count rows with ease"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   TextColor="White"
+                   VerticalOptions="Center"
+                   Opacity="0.95" />
+          </HorizontalStackLayout>
 
-          <!-- Subtitle -->
-          <Label Text="Start counting rows effortlessly"
-                 FontFamily="MontserratMedium"
-                 FontSize="14"
-                 TextColor="{StaticResource TextSecondary}"
-                 HorizontalOptions="Center"
-                 HorizontalTextAlignment="Center" />
-
-          <!-- Description -->
-          <Label Text="Your projects save locally and you always have access to them."
-                 FontFamily="MontserratRegular"
-                 FontSize="13"
-                 TextColor="{StaticResource TextSecondary}"
-                 HorizontalOptions="Center"
-                 HorizontalTextAlignment="Center"
-                 Margin="0,0,0,10" />
-
-          <!-- Features List -->
-          <VerticalStackLayout Spacing="12">
-
-            <!-- Feature 1 -->
-            <HorizontalStackLayout Spacing="12">
-              <Label Text="✓"
-                     FontFamily="MontserratBold"
-                     FontSize="18"
-                     TextColor="{StaticResource BrandGold}"
-                     VerticalOptions="Center" />
-              <Label Text="Track multiple projects"
-                     FontFamily="MontserratMedium"
-                     FontSize="14"
-                     TextColor="{StaticResource TextPrimary}"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
-
-            <!-- Feature 2 -->
-            <HorizontalStackLayout Spacing="12">
-              <Label Text="✓"
-                     FontFamily="MontserratBold"
-                     FontSize="18"
-                     TextColor="{StaticResource BrandGold}"
-                     VerticalOptions="Center" />
-              <Label Text="Count rows with ease"
-                     FontFamily="MontserratMedium"
-                     FontSize="14"
-                     TextColor="{StaticResource TextPrimary}"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
-
-            <!-- Feature 3 -->
-            <HorizontalStackLayout Spacing="12">
-              <Label Text="✓"
-                     FontFamily="MontserratBold"
-                     FontSize="18"
-                     TextColor="{StaticResource BrandGold}"
-                     VerticalOptions="Center" />
-              <Label Text="Never lose your progress"
-                     FontFamily="MontserratMedium"
-                     FontSize="14"
-                     TextColor="{StaticResource TextPrimary}"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
-
-          </VerticalStackLayout>
+          <!-- Feature 3 -->
+          <HorizontalStackLayout Spacing="12"
+                                 HorizontalOptions="Center">
+            <Label Text="✓"
+                   FontFamily="MontserratBold"
+                   FontSize="20"
+                   TextColor="{StaticResource BrandGold}"
+                   VerticalOptions="Center" />
+            <Label Text="Never lose your progress"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   TextColor="White"
+                   VerticalOptions="Center"
+                   Opacity="0.95" />
+          </HorizontalStackLayout>
 
         </VerticalStackLayout>
-      </ScrollView>
+
+      </VerticalStackLayout>
 
       <!-- ============================================ -->
-      <!-- FOOTER: Get Started Button                  -->
+      <!-- FOOTER: Buttons                             -->
       <!-- ============================================ -->
-      <Button Grid.Row="2"
-              Text="GET STARTED"
-              Style="{StaticResource PrimaryButton}"
-              Clicked="OnGetStartedClicked"
-              HorizontalOptions="FillAndExpand"
-              Margin="20,0,20,20" />
+      <VerticalStackLayout Grid.Row="2"
+                          Spacing="12"
+                          Padding="30,0,30,60">
+
+        <!-- Primary Button: Get Started -->
+        <Border BackgroundColor="{StaticResource BrandGold}"
+                StrokeThickness="0"
+                HeightRequest="55"
+                Padding="20,0"
+                HorizontalOptions="Center"
+                WidthRequest="250">
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="10" />
+          </Border.StrokeShape>
+          <Border.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnGetStartedClicked" />
+          </Border.GestureRecognizers>
+
+          <HorizontalStackLayout Spacing="10"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center">
+            <Image Source="ball_of_wool.svg"
+                   HeightRequest="30"
+                   WidthRequest="30"
+                   VerticalOptions="Center">
+              <Image.Behaviors>
+                <toolkit:IconTintColorBehavior TintColor="White" />
+              </Image.Behaviors>
+            </Image>
+            <Label Text="GET STARTED"
+                   TextColor="White"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="15"
+                   VerticalOptions="Center" />
+          </HorizontalStackLayout>
+        </Border>
+
+        <!-- Secondary Button: Enable Backup & Sync -->
+        <Border BackgroundColor="{StaticResource ButtonSecondary}"
+                StrokeThickness="0"
+                HeightRequest="50"
+                Padding="20,0"
+                Opacity="0.9"
+                HorizontalOptions="Center"
+                WidthRequest="250">
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Tapped="OnEnableSyncClicked" />
+            </Border.GestureRecognizers>
+
+            <HorizontalStackLayout Spacing="10"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center">
+              <Image Source="cloud_backup.svg"
+                     HeightRequest="20"
+                     WidthRequest="20"
+                     VerticalOptions="Center">
+                <Image.Behaviors>
+                  <toolkit:IconTintColorBehavior TintColor="White" />
+                </Image.Behaviors>
+              </Image>
+              <Label Text="Enable Backup &amp; Sync"
+                     TextColor="White"
+                     FontFamily="MontserratMedium"
+                     FontSize="14"
+                     VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+
+        <!-- Phase 3 Note -->
+        <Label Text="(Phase 3)"
+               FontFamily="MontserratRegular"
+               FontSize="10"
+               TextColor="White"
+               HorizontalOptions="Center"
+               Opacity="0.7"
+               Margin="0,5,0,0" />
+
+      </VerticalStackLayout>
 
     </Grid>
 
-  </Frame>
+  </Grid>
 
 </toolkit:Popup>

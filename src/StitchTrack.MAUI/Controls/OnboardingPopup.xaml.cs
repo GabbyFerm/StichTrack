@@ -37,6 +37,18 @@ public partial class OnboardingPopup : Popup
     }
 
     /// <summary>
+    /// Enable Backup & Sync button clicked - show Phase 3 message.
+    /// </summary>
+    private async void OnEnableSyncClicked(object sender, EventArgs e)
+    {
+        // Phase 3 feature - show info message
+        await Microsoft.Maui.Controls.Application.Current!.MainPage!.DisplayAlert(
+            "Coming Soon",
+            "Cloud backup & sync will be available in Phase 3! For now, your projects are safely stored locally on your device.",
+            "OK");
+    }
+
+    /// <summary>
     /// Marks onboarding as seen in AppSettings.
     /// Sets IsFirstRun = false so it won't show again.
     /// </summary>

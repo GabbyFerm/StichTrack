@@ -1,7 +1,7 @@
 using ObjCRuntime;
 using UIKit;
 
-namespace StitchTrack.MAUI;
+namespace StitchTrack.MAUI.Platforms.MacCatalyst;
 
 public class Program
 {

@@ -37,8 +37,6 @@ public static class MauiProgram
                 fonts.AddFont("Montserrat-ExtraBold.ttf", "MontserratExtraBold");
             });
 
-
-
         // DATABASE
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(DatabaseConfig.ConnectionString));

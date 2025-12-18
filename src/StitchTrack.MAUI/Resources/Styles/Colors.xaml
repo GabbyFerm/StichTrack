@@ -18,7 +18,7 @@
   <Color x:Key="LightTextPrimary">#424B54</Color>
   <Color x:Key="LightTextSecondary">#6B7280</Color>
   <Color x:Key="LightLine">#E1AD37</Color>
-  <Color x:Key="LightCardBackground">#FFFFFF</Color>
+  <Color x:Key="LightCardBackground">#F5EDD3</Color>
   <Color x:Key="LightIconColor">#424B54</Color>
 
   <!-- ============================================ -->
@@ -37,17 +37,9 @@
   <!-- Use AppThemeBinding in XAML where needed     -->
   <!-- ============================================ -->
 
-  <!-- Note: MAUI doesn't support Light/Dark on Color directly.
-         Instead, use AppThemeBinding in your XAML like this:
-         BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
-    -->
-
-  <!-- App Background: Golden (same in both modes) -->
-  <Color x:Key="AppBackground">#E1AD37</Color>
-
-  <!-- Links & Accents: Golden (same in both modes) -->
-  <Color x:Key="LinkColor">#E1AD37</Color>
-  <Color x:Key="AccentColor">#E1AD37</Color>
+  <Color x:Key="TextPrimary">#424B54</Color>
+  <Color x:Key="TextSecondary">#6B7280</Color>
+  <Color x:Key="TextWhite">#ffffff</Color>
 
   <!-- ============================================ -->
   <!-- BUTTON COLORS (Same in Both Modes)           -->
@@ -55,13 +47,15 @@
   <Color x:Key="ButtonIncrease">#E1AD37</Color>
   <Color x:Key="ButtonDecrease">#424B54</Color>
   <Color x:Key="ButtonCancel">#EB9057</Color>
+  <Color x:Key="ButtonPrimary">#E1AD37</Color>
+  <Color x:Key="ButtonSecondary">#424B54</Color>
   <Color x:Key="ButtonTextOnGold">#FFFFFF</Color>
   <Color x:Key="ButtonTextOnDark">#FFFFFF</Color>
 
   <!-- ============================================ -->
   <!-- NAVIGATION COLORS                            -->
   <!-- ============================================ -->
-  <Color x:Key="NavBackground">#E1AD37</Color>
+  <Color x:Key="NavBackground">#d39d55</Color>
   <Color x:Key="NavTextUnselected">#FFFFFF</Color>
   <Color x:Key="NavTextSelected">#424B54</Color>
   <Color x:Key="NavIconUnselected">#FFFFFF</Color>
@@ -74,5 +68,9 @@
   <Color x:Key="ErrorRed">#EF4444</Color>
   <Color x:Key="WarningYellow">#F59E0B</Color>
   <Color x:Key="InfoBlue">#3B82F6</Color>
+  <Color x:Key="BrandSave">#16697A</Color>
+  <Color x:Key="SecondaryGold">#d39d55</Color>
+  <Color x:Key="LightGreen">#d6cfb4</Color>
+  <Color x:Key="DarkGreen">#606C5D</Color>
 
 </ResourceDictionary>
