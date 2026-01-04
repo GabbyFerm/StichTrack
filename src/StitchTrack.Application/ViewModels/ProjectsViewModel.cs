@@ -11,7 +11,7 @@ namespace StitchTrack.Application.ViewModels;
 
 /// <summary>
 /// ViewModel for the Projects list page.
-/// Manages loading, creating, updating, and deleting projects.
+/// Manages the list of projects, filtering between active and archived.
 /// </summary>
 public class ProjectsViewModel : INotifyPropertyChanged
 {
@@ -20,11 +20,31 @@ public class ProjectsViewModel : INotifyPropertyChanged
     private readonly SynchronizationContext? _syncContext;
     private bool _isLoading;
     private bool _isEmpty;
+    private bool _showArchived;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    // Observable collection of projects (binds to UI list)
+    // Observable collection of ALL projects
+    private readonly ObservableCollection<Project> _allProjects = new();
+
+    // Filtered projects based on ShowArchived flag
     public ObservableCollection<Project> Projects { get; } = new();
+
+    // Whether to show archived or active projects
+    public bool ShowArchived
+    {
+        get => _showArchived;
+        set
+        {
+            if (_showArchived != value)
+            {
+                _showArchived = value;
+                OnPropertyChanged();
+                FilterProjects();
+                System.Diagnostics.Debug.WriteLine($"🔄 Showing {(value ? "archived" : "active")} projects");
+            }
+        }
+    }
 
     // Loading state
     public bool IsLoading
@@ -56,12 +76,18 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     public bool HasProjects => !IsEmpty;
+    public int ActiveProjectCount => _allProjects.Count(p => !p.IsArchived);
+    public int ArchivedProjectCount => _allProjects.Count(p => p.IsArchived);
 
     // Commands
     public ICommand LoadProjectsCommand { get; }
     public ICommand CreateProjectCommand { get; }
     public ICommand DeleteProjectCommand { get; }
     public ICommand RefreshCommand { get; }
+    public ICommand ShowActiveProjectsCommand { get; }
+    public ICommand ShowArchivedProjectsCommand { get; }
+    public ICommand SearchCommand { get; }
+    public ICommand SyncCommand { get; }
 
     public ProjectsViewModel(
         IProjectRepository projectRepository,
@@ -77,6 +103,10 @@ public class ProjectsViewModel : INotifyPropertyChanged
         CreateProjectCommand = new RelayCommand(OnCreateProject);
         DeleteProjectCommand = new RelayCommand(OnDeleteProject);
         RefreshCommand = new RelayCommand(OnRefresh);
+        ShowActiveProjectsCommand = new RelayCommand(() => ShowArchived = false);
+        ShowArchivedProjectsCommand = new RelayCommand(() => ShowArchived = true);
+        SearchCommand = new RelayCommand(OnSearch);
+        SyncCommand = new RelayCommand(OnSync);
 
         System.Diagnostics.Debug.WriteLine("✅ ProjectsViewModel created");
 
@@ -85,27 +115,37 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Loads all active projects from the database.
+    /// Loads all projects (both active and archived) from the database.
     /// </summary>
-    private async Task LoadProjectsAsync()
+    public async Task LoadProjectsAsync()
     {
         try
         {
             System.Diagnostics.Debug.WriteLine("📂 Loading projects...");
             IsLoading = true;
 
-            var projects = await _projectRepository.GetActiveProjectsAsync().ConfigureAwait(false);
+            // ✅ UPDATED: Load both active and archived
+            var activeProjects = await _projectRepository.GetActiveProjectsAsync().ConfigureAwait(false);
+            var archivedProjects = await _projectRepository.GetArchivedProjectsAsync().ConfigureAwait(false);
 
             UpdateOnUiThread(() =>
             {
-                Projects.Clear();
-                foreach (var project in projects)
+                _allProjects.Clear();
+
+                // Add all projects to internal collection
+                foreach (var project in activeProjects)
                 {
-                    Projects.Add(project);
+                    _allProjects.Add(project);
+                }
+                foreach (var project in archivedProjects)
+                {
+                    _allProjects.Add(project);
                 }
 
-                IsEmpty = Projects.Count == 0;
-                System.Diagnostics.Debug.WriteLine($"✅ Loaded {Projects.Count} projects");
+                // Filter based on current tab
+                FilterProjects();
+
+                System.Diagnostics.Debug.WriteLine($"✅ Loaded {_allProjects.Count} projects ({activeProjects.Count()} active, {archivedProjects.Count()} archived)");
             });
         }
         catch (InvalidOperationException ex)
@@ -117,6 +157,27 @@ public class ProjectsViewModel : INotifyPropertyChanged
         {
             UpdateOnUiThread(() => IsLoading = false);
         }
+    }
+
+    /// <summary>
+    /// Filters projects based on ShowArchived flag.
+    /// </summary>
+    private void FilterProjects()
+    {
+        Projects.Clear();
+
+        var filtered = _allProjects.Where(p => p.IsArchived == ShowArchived);
+
+        foreach (var project in filtered)
+        {
+            Projects.Add(project);
+        }
+
+        IsEmpty = Projects.Count == 0;
+
+        // Notify counts changed
+        OnPropertyChanged(nameof(ActiveProjectCount));
+        OnPropertyChanged(nameof(ArchivedProjectCount));
     }
 
     /// <summary>
@@ -153,7 +214,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
             // Reload projects to show new one
             await LoadProjectsAsync().ConfigureAwait(false);
 
-            await _dialogService.ShowToastAsync($"Project '{projectName}' created!").ConfigureAwait(false);
+            await _dialogService.ShowToastAsync($"Project '{projectName}' created! ").ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
@@ -175,7 +236,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         try
         {
-            var project = Projects.FirstOrDefault(p => p.Id == projectId);
+            var project = _allProjects.FirstOrDefault(p => p.Id == projectId);
             if (project == null)
             {
                 System.Diagnostics.Debug.WriteLine($"⚠️ Project not found: {projectId}");
@@ -197,9 +258,10 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
             System.Diagnostics.Debug.WriteLine($"✅ Project archived: {project.Name}");
 
-            // Remove from UI
+            // Remove from both collections
             UpdateOnUiThread(() =>
             {
+                _allProjects.Remove(project);
                 Projects.Remove(project);
                 IsEmpty = Projects.Count == 0;
             });
@@ -253,6 +315,18 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         System.Diagnostics.Debug.WriteLine("🔄 Refreshing projects...");
         _ = LoadProjectsAsync();
+    }
+
+    private void OnSearch()
+    {
+        System.Diagnostics.Debug.WriteLine("🔍 Search tapped");
+        // TODO: Implement search functionality
+    }
+
+    private void OnSync()
+    {
+        System.Diagnostics.Debug.WriteLine("🔄 Sync tapped");
+        // TODO: Implement sync functionality
     }
 
     /// <summary>

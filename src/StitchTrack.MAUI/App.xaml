@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:StitchTrack.MAUI"
              xmlns:converters="clr-namespace:StitchTrack.MAUI.Converters"
              x:Class="StitchTrack.MAUI.App">
   <Application.Resources>
@@ -16,6 +15,11 @@
       <!-- Converters -->
       <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
       <converters:RelativeTimeConverter x:Key="RelativeTimeConverter" />
+      <converters:IsStringNullOrEmptyConverter x:Key="IsStringNullOrEmptyConverter" />
+      <converters:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
+      <converters:TotalRowsConverter x:Key="TotalRowsConverter" />
+      <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
+      <converters:ProgressPercentageConverter x:Key="ProgressPercentageConverter" />
 
       <!-- Add your custom font styles here -->
       <Style TargetType="Label">
