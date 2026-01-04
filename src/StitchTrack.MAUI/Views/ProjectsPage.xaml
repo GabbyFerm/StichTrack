@@ -1,148 +1,351 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:StitchTrack.Application.ViewModels;assembly=StitchTrack.Application"
+             xmlns:entities="clr-namespace:StitchTrack.Domain.Entities;assembly=StitchTrack.Domain"
              x:Class="StitchTrack.MAUI.Views.ProjectsPage"
-             Title="Projects"
-             BackgroundColor="#E8E8E8">
+             x:DataType="viewModels:ProjectsViewModel"
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
+             Shell.NavBarIsVisible="False">
 
-  <Grid RowDefinitions="Auto,*,Auto">
+  <Grid RowDefinitions="Auto,Auto,*"
+        RowSpacing="0">
 
-    <!-- Header -->
-    <VerticalStackLayout Grid.Row="0" 
-                         Padding="20,20,20,10">
-      <Label Text="MY PROJECTS"
-             FontFamily="MontserratBold"
-             FontSize="24"
-             TextColor="#424B54"
-             HorizontalOptions="Start" />
-      <Label Text="Track your knitting and crochet projects"
-             FontFamily="MontserratMedium"
-             FontSize="12"
-             TextColor="#999"
-             HorizontalOptions="Start" />
-    </VerticalStackLayout>
+    <!-- ============================================ -->
+    <!-- TOP BAR:   Logo + Sync Icon                    -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="0"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="30,30"
+          ColumnDefinitions="*,Auto"
+          ColumnSpacing="15">
 
-    <!-- Projects List / Empty State -->
-    <Grid Grid.Row="1">
+      <!-- Logo -->
+      <Image Grid.Column="0"
+             Source="logo.svg"
+             HeightRequest="35"
+             HorizontalOptions="Start"
+             Aspect="AspectFit" />
 
-      <!-- Loading Indicator -->
-      <ActivityIndicator IsRunning="{Binding IsLoading}"
-                         IsVisible="{Binding IsLoading}"
-                         Color="#E1AD37"
-                         VerticalOptions="Center"
-                         HorizontalOptions="Center" />
-
-      <!-- Empty State -->
-      <VerticalStackLayout IsVisible="{Binding IsEmpty}"
-                           Padding="40"
-                           Spacing="20"
-                           VerticalOptions="Center">
-        <Label Text="🧶"
-               FontSize="60"
-               HorizontalOptions="Center" />
-        <Label Text="No Projects Yet"
-               FontFamily="MontserratBold"
-               FontSize="20"
-               TextColor="#424B54"
-               HorizontalOptions="Center" />
-        <Label Text="Tap the + button below to create your first project"
-               FontFamily="MontserratMedium"
-               FontSize="14"
-               TextColor="#999"
-               HorizontalOptions="Center"
-               HorizontalTextAlignment="Center" />
-      </VerticalStackLayout>
-
-      <!-- Projects List -->
-      <!-- FIXED: Removed InvertedBoolConverter - add HasProjects property to ViewModel instead -->
-      <RefreshView IsRefreshing="{Binding IsLoading}"
-                   Command="{Binding RefreshCommand}"
-                   IsVisible="{Binding HasProjects}">
-        <CollectionView ItemsSource="{Binding Projects}"
-                        SelectionMode="None">
-          <CollectionView.ItemTemplate>
-            <DataTemplate>
-              <!-- Project Card -->
-              <Frame Margin="15,10"
-                     Padding="15"
-                     BackgroundColor="White"
-                     CornerRadius="12"
-                     HasShadow="True">
-                <Frame.GestureRecognizers>
-                  <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.NavigateToProjectCommand}"
-                                        CommandParameter="{Binding Id}" />
-                </Frame.GestureRecognizers>
-
-                <Grid ColumnDefinitions="*,Auto"
-                      RowDefinitions="Auto,Auto,Auto">
-
-                  <!-- Project Name -->
-                  <Label Grid.Row="0" Grid.Column="0"
-                         Text="{Binding Name}"
-                         FontFamily="MontserratSemiBold"
-                         FontSize="18"
-                         TextColor="#424B54"
-                         LineBreakMode="TailTruncation" />
-
-                  <!-- Counter Badge -->
-                  <Frame Grid.Row="0" Grid.Column="1"
-                         BackgroundColor="#424B54"
-                         CornerRadius="15"
-                         Padding="12,6"
-                         HasShadow="False"
-                         VerticalOptions="Start">
-                    <Label Text="{Binding CurrentCount, StringFormat='{0} rows'}"
-                           FontFamily="MontserratBold"
-                           FontSize="14"
-                           TextColor="White" />
-                  </Frame>
-
-                  <!-- Show raw date -->
-                  <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                         Text="{Binding UpdatedAt, StringFormat='Updated {0:g}'}"
-                         FontFamily="MontserratMedium"
-                         FontSize="12"
-                         TextColor="#999"
-                         Margin="0,5,0,0" />
-
-                  <!-- Action Buttons -->
-                  <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                                         Spacing="10"
-                                         Margin="0,10,0,0">
-                    <!-- Delete Button (Issue #18) -->
-                    <Button Text="🗑️ Delete"
-                            Clicked="OnDeleteButtonClicked"
-                            CommandParameter="{Binding Id}"
-                            BackgroundColor="Transparent"
-                            TextColor="#FF6B6B"
-                            BorderColor="#FF6B6B"
-                            BorderWidth="1"
-                            FontFamily="MontserratMedium"
-                            FontSize="12"
-                            CornerRadius="8"
-                            Padding="15,8" />
-                  </HorizontalStackLayout>
-
-                </Grid>
-              </Frame>
-            </DataTemplate>
-          </CollectionView.ItemTemplate>
-        </CollectionView>
-      </RefreshView>
+      <!-- Sync Icon -->
+      <Image Grid.Column="1"
+             Source="refresh.svg"
+             HeightRequest="24"
+             WidthRequest="24"
+             HorizontalOptions="End"
+             VerticalOptions="Center">
+        <Image.Behaviors>
+          <toolkit:IconTintColorBehavior TintColor="White" />
+        </Image.Behaviors>
+        <Image.GestureRecognizers>
+          <TapGestureRecognizer Command="{Binding SyncCommand}" />
+        </Image.GestureRecognizers>
+      </Image>
 
     </Grid>
 
-    <!-- New Project Button (Issue #17) -->
-    <Button Grid.Row="2"
-            Text="+ New Project"
-            Command="{Binding CreateProjectCommand}"
-            BackgroundColor="#E1AD37"
-            TextColor="White"
-            FontFamily="MontserratSemiBold"
-            FontSize="16"
-            HeightRequest="55"
-            CornerRadius="15"
-            Margin="20,10,20,30" />
+    <!-- ============================================ -->
+    <!-- PAGE TITLE with Yellow Background            -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="1"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          HeightRequest="60"
+          Padding="20,15">
+
+      <!-- MY PROJECTS Title -->
+      <Label Text="MY PROJECTS"
+             Style="{StaticResource HeaderTitle}"
+             HorizontalOptions="Start"
+             VerticalOptions="Center" />
+
+      <!-- Buttons Container (Right-aligned) -->
+      <HorizontalStackLayout HorizontalOptions="End"
+                             VerticalOptions="Center"
+                             Spacing="15">
+
+        <!-- Add Button -->
+        <Image Source="plus.svg"
+               HeightRequest="24"
+               WidthRequest="24">
+          <Image.Behaviors>
+            <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+          <Image.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding CreateProjectCommand}" />
+          </Image.GestureRecognizers>
+        </Image>
+
+        <!-- Search Button -->
+        <Image Source="search.svg"
+               HeightRequest="24"
+               WidthRequest="24">
+          <Image.Behaviors>
+            <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+          <Image.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding SearchCommand}" />
+          </Image.GestureRecognizers>
+        </Image>
+
+      </HorizontalStackLayout>
+
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT                                 -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="2" RowDefinitions="Auto,*">
+
+      <!-- Filter Tabs:   Active | Archived -->
+      <VerticalStackLayout Grid.Row="0" Spacing="0">
+
+        <!-- Tab Labels -->
+        <Grid Padding="20,20,20,10"
+        ColumnDefinitions="*,*">
+
+          <!-- Active Projects Tab (Left) -->
+          <Label Grid.Column="0"
+                 FontFamily="MontserratSemiBold"
+                 FontSize="16"
+                 HorizontalOptions="Start"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+            <Label.FormattedText>
+              <FormattedString>
+                <Span Text="Active projects (" />
+                <Span Text="{Binding ActiveProjectCount}" />
+                <Span Text=")" />
+              </FormattedString>
+            </Label.FormattedText>
+            <Label.Triggers>
+              <DataTrigger TargetType="Label"
+                           Binding="{Binding ShowArchived}"
+                           Value="False">
+                <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
+                <Setter Property="FontFamily" Value="MontserratBold" />
+              </DataTrigger>
+              </Label.Triggers>
+              <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ShowActiveProjectsCommand}" />
+              </Label.GestureRecognizers>
+          </Label>
+
+          <!-- Archived Projects Tab (Right) -->
+          <Label Grid.Column="1"
+                 FontFamily="MontserratSemiBold"
+                 FontSize="16"
+                 HorizontalOptions="End"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+            <Label.FormattedText>
+              <FormattedString>
+                <Span Text="Archived Projects (" />
+                <Span Text="{Binding ArchivedProjectCount}" />
+                <Span Text=")" />
+              </FormattedString>
+              </Label.FormattedText>
+              <Label.Triggers>
+                <DataTrigger TargetType="Label"
+                             Binding="{Binding ShowArchived}"
+                             Value="True">
+                  <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
+                  <Setter Property="FontFamily" Value="MontserratBold" />
+                </DataTrigger>
+            </Label.Triggers>
+            <Label.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ShowArchivedProjectsCommand}" />
+            </Label.GestureRecognizers>
+          </Label>
+
+        </Grid>
+
+        <!-- Full-Width Underline Container -->
+        <Grid Padding="20,0" ColumnDefinitions="*,*" ColumnSpacing="0">
+
+          <!-- Left Half Underline (Active Projects) -->
+          <BoxView Grid.Column="0"
+             HeightRequest="2"
+             HorizontalOptions="Fill"
+             Color="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+            <BoxView.Triggers>
+              <DataTrigger TargetType="BoxView"
+                     Binding="{Binding ShowArchived}"
+                     Value="False">
+                <Setter Property="Color" Value="{StaticResource BrandGold}" />
+              </DataTrigger>
+              </BoxView.Triggers>
+          </BoxView>
+
+          <!-- Right Half Underline (Archived Projects) -->
+          <BoxView Grid.Column="1"
+             HeightRequest="2"
+             HorizontalOptions="Fill"
+             Color="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+            <BoxView.Triggers>
+              <DataTrigger TargetType="BoxView"
+                     Binding="{Binding ShowArchived}"
+                     Value="True">
+                <Setter Property="Color" Value="{StaticResource BrandGold}" />
+              </DataTrigger>
+            </BoxView.Triggers>
+          </BoxView>
+
+        </Grid>
+
+      </VerticalStackLayout>
+
+      <!-- Projects List -->
+      <CollectionView Grid.Row="1"
+                      ItemsSource="{Binding Projects}"
+                      SelectionMode="None"
+                      Margin="20,10,20,0">
+
+        <CollectionView.EmptyView>
+          <VerticalStackLayout VerticalOptions="Center"
+                               HorizontalOptions="Center"
+                               Spacing="16"
+                               Padding="40">
+
+            <!-- Wool Ball Icon -->
+            <Image Source="ball_of_wool.svg"
+                   WidthRequest="80"
+                   HeightRequest="80"
+                   HorizontalOptions="Center" />
+
+            <Label Text="No projects yet"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="18"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+
+            <Label Text="Tap + to create your first project"
+                   FontFamily="MontserratRegular"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+
+          </VerticalStackLayout>
+        </CollectionView.EmptyView>
+
+        <CollectionView.ItemTemplate>
+          <DataTemplate x:DataType="entities:Project">
+
+            <Border Padding="12"
+                    Margin="0,0,0,16"
+                    StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}">
+
+              <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12" />
+              </Border.StrokeShape>
+
+              <Grid ColumnDefinitions="80,*,Auto" ColumnSpacing="12">
+
+                <!-- Project Image -->
+                <Border Grid.Column="0"
+                        WidthRequest="80"
+                        HeightRequest="80"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                        VerticalOptions="Start">
+
+                  <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                  </Border.StrokeShape>
+
+                  <!-- Wrap both images in a Grid (Border can only have 1 child) -->
+                  <Grid>
+                    <!-- Show placeholder if no image -->
+                    <Image Source="project_placeholder.png"
+                           Aspect="AspectFill"
+                           IsVisible="{Binding ImagePath, Converter={StaticResource IsStringNullOrEmptyConverter}}" />
+
+                    <!-- Show actual image if available -->
+                    <Image Source="{Binding ImagePath}"
+                           Aspect="AspectFill"
+                           IsVisible="{Binding ImagePath, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" />
+                  </Grid>
+
+                </Border>
+
+
+                <!-- Project Info -->
+                <VerticalStackLayout Grid.Column="1"
+                                     Spacing="6"
+                                     VerticalOptions="Center">
+
+                  <!-- Project Name -->
+                  <Label Text="{Binding Name}"
+                         FontFamily="MontserratSemiBold"
+                         FontSize="16"
+                         LineBreakMode="TailTruncation"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+                  <!-- Row Count with Progress -->
+                  <HorizontalStackLayout Spacing="8">
+
+                    <Label FontFamily="MontserratRegular"
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+                      <Label.Text>
+                        <MultiBinding StringFormat="Row {0}{1}">
+                          <Binding Path="CurrentCount" />
+                          <Binding Path="TotalRows" Converter="{StaticResource TotalRowsConverter}" />
+                        </MultiBinding>
+                        </Label.Text>
+                    </Label>
+
+                    <!-- Progress Percentage (only if TotalRows is set) -->
+                    <Label FontFamily="MontserratMedium"
+                           FontSize="14"
+                           TextColor="{StaticResource BrandGold}"
+                           IsVisible="{Binding TotalRows, Converter={StaticResource IsNotNullConverter}}">
+                      <Label.Text>
+                        <MultiBinding StringFormat="// {0}% done">
+                          <Binding Path="." Converter="{StaticResource ProgressPercentageConverter}" />
+                        </MultiBinding>
+                        </Label.Text>
+                    </Label>
+
+                  </HorizontalStackLayout>
+
+                  <!-- Last Updated -->
+                  <Label FontFamily="MontserratRegular"
+                         FontSize="12"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+                    <Label.Text>
+                      <MultiBinding StringFormat="Last worked on: {0}">
+                        <Binding Path="UpdatedAt" Converter="{StaticResource RelativeTimeConverter}" />
+                      </MultiBinding>
+                      </Label.Text>
+                  </Label>
+
+                </VerticalStackLayout>
+
+                <!-- More Options Button -->
+                <Image Grid.Column="2"
+                       Source="more. svg"
+                       WidthRequest="24"
+                       HeightRequest="24"
+                       VerticalOptions="Start">
+                  <Image.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
+                    </Image.Behaviors>
+                    <Image.GestureRecognizers>
+                      <!-- TODO:  Implement options menu -->
+                      <TapGestureRecognizer />
+                    </Image.GestureRecognizers>
+                </Image>
+
+              </Grid>
+
+            </Border>
+
+          </DataTemplate>
+        </CollectionView.ItemTemplate>
+
+      </CollectionView>
+
+    </Grid>
 
   </Grid>
 
