@@ -9,6 +9,7 @@
   <!-- ============================================ -->
   <Color x:Key="BrandGold">#E1AD37</Color>
   <Color x:Key="BrandCancel">#EB9057</Color>
+  <Color x:Key="LinkColor">#16697A</Color>
 
   <!-- ============================================ -->
   <!-- LIGHT MODE COLORS                            -->
