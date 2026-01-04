@@ -32,6 +32,7 @@ public class RelayCommand<T> : ICommand
         _execute((T?)parameter);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1030:Use events where appropriate", Justification = "Conventional ICommand method")]
     public void RaiseCanExecuteChanged()
     {
         CanExecuteChanged?.Invoke(this, EventArgs.Empty);
