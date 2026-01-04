@@ -83,7 +83,7 @@ public static class MauiProgram
 
                 System.Diagnostics.Debug.WriteLine("🔄 Applying database migrations...");
 
-                await dbContext.Database.MigrateAsync();
+                await dbContext.Database.MigrateAsync().ConfigureAwait(false);
 
                 System.Diagnostics.Debug.WriteLine("✅ Database migrations applied successfully");
             }

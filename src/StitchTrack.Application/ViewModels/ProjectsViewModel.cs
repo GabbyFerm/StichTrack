@@ -84,9 +84,9 @@ public class ProjectsViewModel : INotifyPropertyChanged
     public ICommand CreateProjectCommand { get; }
     public ICommand DeleteProjectCommand { get; }
     public ICommand RefreshCommand { get; }
-    public ICommand ShowActiveProjectsCommand { get; } 
-    public ICommand ShowArchivedProjectsCommand { get; } 
-    public ICommand SearchCommand { get; } 
+    public ICommand ShowActiveProjectsCommand { get; }
+    public ICommand ShowArchivedProjectsCommand { get; }
+    public ICommand SearchCommand { get; }
     public ICommand SyncCommand { get; }
 
     public ProjectsViewModel(
@@ -103,9 +103,9 @@ public class ProjectsViewModel : INotifyPropertyChanged
         CreateProjectCommand = new RelayCommand(OnCreateProject);
         DeleteProjectCommand = new RelayCommand(OnDeleteProject);
         RefreshCommand = new RelayCommand(OnRefresh);
-        ShowActiveProjectsCommand = new RelayCommand(() => ShowArchived = false); 
-        ShowArchivedProjectsCommand = new RelayCommand(() => ShowArchived = true); 
-        SearchCommand = new RelayCommand(OnSearch); 
+        ShowActiveProjectsCommand = new RelayCommand(() => ShowArchived = false);
+        ShowArchivedProjectsCommand = new RelayCommand(() => ShowArchived = true);
+        SearchCommand = new RelayCommand(OnSearch);
         SyncCommand = new RelayCommand(OnSync);
 
         System.Diagnostics.Debug.WriteLine("✅ ProjectsViewModel created");
@@ -317,13 +317,13 @@ public class ProjectsViewModel : INotifyPropertyChanged
         _ = LoadProjectsAsync();
     }
 
-    private void OnSearch() 
+    private void OnSearch()
     {
         System.Diagnostics.Debug.WriteLine("🔍 Search tapped");
         // TODO: Implement search functionality
     }
 
-    private void OnSync() 
+    private void OnSync()
     {
         System.Diagnostics.Debug.WriteLine("🔄 Sync tapped");
         // TODO: Implement sync functionality
