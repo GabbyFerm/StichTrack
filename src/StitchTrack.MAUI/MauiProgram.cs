@@ -21,7 +21,6 @@ public static class MauiProgram
 
         builder
             .UseMauiApp<App>()
-            // ✨ Add Community Toolkit
             .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
@@ -38,8 +37,12 @@ public static class MauiProgram
             });
 
         // DATABASE
+        System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
+
         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(DatabaseConfig.ConnectionString));
+        {
+            options.UseSqlite(DatabaseConfig.ConnectionString);
+        });
 
         // REPOSITORIES
         builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
@@ -69,6 +72,27 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-        return builder.Build();
+        var app = builder.Build();
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                using var scope = app.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                System.Diagnostics.Debug.WriteLine("🔄 Applying database migrations...");
+
+                await dbContext.Database.MigrateAsync();
+
+                System.Diagnostics.Debug.WriteLine("✅ Database migrations applied successfully");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Migration error: {ex.Message}");
+            }
+        });
+
+        return app;
     }
 }

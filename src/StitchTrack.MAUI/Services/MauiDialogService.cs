@@ -67,10 +67,14 @@ public class MauiDialogService : IDialogService
             return;
         }
 
-        await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayAlert(
-            "Success",
-            message,
-            "OK"
-        ).ConfigureAwait(false);
+        // ✅ Ensure we're on the main thread for UI operations
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayAlert(
+                "Success",
+                message,
+                "OK"
+            );
+        });
     }
 }
