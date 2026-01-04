@@ -10,7 +10,7 @@ public partial class App : Microsoft.Maui.Controls.Application
         InitializeComponent();
 
         // Force light mode during development
-        // UserAppTheme = AppTheme.Light;
+        UserAppTheme = AppTheme.Light;
 
         MainPage = new AppShell();
     }

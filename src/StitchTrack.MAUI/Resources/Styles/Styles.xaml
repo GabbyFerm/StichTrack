@@ -194,7 +194,7 @@
 
   <!-- Counter Display Card -->
   <Style x:Key="CounterCard" TargetType="Frame">
-    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightCounterCardBackground}, Dark={StaticResource DarkCardBackground}}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}" />
     <Setter Property="BorderColor" Value="Transparent" />
     <Setter Property="CornerRadius" Value="16" />
     <Setter Property="Padding" Value="20" />
