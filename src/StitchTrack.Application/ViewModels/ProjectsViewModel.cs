@@ -242,7 +242,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
     /// </summary>
     private async void OnNavigateToProject(Guid projectId)
     {
-        if (projectId == Guid.Empty) 
+        if (projectId == Guid.Empty)
         {
             System.Diagnostics.Debug.WriteLine("⚠️ Invalid project ID");
             return;

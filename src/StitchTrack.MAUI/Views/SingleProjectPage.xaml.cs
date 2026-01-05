@@ -6,7 +6,7 @@ namespace StitchTrack.MAUI.Views;
 public partial class SingleProjectPage : ContentPage
 {
     private readonly SingleProjectViewModel _viewModel;
-    private string _projectId = string.Empty; 
+    private string _projectId = string.Empty;
 
     public SingleProjectPage(SingleProjectViewModel viewModel)
     {
