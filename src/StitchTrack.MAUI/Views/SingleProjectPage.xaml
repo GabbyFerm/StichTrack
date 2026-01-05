@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:StitchTrack.Application.ViewModels;assembly=StitchTrack.Application"
+             x:Class="StitchTrack.MAUI.Views.SingleProjectPage"
+             x:DataType="viewModels:SingleProjectViewModel"
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
+             Shell.NavBarIsVisible="False">
+
+  <Grid RowDefinitions="Auto,Auto,*">
+
+    <!-- ============================================ -->
+    <!-- TOP BAR:  Logo + Sync Icon                    -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="0"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="30,30"
+          ColumnDefinitions="*,Auto"
+          ColumnSpacing="15">
+
+      <!-- Logo -->
+      <Image Grid.Column="0"
+             Source="logo.svg"
+             HeightRequest="35"
+             HorizontalOptions="Start"
+             Aspect="AspectFit" />
+
+      <!-- Sync Icon -->
+      <Image Grid.Column="1"
+             Source="refresh.svg"
+             HeightRequest="24"
+             WidthRequest="24"
+             HorizontalOptions="End"
+             VerticalOptions="Center">
+        <Image.Behaviors>
+          <toolkit:IconTintColorBehavior TintColor="White" />
+        </Image.Behaviors>
+        <Image.GestureRecognizers>
+          <TapGestureRecognizer Command="{Binding SyncCommand}" />
+        </Image.GestureRecognizers>
+      </Image>
+
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- HEADER: Project Name + Menu                  -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="1"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          HeightRequest="60"
+          Padding="20,15">
+
+      <!-- Project Name -->
+      <Label Text="{Binding ProjectName}"
+             Style="{StaticResource HeaderTitle}"
+             HorizontalOptions="Start"
+             VerticalOptions="Center" />
+
+      <!-- Menu Icon (⋮) -->
+      <Image Source="more.svg"
+             WidthRequest="24"
+             HeightRequest="24"
+             HorizontalOptions="End"
+             VerticalOptions="Center">
+        <Image.Behaviors>
+          <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+          <Image.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding ShowMenuCommand}" />
+          </Image.GestureRecognizers>
+      </Image>
+
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- SCROLLABLE CONTENT                           -->
+    <!-- ============================================ -->
+    <ScrollView Grid.Row="2">
+
+      <VerticalStackLayout Spacing="0">
+
+        <!-- ============================================ -->
+        <!-- PROJECT IMAGE                                -->
+        <!-- ============================================ -->
+        <Grid Grid.Row="2"
+              HeightRequest="250"
+              BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}">
+
+          <!-- Project Image (always show - includes placeholder) -->
+          <Image Source="{Binding ImageUrl}"
+                 Aspect="AspectFill" />
+
+          <!-- ✅ Bottom Gradient Overlay (always show) -->
+          <BoxView VerticalOptions="End"
+                   HeightRequest="50">
+            <BoxView.Background>
+              <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="Transparent" Offset="0.0" />
+                <GradientStop Color="#80000000" Offset="1.0" />
+                <!-- 50% black -->
+              </LinearGradientBrush>
+            </BoxView.Background>
+          </BoxView>
+
+          <!-- ✅ Helper Text Overlay (always show in white) -->
+          <Label Text="← Swipe to go back to projects"
+                 FontFamily="MontserratMedium"
+                 FontSize="12"
+                 FontAttributes="Italic"
+                 TextColor="White"
+                 HorizontalOptions="Start"
+                 VerticalOptions="End"
+                 Margin="16,0,16,12"
+                 Opacity="0.9" />
+
+        </Grid>
+
+
+        <!-- ============================================ -->
+        <!-- PROJECT INFO CARD                            -->
+        <!-- ============================================ -->
+        <Border Padding="20"
+                Margin="16,16,16,0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}">
+
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+          </Border.StrokeShape>
+
+          <VerticalStackLayout Spacing="16">
+
+            <!-- Project Name + Color Tag -->
+            <HorizontalStackLayout Spacing="8">
+              <Label Text="{Binding ProjectName}"
+                     FontFamily="MontserratBold"
+                     FontSize="20"
+                     VerticalOptions="Center"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+              <!-- Color Dot -->
+              <Border WidthRequest="16"
+                      HeightRequest="16"
+                      StrokeThickness="0"
+                      BackgroundColor="{Binding ColorHex}"
+                      VerticalOptions="Center"
+                      IsVisible="{Binding ColorHex, Converter={StaticResource IsStringNotNullOrEmptyConverter}}">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                  <!-- Makes it circular -->
+                </Border.StrokeShape>
+              </Border>
+            </HorizontalStackLayout>
+
+            <!-- Progress Info -->
+            <HorizontalStackLayout Spacing="12">
+              <Label FontFamily="MontserratRegular"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+                <Label.Text>
+                  <MultiBinding StringFormat="Row {0}{1}">
+                    <Binding Path="CurrentCount" />
+                    <Binding Path="TotalRows" Converter="{StaticResource TotalRowsConverter}" />
+                  </MultiBinding>
+                </Label.Text>
+              </Label>
+
+              <Label Text="•"
+                     FontFamily="MontserratRegular"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                     IsVisible="{Binding TotalRows, Converter={StaticResource IsNotNullConverter}}" />
+
+              <Label FontFamily="MontserratMedium"
+                     FontSize="14"
+                     TextColor="{StaticResource BrandGold}"
+                     IsVisible="{Binding TotalRows, Converter={StaticResource IsNotNullConverter}}">
+                <Label.Text>
+                  <MultiBinding StringFormat="{}{0}% done">
+                    <Binding Path="." Converter="{StaticResource ProgressPercentageConverter}" />
+                  </MultiBinding>
+                </Label.Text>
+              </Label>
+            </HorizontalStackLayout>
+
+            <!-- Continue Counting Button -->
+            <Button Text="Continue Counting →"
+                    Command="{Binding ContinueCountingCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    Margin="0,8,0,0" />
+
+          </VerticalStackLayout>
+
+        </Border>
+
+        <!-- ============================================ -->
+        <!-- PATTERN SECTION (if exists)                  -->
+        <!-- ============================================ -->
+        <Border Padding="20"
+                Margin="16,16,16,0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}"
+                IsVisible="{Binding HasPattern}">
+
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="8">
+              <Label Text="📄 Pattern"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="16"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+              <Label Text="View PDF Pattern →"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   TextColor="{StaticResource BrandGold}">
+                <Label.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding ViewPatternCommand}" />
+                </Label.GestureRecognizers>
+              </Label>
+            </VerticalStackLayout>
+
+        </Border>
+
+        <!-- ============================================ -->
+        <!-- NOTES SECTION                                -->
+        <!-- ============================================ -->
+        <Border Padding="20"
+                Margin="16,16,16,0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}"
+                IsVisible="{Binding HasNotes}">
+
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+          </Border.StrokeShape>
+
+          <VerticalStackLayout Spacing="8">
+            <Label Text="📝 Notes:"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="16"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+            <Label Text="{Binding Notes}"
+                   FontFamily="MontserratRegular"
+                   FontSize="14"
+                   LineBreakMode="WordWrap"
+                   MaxLines="{Binding NotesMaxLines}"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+
+            <Label Text="{Binding NotesToggleText}"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   TextColor="{StaticResource BrandGold}"
+                   IsVisible="{Binding NotesCanExpand}">
+              <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ToggleNotesCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+          </VerticalStackLayout>
+
+        </Border>
+
+        <!-- ============================================ -->
+        <!-- SESSIONS SECTION (Phase 2)                   -->
+        <!-- ============================================ -->
+        <!-- TODO: Add session history -->
+
+        <!-- ============================================ -->
+        <!-- ACTION BUTTONS                               -->
+        <!-- ============================================ -->
+        <!-- ACTION BUTTONS -->
+        <Grid ColumnDefinitions="*,*"
+              ColumnSpacing="12"
+              Padding="20"
+              Margin="16,16,16,32">
+
+          <!-- Edit Button -->
+          <Border Grid.Column="0"
+                  Padding="12,10"
+                  StrokeThickness="0"
+                  BackgroundColor="{AppThemeBinding Light=#424B54, Dark=#424B54}">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+
+            <HorizontalStackLayout Spacing="6"
+                                   HorizontalOptions="Center">
+              <Image Source="edit.svg"
+                     WidthRequest="16"
+                     HeightRequest="16"
+                     VerticalOptions="Center">
+                <Image.Behaviors>
+                  <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
+                </Image.Behaviors>
+              </Image>
+              <Label Text="Edit"
+                     FontFamily="MontserratMedium"
+                     FontSize="14"
+                     TextColor="{StaticResource BrandGold}"
+                     VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding EditProjectCommand}" />
+            </Border.GestureRecognizers>
+          </Border>
+
+          <!-- Archive Button -->
+          <Border Grid.Column="1"
+                  Padding="12,10"
+                  StrokeThickness="0"
+                  BackgroundColor="{AppThemeBinding Light=#424B54, Dark=#424B54}">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+
+            <HorizontalStackLayout Spacing="6"
+                                   HorizontalOptions="Center">
+              <Image Source="archive.svg"
+                     WidthRequest="16"
+                     HeightRequest="16"
+                     VerticalOptions="Center">
+                <Image.Behaviors>
+                  <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
+                </Image.Behaviors>
+              </Image>
+              <Label Text="Archive"
+                     FontFamily="MontserratMedium"
+                     FontSize="14"
+                     TextColor="{StaticResource BrandGold}"
+                     VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ArchiveProjectCommand}" />
+            </Border.GestureRecognizers>
+          </Border>
+
+        </Grid>
+
+      </VerticalStackLayout>
+
+    </ScrollView>
+
+  </Grid>
+
+</ContentPage>

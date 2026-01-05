@@ -50,10 +50,12 @@ public static class MauiProgram
 
         // SERVICES
         builder.Services.AddSingleton<IDialogService, MauiDialogService>();
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
 
         // VIEWMODELS
         builder.Services.AddTransient<QuickCounterViewModel>();
         builder.Services.AddTransient<ProjectsViewModel>();
+        builder.Services.AddTransient<SingleProjectViewModel>();
         // TODO: Add other ViewModels as we create them
         // builder.Services.AddTransient<SessionViewModel>();
         // builder.Services.AddTransient<SettingsViewModel>();
@@ -61,6 +63,7 @@ public static class MauiProgram
         // PAGES
         builder.Services.AddTransient<QuickCounterPage>();
         builder.Services.AddTransient<ProjectsPage>();
+        builder.Services.AddTransient<SingleProjectPage>();
         // TODO: Add other Pages as we create them
         // builder.Services.AddTransient<SessionPage>();
         // builder.Services.AddTransient<SettingsPage>();
@@ -87,7 +90,9 @@ public static class MauiProgram
 
                 System.Diagnostics.Debug.WriteLine("✅ Database migrations applied successfully");
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
+#pragma warning restore CA1031
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Migration error: {ex.Message}");
             }

@@ -227,6 +227,12 @@
 
               <Grid ColumnDefinitions="80,*,Auto" ColumnSpacing="12">
 
+                <Grid.GestureRecognizers>
+                  <TapGestureRecognizer 
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProjectsViewModel}}, Path=NavigateToProjectCommand}"
+                    CommandParameter="{Binding Id}" />
+                  </Grid.GestureRecognizers>
+
                 <!-- Project Image -->
                 <Border Grid.Column="0"
                         WidthRequest="80"
