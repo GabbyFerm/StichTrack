@@ -1,5 +1,10 @@
+using System.Security.Cryptography;
+
 namespace StitchTrack.Domain.Entities;
 
+/// <summary>
+/// Predefined color palette for project color tags. 
+/// </summary>
 public static class ProjectColors
 {
     public static readonly string[] Palette = new[]
@@ -16,9 +21,12 @@ public static class ProjectColors
         "#F59E0B"  // Amber
     };
 
+    /// <summary>
+    /// Returns a random color from the palette using cryptographically secure RNG.
+    /// </summary>
     public static string GetRandomColor()
     {
-        var random = new Random();
-        return Palette[random.Next(Palette.Length)];
+        var randomIndex = RandomNumberGenerator.GetInt32(0, Palette.Length);
+        return Palette[randomIndex];
     }
 }
