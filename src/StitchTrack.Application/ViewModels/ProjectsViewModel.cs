@@ -178,7 +178,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
         IsEmpty = Projects.Count == 0;
 
         // Notify counts changed
-        OnPropertyChanged(nameof(ActiveProjectsTabText)); 
+        OnPropertyChanged(nameof(ActiveProjectsTabText));
         OnPropertyChanged(nameof(ArchivedProjectsTabText));
         OnPropertyChanged(nameof(ActiveProjectCount));
         OnPropertyChanged(nameof(ArchivedProjectCount));
