@@ -34,41 +34,35 @@
 
     <TabBar>
 
-    <!-- COUNTER TAB -->
-    <ShellContent
-      Title="COUNTER"
-      ContentTemplate="{DataTemplate views:QuickCounterPage}"
-      Route="QuickCounterPage"
-      Icon="counter.svg" />
+      <!-- COUNTER TAB -->
+      <Tab Title="COUNTER" Icon="counter.svg">
+        <ShellContent Route="counter"
+                      ContentTemplate="{DataTemplate views:QuickCounterPage}" />
+      </Tab>
 
-    <!-- PROJECTS TAB -->
-    <ShellContent
-      Title="PROJECTS"
-      ContentTemplate="{DataTemplate views:ProjectsPage}"
-      Route="ProjectsPage"
-      Icon="projects.svg" />
+      <!-- PROJECTS TAB -->
+      <Tab Title="PROJECTS" Icon="projects.svg">
+        <ShellContent Route="projects"
+                      ContentTemplate="{DataTemplate views:ProjectsPage}" />
+      </Tab>
 
-    <!-- SESSION TAB -->
-    <ShellContent
-      Title="SESSION"
-      ContentTemplate="{DataTemplate local:SessionsPage}"
-      Route="SessionPage"
-      Icon="session.svg" />
+      <!-- SESSION TAB -->
+      <Tab Title="SESSION" Icon="session. svg">
+        <ShellContent Route="session"
+                      ContentTemplate="{DataTemplate views:SessionsPage}" />
+      </Tab>
 
-    <!-- EXPORT TAB -->
-    <ShellContent
-      Title="EXPORT"
-      ContentTemplate="{DataTemplate local:ExportPage}"
-      Route="ExportPage"
-      Icon="export.svg" />
+      <!-- EXPORT TAB -->
+      <Tab Title="EXPORT" Icon="export. svg">
+        <ShellContent Route="export"
+                      ContentTemplate="{DataTemplate views:ExportPage}" />
+      </Tab>
 
-    <!-- SETTINGS TAB -->
-    <ShellContent
-      Title="SETTINGS"
-      ContentTemplate="{DataTemplate local:SettingsPage}"
-      Route="SettingsPage"
-      Icon="settings.svg" />
-
+      <!-- SETTINGS TAB -->
+      <Tab Title="SETTINGS" Icon="settings. svg">
+        <ShellContent Route="settings"
+                      ContentTemplate="{DataTemplate views:SettingsPage}" />
+      </Tab>
   </TabBar>
 
 </Shell>

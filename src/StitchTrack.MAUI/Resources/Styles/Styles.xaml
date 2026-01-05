@@ -246,7 +246,7 @@
   <Style x:Key="Divider" TargetType="BoxView">
     <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource LightLine}, Dark={StaticResource DarkLine}}" />
     <Setter Property="HeightRequest" Value="1" />
-    <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+    <Setter Property="HorizontalOptions" Value="Fill" />
     <Setter Property="Margin" Value="0,10" />
     <Setter Property="Opacity" Value="0.3" />
   </Style>

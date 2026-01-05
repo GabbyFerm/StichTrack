@@ -37,7 +37,7 @@ public partial class OnboardingPopup : Popup
     }
 
     /// <summary>
-    /// Enable Backup & Sync button clicked - show Phase 3 message.
+    /// Enable Backup and Sync button clicked - show phase 3 message. 
     /// </summary>
     private async void OnEnableSyncClicked(object sender, EventArgs e)
     {
@@ -71,7 +71,9 @@ public partial class OnboardingPopup : Popup
                 System.Diagnostics.Debug.WriteLine("✅ Onboarding marked as seen");
             }
         }
+#pragma warning disable CA1031 // Do not catch general exception types
         catch (Exception ex)
+#pragma warning restore CA1031
         {
             System.Diagnostics.Debug.WriteLine($"❌ Error marking onboarding as seen: {ex.Message}");
             // Don't crash the app if this fails - just log it

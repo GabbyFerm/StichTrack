@@ -17,6 +17,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IDialogService _dialogService;
+    private readonly INavigationService _navigationService;
     private readonly SynchronizationContext? _syncContext;
     private bool _isLoading;
     private bool _isEmpty;
@@ -90,13 +91,16 @@ public class ProjectsViewModel : INotifyPropertyChanged
     public ICommand ShowArchivedProjectsCommand { get; }
     public ICommand SearchCommand { get; }
     public ICommand SyncCommand { get; }
+    public ICommand NavigateToProjectCommand { get; }
 
     public ProjectsViewModel(
         IProjectRepository projectRepository,
-        IDialogService dialogService)
+        IDialogService dialogService,
+        INavigationService navigationService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+        _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
         _syncContext = SynchronizationContext.Current;
 
@@ -109,6 +113,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
         ShowArchivedProjectsCommand = new RelayCommand(() => ShowArchived = true);
         SearchCommand = new RelayCommand(OnSearch);
         SyncCommand = new RelayCommand(OnSync);
+        NavigateToProjectCommand = new RelayCommand<Guid>(OnNavigateToProject);
 
         System.Diagnostics.Debug.WriteLine("✅ ProjectsViewModel created");
 
@@ -230,6 +235,22 @@ public class ProjectsViewModel : INotifyPropertyChanged
             System.Diagnostics.Debug.WriteLine($"❌ Validation error: {ex.Message}");
             await _dialogService.ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
         }
+    }
+
+    /// <summary>
+    /// Navigation to single project page.
+    /// </summary>
+    private async void OnNavigateToProject(Guid projectId)
+    {
+        if (projectId == Guid.Empty) 
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ Invalid project ID");
+            return;
+        }
+
+        System.Diagnostics.Debug.WriteLine($"🔗 Navigating to project: {projectId}");
+
+        await _navigationService.NavigateToAsync($"SingleProjectPage?ProjectId={projectId}").ConfigureAwait(false);
     }
 
     /// <summary>
