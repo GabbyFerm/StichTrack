@@ -103,53 +103,40 @@
         <!-- Tab Labels -->
         <Grid Padding="20,20,20,10"
         ColumnDefinitions="*,*">
-
           <!-- Active Projects Tab (Left) -->
           <Label Grid.Column="0"
-                 FontFamily="MontserratSemiBold"
+                 Text="{Binding ActiveProjectsTabText}"
+                 FontFamily="MontserratMedium"
                  FontSize="16"
                  HorizontalOptions="Start"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="Active projects (" />
-                <Span Text="{Binding ActiveProjectCount}" />
-                <Span Text=")" />
-              </FormattedString>
-            </Label.FormattedText>
             <Label.Triggers>
               <DataTrigger TargetType="Label"
                            Binding="{Binding ShowArchived}"
                            Value="False">
                 <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
-                <Setter Property="FontFamily" Value="MontserratBold" />
+                <Setter Property="FontFamily" Value="MontserratSemiBold" />
               </DataTrigger>
-              </Label.Triggers>
-              <Label.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding ShowActiveProjectsCommand}" />
+            </Label.Triggers>
+            <Label.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ShowActiveProjectsCommand}" />
               </Label.GestureRecognizers>
           </Label>
 
           <!-- Archived Projects Tab (Right) -->
           <Label Grid.Column="1"
-                 FontFamily="MontserratSemiBold"
+                 Text="{Binding ArchivedProjectsTabText}"
+                 FontFamily="MontserratMedium"
                  FontSize="16"
                  HorizontalOptions="End"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="Archived Projects (" />
-                <Span Text="{Binding ArchivedProjectCount}" />
-                <Span Text=")" />
-              </FormattedString>
-              </Label.FormattedText>
-              <Label.Triggers>
-                <DataTrigger TargetType="Label"
-                             Binding="{Binding ShowArchived}"
-                             Value="True">
-                  <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
-                  <Setter Property="FontFamily" Value="MontserratBold" />
-                </DataTrigger>
+            <Label.Triggers>
+              <DataTrigger TargetType="Label"
+                           Binding="{Binding ShowArchived}"
+                           Value="True">
+                <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
+                <Setter Property="FontFamily" Value="MontserratSemiBold" />
+              </DataTrigger>
             </Label.Triggers>
             <Label.GestureRecognizers>
               <TapGestureRecognizer Command="{Binding ShowArchivedProjectsCommand}" />
@@ -192,7 +179,7 @@
         </Grid>
 
       </VerticalStackLayout>
-
+      
       <!-- Projects List -->
       <CollectionView Grid.Row="1"
                       ItemsSource="{Binding Projects}"

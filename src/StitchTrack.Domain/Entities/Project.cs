@@ -38,7 +38,7 @@ public class Project
     private Project() { }
 
     // Factory method to create a new project with validated initial state
-    public static Project CreateProject(string name, Guid? userId = null)
+    public static Project CreateProject(string name, Guid? userId = null, string? colorHex = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -53,6 +53,7 @@ public class Project
             UserId = userId,
             Name = name.Trim(),
             CurrentCount = 0,
+            ColorHex = colorHex ?? ProjectColors.GetRandomColor(), // Random if not provided
             CreatedAt = now,
             UpdatedAt = now
         };

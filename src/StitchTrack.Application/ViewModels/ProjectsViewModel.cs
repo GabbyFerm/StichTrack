@@ -76,6 +76,8 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     public bool HasProjects => !IsEmpty;
+    public string ActiveProjectsTabText => $"Active projects ({ActiveProjectCount})";
+    public string ArchivedProjectsTabText => $"Archived Projects ({ArchivedProjectCount})";
     public int ActiveProjectCount => _allProjects.Count(p => !p.IsArchived);
     public int ArchivedProjectCount => _allProjects.Count(p => p.IsArchived);
 
@@ -176,6 +178,8 @@ public class ProjectsViewModel : INotifyPropertyChanged
         IsEmpty = Projects.Count == 0;
 
         // Notify counts changed
+        OnPropertyChanged(nameof(ActiveProjectsTabText)); 
+        OnPropertyChanged(nameof(ArchivedProjectsTabText));
         OnPropertyChanged(nameof(ActiveProjectCount));
         OnPropertyChanged(nameof(ArchivedProjectCount));
     }
