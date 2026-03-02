@@ -21,6 +21,7 @@ public partial class QuickCounterPage : ContentPage
 
         _viewModel = viewModel;
         _appSettingsRepository = appSettingsRepository;
+
         BindingContext = _viewModel;
     }
 
