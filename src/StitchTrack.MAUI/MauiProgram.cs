@@ -51,6 +51,7 @@ public static class MauiProgram
         // SERVICES
         builder.Services.AddSingleton<IDialogService, MauiDialogService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddSingleton<IHapticsService, MauiHapticsService>();
 
         // VIEWMODELS
         builder.Services.AddTransient<QuickCounterViewModel>();

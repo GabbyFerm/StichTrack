@@ -16,6 +16,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     private readonly Project _project;
     private readonly IProjectRepository _projectRepository;
     private readonly IDialogService _dialogService;
+    private readonly IHapticsService _hapticsService;
 
     // Undo stack to track actions
     private readonly Stack<CounterAction> _undoStack = new Stack<CounterAction>();
@@ -23,9 +24,6 @@ public class QuickCounterViewModel : INotifyPropertyChanged
 
     // PropertyChanged event for data binding
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    // Action to trigger haptic feedback (injected from UI layer)
-    public Action? TriggerHapticFeedback { get; set; }
 
     // Current row count displayed to user
     public int CurrentCount => _project.CurrentCount;
@@ -46,10 +44,11 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     // Callback when project is saved (for navigation)
     public Func<Task>? OnProjectSaved { get; set; }
 
-    public QuickCounterViewModel(IProjectRepository projectRepository, IDialogService dialogService)
+    public QuickCounterViewModel(IProjectRepository projectRepository, IDialogService dialogService, IHapticsService hapticsService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+        _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
 
         // Create in-memory project (not saved to database yet)
         _project = Project.CreateProject("Quick Counter");
@@ -68,7 +67,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     {
         _project.IncrementCount();
         AddToUndoStack(CounterAction.Increment);
-        TriggerHapticFeedback?.Invoke();
+        _hapticsService.Click();
         NotifyCountChanged();
         System.Diagnostics.Debug.WriteLine($"➕ Incremented to {CurrentCount}");
     }
@@ -79,7 +78,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         {
             _project.DecrementCount();
             AddToUndoStack(CounterAction.Decrement);
-            TriggerHapticFeedback?.Invoke();
+            _hapticsService.Click();
             NotifyCountChanged();
             System.Diagnostics.Debug.WriteLine($"➖ Decremented to {CurrentCount}");
         }
@@ -114,7 +113,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
                 break;
         }
 
-        TriggerHapticFeedback?.Invoke();
+        _hapticsService.Click();
         NotifyCountChanged();
     }
 
@@ -127,7 +126,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
             AddToUndoStack(CounterAction.Reset, previousCount);
 
             _project.ResetCount();
-            TriggerHapticFeedback?.Invoke();
+            _hapticsService.Click();
             NotifyCountChanged();
             System.Diagnostics.Debug.WriteLine($"🔄 Reset from {previousCount} to 0");
         }
