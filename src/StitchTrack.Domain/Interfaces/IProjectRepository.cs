@@ -34,7 +34,14 @@ public interface IProjectRepository
     Task UpdateAsync(Project project);
 
     /// <summary>
-    /// Deletes a project (soft delete by setting IsArchived = true).
+    /// Soft delete — sets IsArchived = true. Project remains in the database.
+    /// Use this when the user wants to "hide" a project but keep it recoverable.
+    /// </summary>
+    Task ArchiveAsync(Guid id);
+
+    /// <summary>
+    /// Hard delete — permanently removes the project row from the database.
+    /// This cannot be undone. Use only after explicit user confirmation.
     /// </summary>
     Task DeleteAsync(Guid id);
 

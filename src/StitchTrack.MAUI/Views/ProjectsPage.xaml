@@ -324,9 +324,10 @@
                     <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
                     </Image.Behaviors>
                     <Image.GestureRecognizers>
-                      <!-- TODO:  Implement options menu -->
-                      <TapGestureRecognizer />
-                    </Image.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProjectsViewModel}}, Path=ShowProjectMenuCommand}"
+                        CommandParameter="{Binding .}" />
+                  </Image.GestureRecognizers>
                 </Image>
 
               </Grid>

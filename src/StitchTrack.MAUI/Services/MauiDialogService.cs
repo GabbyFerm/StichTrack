@@ -4,7 +4,7 @@ namespace StitchTrack.MAUI.Services;
 
 /// <summary>
 /// MAUI implementation of IDialogService.
-/// Uses MAUI's built-in dialog APIs to show prompts and alerts.
+/// Uses MAUI's built-in dialog APIs to show prompts, alerts, and action sheets.
 /// </summary>
 public class MauiDialogService : IDialogService
 {
@@ -22,7 +22,7 @@ public class MauiDialogService : IDialogService
         // Ensure we're on the main thread
         if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show dialog: MainPage is null");
+            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show prompt: MainPage is null");
             return null;
         }
 
@@ -59,22 +59,51 @@ public class MauiDialogService : IDialogService
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        // TODO: In Phase 2, implement proper toast notifications
-        // For now, use a brief alert
         if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
         {
             System.Diagnostics.Debug.WriteLine("⚠️ Cannot show toast: MainPage is null");
             return;
         }
 
-        // ✅ Ensure we're on the main thread for UI operations
+        // CommunityToolkit Toast — auto-dismisses, no button needed
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
-            await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayAlert(
-                "Success",
+            var toast = CommunityToolkit.Maui.Alerts.Toast.Make(
                 message,
-                "OK"
+                CommunityToolkit.Maui.Core.ToastDuration.Short
+            );
+            await toast.Show();
+        });
+    }
+
+    /// <summary>
+    /// Shows a native bottom action sheet.
+    /// Returns the label tapped by the user, or null if they tapped cancel.
+    /// </summary>
+    public async Task<string?> ShowActionSheetAsync(
+        string title,
+        string cancel,
+        string? destruction,
+        params string[] buttons)
+    {
+        ArgumentNullException.ThrowIfNull(title);
+        ArgumentNullException.ThrowIfNull(cancel);
+
+        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show action sheet: MainPage is null");
+            return null;
+        }
+
+        string? result = null;
+
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            result = await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayActionSheet(
+                title, cancel, destruction, buttons
             );
         });
+
+        return result == cancel ? null : result;
     }
 }
