@@ -95,16 +95,15 @@ public class MauiDialogService : IDialogService
             return null;
         }
 
-        // DisplayActionSheet returns the label of the tapped button,
-        // or the cancel string if the user dismisses it
-        var result = await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayActionSheet(
-            title,
-            cancel,
-            destruction,
-            buttons
-        ).ConfigureAwait(false);
+        string? result = null;
 
-        // Treat cancel tap as null so callers can do a simple null-check
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            result = await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayActionSheet(
+                title, cancel, destruction, buttons
+            );
+        });
+
         return result == cancel ? null : result;
     }
 }

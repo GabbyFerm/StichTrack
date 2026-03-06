@@ -105,11 +105,13 @@ public class ProjectRepository : IProjectRepository
     /// </summary>
     public async Task DeleteAsync(Guid id)
     {
-        var project = await GetByIdAsync(id).ConfigureAwait(false);
+        // Lightweight fetch — no Includes needed, just the row to remove
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(p => p.Id == id)
+            .ConfigureAwait(false);
+
         if (project != null)
         {
-            // EF Core will cascade-delete related rows (sessions, history, etc.)
-            // if cascade delete is configured in AppDbContext
             _context.Projects.Remove(project);
             System.Diagnostics.Debug.WriteLine($"🗑️ Project hard-deleted: {project.Name}");
         }

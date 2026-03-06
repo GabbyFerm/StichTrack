@@ -421,8 +421,8 @@ public class ProjectsViewModel : INotifyPropertyChanged
             UpdateOnUiThread(() =>
             {
                 _allProjects.Remove(project);
-                Projects.Remove(project);
-                IsEmpty = Projects.Count == 0;
+                // FilterProjects() rebuilds Projects and notifies all count/tab properties
+                FilterProjects();
             });
 
             await _dialogService.ShowToastAsync($"'{project.Name}' deleted").ConfigureAwait(false);

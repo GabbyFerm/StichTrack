@@ -40,7 +40,7 @@ public partial class ProjectFormPopup : Popup
         if (_isEditMode && existingProject != null)
         {
             NameEntry.Text = existingProject.Name;
-            TotalRowsEntry.Text = existingProject.TotalRows?.ToString();
+            TotalRowsEntry.Text = existingProject.TotalRows?.ToString(System.Globalization.CultureInfo.InvariantCulture);
             NotesEditor.Text = existingProject.Notes;
         }
     }

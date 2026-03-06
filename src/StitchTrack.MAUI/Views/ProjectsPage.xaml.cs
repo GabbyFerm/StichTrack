@@ -73,9 +73,11 @@ public partial class ProjectsPage : ContentPage
         {
             var popup = new ProjectMenuPopup(project);
             var result = await this.ShowPopupAsync(popup);
-            await Task.Delay(300);
             action = result as string;
         });
+
+        // Delay outside the UI thread block — no reason to block the UI for this
+        await Task.Delay(300);
 
         return action;
     }
