@@ -17,7 +17,7 @@ public class ProgressPercentageConverter : IValueConverter
             return "0";
 
         var percentage = (int)Math.Round((double)project.CurrentCount / project.TotalRows.Value * 100);
-        return Math.Min(percentage, 100).ToString(); // Cap at 100%
+        return Math.Min(percentage, 100).ToString(culture); // Cap at 100%
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

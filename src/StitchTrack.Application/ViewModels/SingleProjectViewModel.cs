@@ -1,10 +1,11 @@
+using StitchTrack.Application.Commands;
+using StitchTrack.Application.Interfaces;
+using StitchTrack.Application.Models;
+using StitchTrack.Domain.Entities;
+using StitchTrack.Domain.Interfaces;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using StitchTrack.Application.Commands;
-using StitchTrack.Application.Interfaces;
-using StitchTrack.Domain.Entities;
-using StitchTrack.Domain.Interfaces;
 
 namespace StitchTrack.Application.ViewModels;
 
@@ -12,15 +13,16 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IDialogService _dialogService;
+    private readonly INavigationService _navigationService;
     private Project? _project;
     private bool _notesExpanded;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    // Project ID (set from navigation)
+    // Project ID set from Shell navigation query parameter
     public Guid ProjectId { get; set; }
 
-    // Project properties
+    // Project properties exposed to the UI
     public string ProjectName => _project?.Name ?? "Project";
     public string? ImagePath => _project?.ImagePath;
     public string? ColorHex => _project?.ColorHex;
@@ -65,35 +67,47 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     public bool NotesCanExpand => HasNotes && (Notes?.Length ?? 0) > 150;
     public int NotesMaxLines => _notesExpanded ? int.MaxValue : 3;
     public string NotesToggleText => _notesExpanded ? "See less ▲" : "See all notes ▼";
+    public bool IsArchived => _project?.IsArchived ?? false;
+    public string ArchiveButtonText => IsArchived ? "Unarchive" : "Archive";
+
+    /// <summary>
+    /// Set by SingleProjectPage to open the create/edit form popup.
+    /// Receives the project to edit. Returns the result or null if cancelled.
+    /// </summary>
+    public Func<Project?, Task<ProjectFormResult?>>? ShowProjectFormAsync { get; set; }
 
     // Commands
     public ICommand SyncCommand { get; }
-    public ICommand ShowMenuCommand { get; }
     public ICommand ContinueCountingCommand { get; }
     public ICommand ViewPatternCommand { get; }
     public ICommand ToggleNotesCommand { get; }
     public ICommand EditProjectCommand { get; }
     public ICommand ArchiveProjectCommand { get; }
+    public ICommand DeleteProjectCommand { get; }
 
     public SingleProjectViewModel(
         IProjectRepository projectRepository,
-        IDialogService dialogService)
+        IDialogService dialogService,
+        INavigationService navigationService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+        _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
-        // Initialize commands
         SyncCommand = new RelayCommand(OnSync);
-        ShowMenuCommand = new RelayCommand(OnShowMenu);
         ContinueCountingCommand = new RelayCommand(OnContinueCounting);
         ViewPatternCommand = new RelayCommand(OnViewPattern);
         ToggleNotesCommand = new RelayCommand(OnToggleNotes);
         EditProjectCommand = new RelayCommand(OnEditProject);
         ArchiveProjectCommand = new RelayCommand(OnArchiveProject);
+        DeleteProjectCommand = new RelayCommand(OnDeleteProject);
 
         System.Diagnostics.Debug.WriteLine("✅ SingleProjectViewModel created");
     }
 
+    /// <summary>
+    /// Loads the project from the database using ProjectId set by navigation.
+    /// </summary>
     public async Task LoadProjectAsync()
     {
         try
@@ -123,16 +137,149 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Opens the edit form popup pre-filled with the current project data.
+    /// </summary>
+    private async Task EditProjectAsync()
+    {
+        if (_project == null) return;
+
+        if (ShowProjectFormAsync == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectFormAsync callback not set");
+            return;
+        }
+
+        var result = await ShowProjectFormAsync(_project).ConfigureAwait(true);
+
+        if (result == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ Edit cancelled");
+            return;
+        }
+
+        try
+        {
+            // Entity controls all state changes via domain methods
+            _project.Rename(result.Name);
+            _project.UpdateProjectDetails(
+                colorHex: result.ColorHex,
+                totalRows: result.TotalRows,
+                notes: result.Notes
+            );
+
+            await _projectRepository.UpdateAsync(_project).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            // Refresh all UI properties to reflect the changes
+            OnPropertyChanged(string.Empty);
+
+            System.Diagnostics.Debug.WriteLine($"✅ Project updated: {_project.Name}");
+            await _dialogService.ShowToastAsync($"'{_project.Name}' updated!").ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error updating project: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Update Failed", "Could not save changes.").ConfigureAwait(false);
+        }
+        catch (ArgumentException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Validation error: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Archives the project and navigates back to the projects list.
+    /// </summary>
+    private async Task ArchiveProjectAsync()
+    {
+        if (_project == null) return;
+
+        try
+        {
+            await _projectRepository.ArchiveAsync(_project.Id).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            System.Diagnostics.Debug.WriteLine($"📦 Project archived: {_project.Name}");
+            await _dialogService.ShowToastAsync($"'{_project.Name}' archived").ConfigureAwait(false);
+
+            // Go back to the projects list
+            await _navigationService.GoBackAsync().ConfigureAwait(false);
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error archiving project: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Archive Failed", "Could not archive project.").ConfigureAwait(false);
+        }
+    }
+
+    private async Task UnarchiveProjectAsync()
+    {
+        if (_project == null) return;
+
+        try
+        {
+            _project.UnarchiveProject();
+            await _projectRepository.UpdateAsync(_project).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            await _dialogService.ShowToastAsync($"'{_project.Name}' restored").ConfigureAwait(false);
+            await _navigationService.GoBackAsync().ConfigureAwait(false);
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error unarchiving: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Restore Failed", "Could not restore project.").ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Permanently deletes the project after explicit confirmation, then navigates back.
+    /// </summary>
+    private async Task DeleteProjectAsync()
+    {
+        if (_project == null) return;
+
+        // Require typing DELETE — permanent action deserves a higher bar
+        var result = await _dialogService.ShowPromptAsync(
+            title: "Delete Project?",
+            message: $"This will permanently delete '{_project.Name}'. Type DELETE to confirm.",
+            accept: "Delete",
+            cancel: "Cancel",
+            placeholder: "DELETE",
+            maxLength: 10
+        ).ConfigureAwait(true);
+
+        if (result?.Equals("DELETE", StringComparison.OrdinalIgnoreCase) != true) return;
+
+        try
+        {
+            await _projectRepository.DeleteAsync(_project.Id).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            System.Diagnostics.Debug.WriteLine($"🗑️ Project deleted: {_project.Name}");
+            await _dialogService.ShowToastAsync($"'{_project.Name}' deleted").ConfigureAwait(false);
+
+            // Go back to the projects list
+            await _navigationService.GoBackAsync().ConfigureAwait(false);
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error deleting project: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Delete Failed", "Could not delete project.").ConfigureAwait(false);
+        }
+    }
     private void OnSync()
     {
         System.Diagnostics.Debug.WriteLine("🔄 Sync tapped");
         // TODO: Implement sync
-    }
-
-    private void OnShowMenu()
-    {
-        System.Diagnostics.Debug.WriteLine("⋮ Menu tapped");
-        // TODO: Show action sheet with Edit, Archive, Delete
     }
 
     private void OnContinueCounting()
@@ -156,52 +303,16 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
     private void OnEditProject()
     {
-        System.Diagnostics.Debug.WriteLine("✏️ Edit Project tapped");
-        // TODO: Show edit modal
+        _ = EditProjectAsync();
     }
 
     private void OnArchiveProject()
     {
-        System.Diagnostics.Debug.WriteLine("🗑️ Archive Project tapped");
-        _ = ArchiveProjectAsync();
+        _ = IsArchived ? UnarchiveProjectAsync() : ArchiveProjectAsync();
     }
-
-    private async Task ArchiveProjectAsync()
+    private void OnDeleteProject()
     {
-        if (_project == null) return;
-
-        var confirmed = await _dialogService.ShowPromptAsync(
-            title: "Archive Project? ",
-            message: $"Are you sure you want to archive '{_project.Name}'?  Type 'ARCHIVE' to confirm.",
-            accept: "Archive",
-            cancel: "Cancel",
-            placeholder: "ARCHIVE",
-            maxLength: 10
-        ).ConfigureAwait(false);
-
-        if (confirmed?.Equals("ARCHIVE", StringComparison.OrdinalIgnoreCase) != true)
-        {
-            return;
-        }
-
-        try
-        {
-            _project.ArchiveProject();
-            await _projectRepository.UpdateAsync(_project).ConfigureAwait(false);
-            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
-
-            await _dialogService.ShowToastAsync($"Project '{_project.Name}' archived").ConfigureAwait(false);
-
-            // Navigate back to projects list
-            // TODO: await Shell.Current.GoToAsync(". .");
-        }
-#pragma warning disable CA1031 // Do not catch general exception types
-        catch (Exception ex)
-#pragma warning restore CA1031
-        {
-            System.Diagnostics.Debug.WriteLine($"❌ Error archiving project: {ex.Message}");
-            await _dialogService.ShowAlertAsync("Error", "Could not archive project").ConfigureAwait(false);
-        }
+        _ = DeleteProjectAsync();
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
