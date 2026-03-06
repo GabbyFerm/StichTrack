@@ -5,7 +5,11 @@ using StitchTrack.MAUI.Controls;
 
 namespace StitchTrack.MAUI.Views;
 
+// Timer is disposed in OnDisappearing — MAUI pages use lifecycle methods
+// instead of IDisposable since the framework controls their lifetime
+#pragma warning disable CA1001
 public partial class QuickCounterPage : ContentPage
+#pragma warning restore CA1001
 {
     private readonly QuickCounterViewModel _viewModel;
     private readonly IAppSettingsRepository _appSettingsRepository;
@@ -70,10 +74,13 @@ public partial class QuickCounterPage : ContentPage
             //    System.Diagnostics.Debug.WriteLine("✅ Not first run - skipping onboarding");
             //}
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
             System.Diagnostics.Debug.WriteLine($"❌ Error checking first run: {ex.Message}");
-            // Don't crash if this fails - just don't show the popup
+        }
+        catch (TaskCanceledException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Popup cancelled: {ex.Message}");
         }
     }
 

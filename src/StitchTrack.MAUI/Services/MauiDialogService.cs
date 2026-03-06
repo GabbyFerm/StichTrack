@@ -55,6 +55,32 @@ public class MauiDialogService : IDialogService
         ).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Shows a two-button confirmation dialog.
+    /// Returns true if the user tapped accept, false otherwise.
+    /// </summary>
+    public async Task<bool> ShowConfirmAsync(
+        string title,
+        string message,
+        string accept = "Yes",
+        string cancel = "Cancel")
+    {
+        ArgumentNullException.ThrowIfNull(title);
+        ArgumentNullException.ThrowIfNull(message);
+
+        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show confirm: MainPage is null");
+            return false;
+        }
+
+        return await MainThread.InvokeOnMainThreadAsync(async () =>
+            await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayAlert(
+                title, message, accept, cancel
+            )
+        );
+    }
+
     public async Task ShowToastAsync(string message)
     {
         ArgumentNullException.ThrowIfNull(message);

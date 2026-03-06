@@ -1,21 +1,14 @@
 namespace StitchTrack.Application.Interfaces;
 
 /// <summary>
-/// Service interface for showing user dialogs and prompts.
-/// Abstracts MAUI-specific UI operations from the Application layer.
+/// Abstraction for showing dialogs and user feedback.
+/// Keeps ViewModels decoupled from MAUI-specific UI APIs.
 /// </summary>
 public interface IDialogService
 {
     /// <summary>
-    /// Shows a prompt dialog asking the user to enter text.
+    /// Shows a text input prompt and returns what the user typed, or null if cancelled.
     /// </summary>
-    /// <param name="title">Dialog title</param>
-    /// <param name="message">Dialog message</param>
-    /// <param name="accept">Accept button text (e.g., "Save")</param>
-    /// <param name="cancel">Cancel button text (e.g., "Cancel")</param>
-    /// <param name="placeholder">Placeholder text for input field</param>
-    /// <param name="maxLength">Maximum length of input</param>
-    /// <returns>The entered text, or null if cancelled</returns>
     Task<string?> ShowPromptAsync(
         string title,
         string message,
@@ -30,6 +23,18 @@ public interface IDialogService
     Task ShowAlertAsync(string title, string message, string cancel = "OK");
 
     /// <summary>
+    /// Shows a yes/no confirmation dialog.
+    /// Returns true if the user tapped accept, false if cancelled.
+    /// Use for reversible actions (e.g. Archive).
+    /// Use ShowPromptAsync with typed confirmation for permanent actions (e.g. Delete).
+    /// </summary>
+    Task<bool> ShowConfirmAsync(
+        string title,
+        string message,
+        string accept = "Yes",
+        string cancel = "Cancel");
+
+    /// <summary>
     /// Shows a brief success/info message.
     /// </summary>
     Task ShowToastAsync(string message);
@@ -37,10 +42,7 @@ public interface IDialogService
     /// <summary>
     /// Shows a native action sheet (bottom sheet with labelled options).
     /// Returns the label of the button the user tapped, or null if cancelled.
-    /// 
-    /// - <paramref name="destruction"/> is shown in red (use for destructive actions like Delete).
-    ///   Pass null if there is no destructive option.
-    /// - <paramref name="buttons"/> are the non-destructive options shown above the cancel button.
+    /// destruction is shown in red — pass null if there is no destructive option.
     /// </summary>
     Task<string?> ShowActionSheetAsync(
         string title,

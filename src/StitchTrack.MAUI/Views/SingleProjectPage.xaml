@@ -44,7 +44,7 @@
     </Grid>
 
     <!-- ============================================ -->
-    <!-- HEADER: Project Name + Menu                  -->
+    <!-- HEADER: Project Name                  -->
     <!-- ============================================ -->
     <Grid Grid.Row="1"
           BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
@@ -56,20 +56,6 @@
              Style="{StaticResource HeaderTitle}"
              HorizontalOptions="Start"
              VerticalOptions="Center" />
-
-      <!-- Menu Icon (⋮) -->
-      <Image Source="more.svg"
-             WidthRequest="24"
-             HeightRequest="24"
-             HorizontalOptions="End"
-             VerticalOptions="Center">
-        <Image.Behaviors>
-          <toolkit:IconTintColorBehavior TintColor="White" />
-          </Image.Behaviors>
-          <Image.GestureRecognizers>
-            <TapGestureRecognizer Command="{Binding ShowMenuCommand}" />
-          </Image.GestureRecognizers>
-      </Image>
 
     </Grid>
 
@@ -91,7 +77,7 @@
           <Image Source="{Binding ImageUrl}"
                  Aspect="AspectFill" />
 
-          <!-- ✅ Bottom Gradient Overlay (always show) -->
+          <!-- Gradient overlay at bottom of image -->
           <BoxView VerticalOptions="End"
                    HeightRequest="50">
             <BoxView.Background>
@@ -103,7 +89,7 @@
             </BoxView.Background>
           </BoxView>
 
-          <!-- ✅ Helper Text Overlay (always show in white) -->
+          <!-- Helper Text Overlay (always show in white) -->
           <Label Text="← Swipe to go back to projects"
                  FontFamily="MontserratMedium"
                  FontSize="12"
@@ -131,7 +117,7 @@
 
           <VerticalStackLayout Spacing="16">
 
-            <!-- Project Name + Color Tag -->
+            <!-- Project Name + Color Dot -->
             <HorizontalStackLayout Spacing="8">
               <Label Text="{Binding ProjectName}"
                      FontFamily="MontserratBold"
@@ -153,7 +139,7 @@
               </Border>
             </HorizontalStackLayout>
 
-            <!-- Progress Info -->
+            <!-- Row count + progress percentage -->
             <HorizontalStackLayout Spacing="12">
               <Label FontFamily="MontserratRegular"
                      FontSize="14"
@@ -270,12 +256,11 @@
         <!-- TODO: Add session history -->
 
         <!-- ============================================ -->
-        <!-- ACTION BUTTONS                               -->
+        <!-- ACTION BUTTONS: Edit | Archive | Delete      -->
         <!-- ============================================ -->
-        <!-- ACTION BUTTONS -->
-        <Grid ColumnDefinitions="*,*"
-              ColumnSpacing="12"
-              Padding="20"
+        <Grid ColumnDefinitions="*,*,*"
+              ColumnSpacing="10"
+              Padding="0"
               Margin="16,16,16,32">
 
           <!-- Edit Button -->
@@ -286,9 +271,11 @@
             <Border.StrokeShape>
               <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding EditProjectCommand}" />
+            </Border.GestureRecognizers>
 
-            <HorizontalStackLayout Spacing="6"
-                                   HorizontalOptions="Center">
+            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
               <Image Source="edit.svg"
                      WidthRequest="16"
                      HeightRequest="16"
@@ -303,10 +290,6 @@
                      TextColor="{StaticResource BrandGold}"
                      VerticalOptions="Center" />
             </HorizontalStackLayout>
-
-            <Border.GestureRecognizers>
-              <TapGestureRecognizer Command="{Binding EditProjectCommand}" />
-            </Border.GestureRecognizers>
           </Border>
 
           <!-- Archive Button -->
@@ -317,9 +300,11 @@
             <Border.StrokeShape>
               <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ArchiveProjectCommand}" />
+            </Border.GestureRecognizers>
 
-            <HorizontalStackLayout Spacing="6"
-                                   HorizontalOptions="Center">
+            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
               <Image Source="archive.svg"
                      WidthRequest="16"
                      HeightRequest="16"
@@ -328,18 +313,43 @@
                   <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
                 </Image.Behaviors>
               </Image>
-              <Label Text="Archive"
+              <Label Text="{Binding ArchiveButtonText}"
                      FontFamily="MontserratMedium"
                      FontSize="14"
                      TextColor="{StaticResource BrandGold}"
                      VerticalOptions="Center" />
             </HorizontalStackLayout>
-
-            <Border.GestureRecognizers>
-              <TapGestureRecognizer Command="{Binding ArchiveProjectCommand}" />
-            </Border.GestureRecognizers>
           </Border>
 
+          <!-- Delete Button — orange background signals destructive action -->
+          <Border Grid.Column="2"
+                  Padding="12,10"
+                  StrokeThickness="0"
+                  BackgroundColor="{StaticResource ButtonCancel}">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding DeleteProjectCommand}" />
+            </Border.GestureRecognizers>
+
+            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+              <Image Source="trash.svg"
+                     WidthRequest="16"
+                     HeightRequest="16"
+                     VerticalOptions="Center">
+                <Image.Behaviors>
+                  <toolkit:IconTintColorBehavior TintColor="White" />
+                </Image.Behaviors>
+              </Image>
+              <Label Text="Delete"
+                     FontFamily="MontserratMedium"
+                     FontSize="14"
+                     TextColor="White"
+                     VerticalOptions="Center" />
+            </HorizontalStackLayout>
+          </Border>
+          
         </Grid>
 
       </VerticalStackLayout>

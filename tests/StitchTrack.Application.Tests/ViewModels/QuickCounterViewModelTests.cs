@@ -14,6 +14,7 @@ public class QuickCounterViewModelTests
     private QuickCounterViewModel _viewModel;
     private Mock<IProjectRepository> _mockProjectRepo;
     private Mock<IDialogService> _mockDialogService;
+    private Mock<IHapticsService> _mockHapticsService;
 
     [SetUp]
     public void Setup()
@@ -21,11 +22,13 @@ public class QuickCounterViewModelTests
         // Create mock repositories and services
         _mockProjectRepo = new Mock<IProjectRepository>();
         _mockDialogService = new Mock<IDialogService>();
+        _mockHapticsService = new Mock<IHapticsService>();
 
         // Create ViewModel with mocked dependencies
         _viewModel = new QuickCounterViewModel(
             _mockProjectRepo.Object,
-            _mockDialogService.Object);
+            _mockDialogService.Object,
+            _mockHapticsService.Object);
     }
 
     [Test]

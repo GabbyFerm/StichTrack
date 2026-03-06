@@ -14,8 +14,10 @@ public class NavigationService : INavigationService
         return Shell.Current.GoToAsync(route, parameters);
     }
 
-    public Task GoBackAsync()
+    public async Task GoBackAsync()
     {
-        return Shell.Current.GoToAsync(". .");
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+            await Shell.Current.GoToAsync("..")
+        );
     }
 }

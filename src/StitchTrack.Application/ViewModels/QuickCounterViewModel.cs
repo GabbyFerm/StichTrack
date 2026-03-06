@@ -44,6 +44,9 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     // Callback when project is saved (for navigation)
     public Func<Task>? OnProjectSaved { get; set; }
 
+    // Add this property to QuickCounterViewModel to allow test injection of haptic feedback
+    public Action? TriggerHapticFeedback { get; set; }
+
     public QuickCounterViewModel(IProjectRepository projectRepository, IDialogService dialogService, IHapticsService hapticsService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
@@ -67,7 +70,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     {
         _project.IncrementCount();
         AddToUndoStack(CounterAction.Increment);
-        _hapticsService.Click();
+        TriggerHapticFeedback?.Invoke();
         NotifyCountChanged();
         System.Diagnostics.Debug.WriteLine($"➕ Incremented to {CurrentCount}");
     }
@@ -78,7 +81,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         {
             _project.DecrementCount();
             AddToUndoStack(CounterAction.Decrement);
-            _hapticsService.Click();
+            TriggerHapticFeedback?.Invoke();
             NotifyCountChanged();
             System.Diagnostics.Debug.WriteLine($"➖ Decremented to {CurrentCount}");
         }
@@ -113,7 +116,6 @@ public class QuickCounterViewModel : INotifyPropertyChanged
                 break;
         }
 
-        _hapticsService.Click();
         NotifyCountChanged();
     }
 
@@ -126,7 +128,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
             AddToUndoStack(CounterAction.Reset, previousCount);
 
             _project.ResetCount();
-            _hapticsService.Click();
+            TriggerHapticFeedback?.Invoke();
             NotifyCountChanged();
             System.Diagnostics.Debug.WriteLine($"🔄 Reset from {previousCount} to 0");
         }

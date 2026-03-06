@@ -1,4 +1,8 @@
+using CommunityToolkit.Maui.Views;
+using StitchTrack.Application.Models;
 using StitchTrack.Application.ViewModels;
+using StitchTrack.Domain.Entities;
+using StitchTrack.MAUI.Controls;
 
 namespace StitchTrack.MAUI.Views;
 
@@ -13,6 +17,9 @@ public partial class SingleProjectPage : ContentPage
         InitializeComponent();
         _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         BindingContext = _viewModel;
+
+        // Wire popup callback — same pattern as ProjectsPage
+        _viewModel.ShowProjectFormAsync = ShowProjectFormPopupAsync;
 
         System.Diagnostics.Debug.WriteLine("✅ SingleProjectPage initialized");
     }
@@ -35,5 +42,23 @@ public partial class SingleProjectPage : ContentPage
     {
         base.OnAppearing();
         await _viewModel.LoadProjectAsync();
+    }
+
+    /// <summary>
+    /// Opens the ProjectFormPopup in edit mode pre-filled with the project data.
+    /// Returns the form result, or null if the user cancelled.
+    /// </summary>
+    private async Task<ProjectFormResult?> ShowProjectFormPopupAsync(Project? project)
+    {
+        ProjectFormResult? formResult = null;
+
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            var popup = new ProjectFormPopup(project);
+            var result = await this.ShowPopupAsync(popup);
+            formResult = result as ProjectFormResult;
+        });
+
+        return formResult;
     }
 }
