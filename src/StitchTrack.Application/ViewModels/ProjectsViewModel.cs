@@ -130,7 +130,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
         NavigateToProjectCommand = new RelayCommand<Guid>(OnNavigateToProject);
 
         // Passes the full Project object so we have name + id without an extra lookup
-        ShowProjectMenuCommand = new RelayCommand<Project>(OnShowProjectMenu);
+        ShowProjectMenuCommand = new RelayCommand<Project?>(OnShowProjectMenu);
 
         System.Diagnostics.Debug.WriteLine("✅ ProjectsViewModel created");
 
@@ -305,9 +305,9 @@ public class ProjectsViewModel : INotifyPropertyChanged
     /// Shows an action sheet for the tapped project card.
     /// Branches to Edit, Archive, or Delete based on what the user picks.
     /// </summary>
-    private void OnShowProjectMenu(Project project)
+    private void OnShowProjectMenu(Project? project)
     {
-        if (project == null)
+        if (project is null)
         {
             System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectMenu called with null project");
             return;
