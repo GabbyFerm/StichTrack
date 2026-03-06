@@ -59,6 +59,18 @@ public class Project
         };
     }
 
+    /// <summary>
+    /// Renames the project. Only the domain entity controls name changes.
+    /// </summary>
+    public void Rename(string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+            throw new ArgumentException("Project name cannot be empty", nameof(newName));
+
+        Name = newName.Trim();
+        UpdatedAt = DateTime.UtcNow;
+    }
+
     public void IncrementCount()
     {
         int oldValue = CurrentCount;
@@ -108,7 +120,7 @@ public class Project
         return true;
     }
 
-    // Record a counter change in history for undo functionality, only Project should control when history is recorded
+    // Only the project controls when history is recorded
     private void RecordCounterChange(int oldValue, int newValue)
     {
         var history = CounterHistory.CreateCounterHistory(Id, oldValue, newValue);

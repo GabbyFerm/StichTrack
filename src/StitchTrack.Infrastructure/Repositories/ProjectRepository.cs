@@ -86,13 +86,32 @@ public class ProjectRepository : IProjectRepository
         await Task.CompletedTask.ConfigureAwait(false);
     }
 
-    public async Task DeleteAsync(Guid id)
+    /// <summary>
+    /// Soft delete — marks the project as archived so it can be recovered.
+    /// </summary>
+    public async Task ArchiveAsync(Guid id)
     {
         var project = await GetByIdAsync(id).ConfigureAwait(false);
         if (project != null)
         {
             project.ArchiveProject();
-            System.Diagnostics.Debug.WriteLine($"🗑️ Project archived: {project.Name}");
+            System.Diagnostics.Debug.WriteLine($"📦 Project soft-deleted (archived): {project.Name}");
+        }
+    }
+
+    /// <summary>
+    /// Hard delete — permanently removes the project from the database.
+    /// Does nothing silently if the project is not found.
+    /// </summary>
+    public async Task DeleteAsync(Guid id)
+    {
+        var project = await GetByIdAsync(id).ConfigureAwait(false);
+        if (project != null)
+        {
+            // EF Core will cascade-delete related rows (sessions, history, etc.)
+            // if cascade delete is configured in AppDbContext
+            _context.Projects.Remove(project);
+            System.Diagnostics.Debug.WriteLine($"🗑️ Project hard-deleted: {project.Name}");
         }
     }
 

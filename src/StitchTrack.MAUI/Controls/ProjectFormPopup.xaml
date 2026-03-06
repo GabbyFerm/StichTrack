@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               x:Class="StitchTrack.MAUI.Controls.ProjectFormPopup"
+               Color="Transparent"
+               CanBeDismissedByTappingOutsideOfPopup="False"
+               HorizontalOptions="Fill"
+               VerticalOptions="End">
+
+  <!-- Semi-transparent backdrop -->
+  <Grid>
+
+    <BoxView BackgroundColor="#80000000" />
+
+    <!-- Card sits at the bottom, rounded top corners -->
+    <Border Margin="0"
+            Padding="0"
+            StrokeThickness="0"
+            BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
+            VerticalOptions="End">
+
+      <Border.StrokeShape>
+        <RoundRectangle CornerRadius="20,20,0,0" />
+      </Border.StrokeShape>
+
+      <Grid RowDefinitions="Auto,*,Auto"
+            MaximumHeightRequest="680">
+
+        <!-- ============================================ -->
+        <!-- HEADER: Title + Close Button                 -->
+        <!-- ============================================ -->
+        <Grid Grid.Row="0"
+              Padding="24,20,16,16"
+              ColumnDefinitions="*,Auto">
+
+          <!-- Title changes between Create and Edit mode -->
+          <Label x:Name="FormTitleLabel"
+                 Grid.Column="0"
+                 FontFamily="MontserratBold"
+                 FontSize="20"
+                 VerticalOptions="Center"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+          <!-- Close (X) button -->
+          <ImageButton Grid.Column="1"
+                       Source="close.svg"
+                       WidthRequest="32"
+                       HeightRequest="32"
+                       CornerRadius="16"
+                       BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                       Padding="6"
+                       Clicked="OnCancelClicked">
+            <ImageButton.Behaviors>
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
+            </ImageButton.Behaviors>
+          </ImageButton>
+
+        </Grid>
+
+        <!-- ============================================ -->
+        <!-- FORM FIELDS (scrollable)                     -->
+        <!-- ============================================ -->
+        <ScrollView Grid.Row="1">
+
+          <VerticalStackLayout Padding="24,0,24,16" Spacing="20">
+
+            <!-- PROJECT NAME (required) -->
+            <VerticalStackLayout Spacing="8">
+
+              <!-- Label with required asterisk -->
+              <HorizontalStackLayout Spacing="4">
+                <Label Text="Project Name"
+                       FontFamily="MontserratSemiBold"
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+                <Label Text="*"
+                       FontFamily="MontserratSemiBold"
+                       FontSize="14"
+                       TextColor="{StaticResource BrandGold}" />
+              </HorizontalStackLayout>
+
+              <Border StrokeThickness="1"
+                      Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                      BackgroundColor="{AppThemeBinding Light=White, Dark=#1F2937}"
+                      Padding="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+
+                <Entry x:Name="NameEntry"
+                       Placeholder="My Knitting Project"
+                       FontFamily="MontserratRegular"
+                       FontSize="14"
+                       MaxLength="200"
+                       Margin="12,0"
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+              </Border>
+
+            </VerticalStackLayout>
+
+            <!-- COLOUR TAG -->
+            <VerticalStackLayout Spacing="10">
+
+              <Label Text="Colour Tag"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+              <!-- Color dots - built dynamically in code-behind from ProjectColors.Palette -->
+              <HorizontalStackLayout x:Name="ColorPickerContainer"
+                                     Spacing="12" />
+
+            </VerticalStackLayout>
+
+            <!-- PHOTO UPLOAD (placeholder - Phase 2) -->
+            <VerticalStackLayout Spacing="8">
+
+              <Label Text="Photo"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+              <Border StrokeThickness="1"
+                      Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                      BackgroundColor="{AppThemeBinding Light=White, Dark=#1F2937}"
+                      Padding="16,12">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Tapped="OnPhotoUploadTapped" />
+                </Border.GestureRecognizers>
+
+                <Label Text="[ ADD AN IMAGE ]"
+                       FontFamily="MontserratMedium"
+                       FontSize="13"
+                       TextColor="{StaticResource BrandGold}"
+                       HorizontalOptions="Center" />
+
+              </Border>
+
+            </VerticalStackLayout>
+
+            <!-- TOTAL ROWS (optional) -->
+            <VerticalStackLayout Spacing="8">
+
+              <Label Text="Total rows"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+              <Border StrokeThickness="1"
+                      Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                      BackgroundColor="{AppThemeBinding Light=White, Dark=#1F2937}"
+                      Padding="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+
+                <Entry x:Name="TotalRowsEntry"
+                       Placeholder="Optional"
+                       Keyboard="Numeric"
+                       FontFamily="MontserratRegular"
+                       FontSize="14"
+                       MaxLength="6"
+                       Margin="12,0"
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+              </Border>
+
+            </VerticalStackLayout>
+
+            <!-- NOTES (optional) -->
+            <VerticalStackLayout Spacing="8">
+
+              <Label Text="Notes"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+              <Border StrokeThickness="1"
+                      Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                      BackgroundColor="{AppThemeBinding Light=White, Dark=#1F2937}"
+                      Padding="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+
+                <Editor x:Name="NotesEditor"
+                        Placeholder="Optional notes about this project..."
+                        FontFamily="MontserratRegular"
+                        FontSize="14"
+                        HeightRequest="100"
+                        Margin="12,8"
+                        AutoSize="Disabled"
+                        TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+                        PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+              </Border>
+
+            </VerticalStackLayout>
+
+          </VerticalStackLayout>
+
+        </ScrollView>
+
+        <!-- ============================================ -->
+        <!-- FOOTER: Cancel + Save Buttons                -->
+        <!-- ============================================ -->
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*,*"
+              ColumnSpacing="12"
+              Padding="24,16,24,40">
+
+          <!-- Cancel Button -->
+          <Border Grid.Column="0"
+                  StrokeThickness="1"
+                  Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                  BackgroundColor="Transparent"
+                  HeightRequest="50">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Tapped="OnCancelClicked" />
+            </Border.GestureRecognizers>
+
+            <Label Text="CANCEL"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+          </Border>
+
+          <!-- Save / Create Button -->
+          <Border Grid.Column="1"
+                  StrokeThickness="0"
+                  BackgroundColor="{StaticResource BrandGold}"
+                  HeightRequest="50">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Tapped="OnSaveClicked" />
+            </Border.GestureRecognizers>
+
+            <!-- Label text set in code-behind based on mode -->
+            <Label x:Name="SaveButtonLabel"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="White" />
+          </Border>
+
+        </Grid>
+
+      </Grid>
+
+    </Border>
+
+  </Grid>
+
+</toolkit:Popup>

@@ -1,11 +1,12 @@
+using StitchTrack.Application.Commands;
+using StitchTrack.Application.Interfaces;
+using StitchTrack.Application.Models;
+using StitchTrack.Domain.Entities;
+using StitchTrack.Domain.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using StitchTrack.Application.Commands;
-using StitchTrack.Application.Interfaces;
-using StitchTrack.Domain.Entities;
-using StitchTrack.Domain.Interfaces;
 
 namespace StitchTrack.Application.ViewModels;
 
@@ -25,13 +26,13 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    // Observable collection of ALL projects
+    // Holds every project loaded from the database (both active and archived)
     private readonly ObservableCollection<Project> _allProjects = new();
 
-    // Filtered projects based on ShowArchived flag
+    // The filtered list the UI binds to
     public ObservableCollection<Project> Projects { get; } = new();
 
-    // Whether to show archived or active projects
+    // Controls which tab is active — triggers a re-filter when changed
     public bool ShowArchived
     {
         get => _showArchived;
@@ -47,7 +48,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
         }
     }
 
-    // Loading state
     public bool IsLoading
     {
         get => _isLoading;
@@ -61,7 +61,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
         }
     }
 
-    // Empty state (show "no projects" message)
+    // When true the empty state view is shown instead of the list
     public bool IsEmpty
     {
         get => _isEmpty;
@@ -77,21 +77,37 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     public bool HasProjects => !IsEmpty;
+
+    // Tab labels include live counts so they stay in sync after changes
     public string ActiveProjectsTabText => $"Active projects ({ActiveProjectCount})";
     public string ArchivedProjectsTabText => $"Archived Projects ({ArchivedProjectCount})";
     public int ActiveProjectCount => _allProjects.Count(p => !p.IsArchived);
     public int ArchivedProjectCount => _allProjects.Count(p => p.IsArchived);
 
-    // Commands
+    /// <summary>
+    /// Set by ProjectsPage to open the form popup.
+    /// Receives the project to edit (null = create mode).
+    /// Returns the filled form result, or null if cancelled.
+    /// </summary>
+    public Func<Project?, Task<ProjectFormResult?>>? ShowProjectFormAsync { get; set; }
+
+    /// <summary>
+    /// Set by ProjectsPage to open the project menu popup.
+    /// Returns the action string ("Edit", "Archive", "Unarchive", "Delete"), or null for cancel.
+    /// </summary>
+    public Func<Project, Task<string?>>? ShowProjectMenuPopupAsync { get; set; }
+
     public ICommand LoadProjectsCommand { get; }
     public ICommand CreateProjectCommand { get; }
-    public ICommand DeleteProjectCommand { get; }
     public ICommand RefreshCommand { get; }
     public ICommand ShowActiveProjectsCommand { get; }
     public ICommand ShowArchivedProjectsCommand { get; }
     public ICommand SearchCommand { get; }
     public ICommand SyncCommand { get; }
     public ICommand NavigateToProjectCommand { get; }
+
+    // Handles the ⋮ tap on a project card — shows Edit / Archive / Delete sheet
+    public ICommand ShowProjectMenuCommand { get; }
 
     public ProjectsViewModel(
         IProjectRepository projectRepository,
@@ -104,10 +120,8 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
         _syncContext = SynchronizationContext.Current;
 
-        // Initialize commands
         LoadProjectsCommand = new RelayCommand(OnLoadProjects);
         CreateProjectCommand = new RelayCommand(OnCreateProject);
-        DeleteProjectCommand = new RelayCommand(OnDeleteProject);
         RefreshCommand = new RelayCommand(OnRefresh);
         ShowActiveProjectsCommand = new RelayCommand(() => ShowArchived = false);
         ShowArchivedProjectsCommand = new RelayCommand(() => ShowArchived = true);
@@ -115,14 +129,16 @@ public class ProjectsViewModel : INotifyPropertyChanged
         SyncCommand = new RelayCommand(OnSync);
         NavigateToProjectCommand = new RelayCommand<Guid>(OnNavigateToProject);
 
+        // Passes the full Project object so we have name + id without an extra lookup
+        ShowProjectMenuCommand = new RelayCommand<Project>(OnShowProjectMenu);
+
         System.Diagnostics.Debug.WriteLine("✅ ProjectsViewModel created");
 
-        // Load projects on initialization
         _ = LoadProjectsAsync();
     }
 
     /// <summary>
-    /// Loads all projects (both active and archived) from the database.
+    /// Loads all projects from the database and populates both tabs.
     /// </summary>
     public async Task LoadProjectsAsync()
     {
@@ -131,7 +147,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
             System.Diagnostics.Debug.WriteLine("📂 Loading projects...");
             IsLoading = true;
 
-            // ✅ UPDATED: Load both active and archived
             var activeProjects = await _projectRepository.GetActiveProjectsAsync().ConfigureAwait(false);
             var archivedProjects = await _projectRepository.GetArchivedProjectsAsync().ConfigureAwait(false);
 
@@ -139,7 +154,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
             {
                 _allProjects.Clear();
 
-                // Add all projects to internal collection
                 foreach (var project in activeProjects)
                 {
                     _allProjects.Add(project);
@@ -149,7 +163,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
                     _allProjects.Add(project);
                 }
 
-                // Filter based on current tab
                 FilterProjects();
 
                 System.Diagnostics.Debug.WriteLine($"✅ Loaded {_allProjects.Count} projects ({activeProjects.Count()} active, {archivedProjects.Count()} archived)");
@@ -167,7 +180,8 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Filters projects based on ShowArchived flag.
+    /// Filters _allProjects into Projects based on the active tab.
+    /// Also refreshes the tab count labels.
     /// </summary>
     private void FilterProjects()
     {
@@ -182,7 +196,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
         IsEmpty = Projects.Count == 0;
 
-        // Notify counts changed
         OnPropertyChanged(nameof(ActiveProjectsTabText));
         OnPropertyChanged(nameof(ArchivedProjectsTabText));
         OnPropertyChanged(nameof(ActiveProjectCount));
@@ -190,40 +203,41 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Creates a new project with user-provided name.
+    /// Opens the form popup to create a new project (null = create mode).
     /// </summary>
     private async Task CreateProjectAsync()
     {
+        if (ShowProjectFormAsync == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectFormAsync callback not set");
+            return;
+        }
+
+        var result = await ShowProjectFormAsync(null).ConfigureAwait(false);
+
+        if (result == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ Project creation cancelled");
+            return;
+        }
+
         try
         {
-            var projectName = await _dialogService.ShowPromptAsync(
-                title: "New Project",
-                message: "Enter project name:",
-                accept: "Create",
-                cancel: "Cancel",
-                placeholder: "My Knitting Project",
-                maxLength: 200
-            ).ConfigureAwait(false);
-
-            if (string.IsNullOrWhiteSpace(projectName))
-            {
-                System.Diagnostics.Debug.WriteLine("⚠️ Project creation cancelled");
-                return;
-            }
-
-            System.Diagnostics.Debug.WriteLine($"➕ Creating project: {projectName}");
-
-            var newProject = Project.CreateProject(projectName.Trim());
+            // CreateProject sets the name and color; UpdateProjectDetails adds the rest
+            var newProject = Project.CreateProject(result.Name, colorHex: result.ColorHex);
+            newProject.UpdateProjectDetails(
+                colorHex: result.ColorHex,
+                totalRows: result.TotalRows,
+                notes: result.Notes
+            );
 
             await _projectRepository.AddAsync(newProject).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Id}");
+            System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Name}");
 
-            // Reload projects to show new one
             await LoadProjectsAsync().ConfigureAwait(false);
-
-            await _dialogService.ShowToastAsync($"Project '{projectName}' created! ").ConfigureAwait(false);
+            await _dialogService.ShowToastAsync($"'{result.Name}' created!").ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
@@ -238,52 +252,172 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Navigation to single project page.
+    /// Opens the form popup pre-filled with the project's current data.
     /// </summary>
-    private async void OnNavigateToProject(Guid projectId)
+    private async Task EditProjectAsync(Project project)
     {
-        if (projectId == Guid.Empty)
+        if (ShowProjectFormAsync == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Invalid project ID");
+            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectFormAsync callback not set");
             return;
         }
 
-        System.Diagnostics.Debug.WriteLine($"🔗 Navigating to project: {projectId}");
+        // Pass the existing project so the popup pre-fills the form fields
+        var result = await ShowProjectFormAsync(project).ConfigureAwait(false);
 
-        await _navigationService.NavigateToAsync($"SingleProjectPage?ProjectId={projectId}").ConfigureAwait(false);
+        if (result == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ Project edit cancelled");
+            return;
+        }
+
+        try
+        {
+            // Apply domain methods — the entity controls all state changes
+            project.Rename(result.Name);
+            project.UpdateProjectDetails(
+                colorHex: result.ColorHex,
+                totalRows: result.TotalRows,
+                notes: result.Notes
+            );
+
+            await _projectRepository.UpdateAsync(project).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            System.Diagnostics.Debug.WriteLine($"✅ Project updated: {project.Name}");
+
+            await LoadProjectsAsync().ConfigureAwait(false);
+            await _dialogService.ShowToastAsync($"'{result.Name}' updated!").ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error updating project: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Update Failed", "Could not save changes.").ConfigureAwait(false);
+        }
+        catch (ArgumentException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Validation error: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
+        }
     }
 
     /// <summary>
-    /// Deletes a project (soft delete - sets IsArchived = true).
-    /// Shows confirmation dialog before deleting.
+    /// Shows an action sheet for the tapped project card.
+    /// Branches to Edit, Archive, or Delete based on what the user picks.
+    /// </summary>
+    private void OnShowProjectMenu(Project project)
+    {
+        if (project == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectMenu called with null project");
+            return;
+        }
+
+        _ = ShowProjectMenuAsync(project).ContinueWith(
+            t =>
+            {
+                if (t.IsFaulted)
+                    System.Diagnostics.Debug.WriteLine($"❌ ShowProjectMenu failed: {t.Exception?.GetBaseException().Message}");
+            },
+            TaskScheduler.FromCurrentSynchronizationContext()
+        );
+    }
+
+    private async Task ShowProjectMenuAsync(Project project)
+    {
+        if (ShowProjectMenuPopupAsync == null)
+        {
+            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectMenuPopupAsync callback not set");
+            return;
+        }
+
+        // The popup handles Archive vs Unarchive label based on project.IsArchived
+        var action = await ShowProjectMenuPopupAsync(project).ConfigureAwait(true);
+
+        // null means the user cancelled
+        switch (action)
+        {
+            case "Edit":
+                await EditProjectAsync(project).ConfigureAwait(false);
+                break;
+
+            case "Archive":
+                await ArchiveProjectAsync(project.Id).ConfigureAwait(false);
+                break;
+
+            case "Unarchive":
+                await UnarchiveProjectAsync(project.Id).ConfigureAwait(false);
+                break;
+
+            case "Delete":
+                await DeleteProjectAsync(project.Id).ConfigureAwait(false);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Soft delete — moves the project to the Archived tab. Reversible.
+    /// </summary>
+    private async Task ArchiveProjectAsync(Guid projectId)
+    {
+        var project = _allProjects.FirstOrDefault(p => p.Id == projectId);
+        if (project == null) return;
+
+        try
+        {
+            await _projectRepository.ArchiveAsync(projectId).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            await LoadProjectsAsync().ConfigureAwait(false);
+            await _dialogService.ShowToastAsync($"'{project.Name}' archived").ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error archiving project: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Archive Failed", "Could not archive project.").ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Restores an archived project back to the active tab.
+    /// </summary>
+    private async Task UnarchiveProjectAsync(Guid projectId)
+    {
+        var project = _allProjects.FirstOrDefault(p => p.Id == projectId);
+        if (project == null) return;
+
+        try
+        {
+            project.UnarchiveProject(); // already exists on the entity
+            await _projectRepository.UpdateAsync(project).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            await LoadProjectsAsync().ConfigureAwait(false);
+            await _dialogService.ShowToastAsync($"'{project.Name}' restored").ConfigureAwait(false);
+        }
+        catch (InvalidOperationException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Error unarchiving project: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Restore Failed", "Could not restore project.").ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Hard delete — permanently removes the project after explicit user confirmation.
     /// </summary>
     private async Task DeleteProjectAsync(Guid projectId)
     {
+        var project = _allProjects.FirstOrDefault(p => p.Id == projectId);
+        if (project == null) return;
+
+        var confirmed = await ShowDeleteConfirmationAsync(project.Name).ConfigureAwait(false);
+        if (!confirmed) return;
+
         try
         {
-            var project = _allProjects.FirstOrDefault(p => p.Id == projectId);
-            if (project == null)
-            {
-                System.Diagnostics.Debug.WriteLine($"⚠️ Project not found: {projectId}");
-                return;
-            }
-
-            // Show confirmation dialog
-            var confirmed = await ShowDeleteConfirmationAsync(project.Name).ConfigureAwait(false);
-            if (!confirmed)
-            {
-                System.Diagnostics.Debug.WriteLine($"⚠️ Delete cancelled by user: {project.Name}");
-                return;
-            }
-
-            System.Diagnostics.Debug.WriteLine($"🗑️ Archiving project: {project.Name}");
-
             await _projectRepository.DeleteAsync(projectId).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"✅ Project archived: {project.Name}");
-
-            // Remove from both collections
             UpdateOnUiThread(() =>
             {
                 _allProjects.Remove(project);
@@ -291,7 +425,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
                 IsEmpty = Projects.Count == 0;
             });
 
-            await _dialogService.ShowToastAsync($"Project '{project.Name}' deleted").ConfigureAwait(false);
+            await _dialogService.ShowToastAsync($"'{project.Name}' deleted").ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
@@ -301,15 +435,13 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Shows confirmation dialog for deleting a project.
+    /// Asks the user to type DELETE to confirm a permanent action.
     /// </summary>
     private async Task<bool> ShowDeleteConfirmationAsync(string projectName)
     {
-        // For now, use DisplayPromptAsync to get yes/no
-        // In future, implement proper DisplayActionSheet
         var result = await _dialogService.ShowPromptAsync(
             title: "Delete Project?",
-            message: $"Are you sure you want to delete '{projectName}'? Type 'DELETE' to confirm.",
+            message: $"This will permanently delete '{projectName}'. Type DELETE to confirm.",
             accept: "Delete",
             cancel: "Cancel",
             placeholder: "DELETE",
@@ -317,6 +449,12 @@ public class ProjectsViewModel : INotifyPropertyChanged
         ).ConfigureAwait(false);
 
         return result?.Equals("DELETE", StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    private async void OnNavigateToProject(Guid projectId)
+    {
+        if (projectId == Guid.Empty) return;
+        await _navigationService.NavigateToAsync($"SingleProjectPage?ProjectId={projectId}").ConfigureAwait(false);
     }
 
     // Command handlers
@@ -328,12 +466,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
     private void OnCreateProject()
     {
         _ = CreateProjectAsync();
-    }
-
-    private void OnDeleteProject()
-    {
-        // This will be called with project ID as parameter from UI
-        System.Diagnostics.Debug.WriteLine("⚠️ DeleteProject called without parameter - use DeleteProjectAsync(Guid)");
     }
 
     private void OnRefresh()
@@ -355,26 +487,15 @@ public class ProjectsViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Public method to delete a specific project (called from UI).
-    /// </summary>
-    public async Task DeleteProjectByIdAsync(Guid projectId)
-    {
-        await DeleteProjectAsync(projectId).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Executes an action on the UI thread.
+    /// Runs an action on the UI thread using the captured SynchronizationContext.
+    /// Required when updating ObservableCollections from background tasks.
     /// </summary>
     private void UpdateOnUiThread(Action action)
     {
         if (_syncContext != null)
-        {
             _syncContext.Post(_ => action(), null);
-        }
         else
-        {
             action();
-        }
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

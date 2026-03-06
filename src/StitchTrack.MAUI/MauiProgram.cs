@@ -71,6 +71,8 @@ public static class MauiProgram
 
         // POPUPS (Community Toolkit)
         builder.Services.AddTransient<OnboardingPopup>();
+        builder.Services.AddTransient<ProjectFormPopup>();
+        builder.Services.AddTransient<ProjectMenuPopup>();
 
 #if DEBUG
         builder.Logging.AddDebug();

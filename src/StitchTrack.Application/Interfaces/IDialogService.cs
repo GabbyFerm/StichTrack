@@ -25,16 +25,26 @@ public interface IDialogService
         int maxLength = -1);
 
     /// <summary>
-    /// Shows an alert dialog with a message.
+    /// Shows a simple alert with a dismiss button.
     /// </summary>
-    /// <param name="title">Alert title</param>
-    /// <param name="message">Alert message</param>
-    /// <param name="cancel">Button text (e.g., "OK")</param>
     Task ShowAlertAsync(string title, string message, string cancel = "OK");
 
     /// <summary>
-    /// Shows a brief toast-style message (simulated in Phase 1).
+    /// Shows a brief success/info message.
     /// </summary>
-    /// <param name="message">Message to display</param>
     Task ShowToastAsync(string message);
+
+    /// <summary>
+    /// Shows a native action sheet (bottom sheet with labelled options).
+    /// Returns the label of the button the user tapped, or null if cancelled.
+    /// 
+    /// - <paramref name="destruction"/> is shown in red (use for destructive actions like Delete).
+    ///   Pass null if there is no destructive option.
+    /// - <paramref name="buttons"/> are the non-destructive options shown above the cancel button.
+    /// </summary>
+    Task<string?> ShowActionSheetAsync(
+        string title,
+        string cancel,
+        string? destruction,
+        params string[] buttons);
 }

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               x:Class="StitchTrack.MAUI.Controls.ProjectMenuPopup"
+               Color="Transparent"
+               CanBeDismissedByTappingOutsideOfPopup="True"
+               HorizontalOptions="Fill"
+               VerticalOptions="End">
+
+  <Grid>
+
+    <!-- Semi-transparent backdrop -->
+    <BoxView BackgroundColor="#80000000" />
+
+    <!-- Card pinned to the bottom with rounded top corners -->
+    <Border Margin="0"
+            Padding="0"
+            StrokeThickness="0"
+            BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
+            VerticalOptions="End">
+
+      <Border.StrokeShape>
+        <RoundRectangle CornerRadius="20,20,0,0" />
+      </Border.StrokeShape>
+
+      <VerticalStackLayout Spacing="0" Padding="0,8,0,0">
+
+        <!-- Drag handle -->
+        <BoxView WidthRequest="40"
+                 HeightRequest="4"
+                 CornerRadius="2"
+                 BackgroundColor="{AppThemeBinding Light=#D1D5DB, Dark=#4B5563}"
+                 HorizontalOptions="Center"
+                 Margin="0,8,0,16" />
+
+        <!-- Project Name -->
+        <Label x:Name="ProjectNameLabel"
+               FontFamily="MontserratBold"
+               FontSize="18"
+               Margin="24,0,24,16"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+        <!-- Divider -->
+        <BoxView HeightRequest="1"
+                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                 HorizontalOptions="Fill" />
+
+        <!-- Edit Row -->
+        <Grid Padding="24,18"
+              ColumnDefinitions="28,*">
+          <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnEditTapped" />
+          </Grid.GestureRecognizers>
+
+          <Image Grid.Column="0"
+                 Source="edit.svg"
+                 WidthRequest="20"
+                 HeightRequest="20"
+                 VerticalOptions="Center">
+            <Image.Behaviors>
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+            </Image.Behaviors>
+          </Image>
+
+          <Label Grid.Column="1"
+                 Text="Edit"
+                 FontFamily="MontserratMedium"
+                 FontSize="16"
+                 Margin="12,0,0,0"
+                 VerticalOptions="Center"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+        </Grid>
+
+        <!-- Divider -->
+        <BoxView HeightRequest="1"
+                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                 HorizontalOptions="Fill" />
+
+        <!-- Archive / Unarchive Row — label set in code-behind based on project state -->
+        <Grid Padding="24,18"
+              ColumnDefinitions="28,*">
+          <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnArchiveTapped" />
+          </Grid.GestureRecognizers>
+
+          <Image Grid.Column="0"
+                 Source="archive.svg"
+                 WidthRequest="20"
+                 HeightRequest="20"
+                 VerticalOptions="Center">
+            <Image.Behaviors>
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+            </Image.Behaviors>
+          </Image>
+
+          <Label x:Name="ArchiveLabel"
+                 Grid.Column="1"
+                 FontFamily="MontserratMedium"
+                 FontSize="16"
+                 Margin="12,0,0,0"
+                 VerticalOptions="Center"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+        </Grid>
+
+        <!-- Divider -->
+        <BoxView HeightRequest="1"
+                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                 HorizontalOptions="Fill" />
+
+        <!-- Delete Row — red to signal destructive action -->
+        <Grid Padding="24,18"
+              ColumnDefinitions="28,*">
+          <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnDeleteTapped" />
+          </Grid.GestureRecognizers>
+
+          <Image Grid.Column="0"
+                 Source="trash.svg"
+                 WidthRequest="20"
+                 HeightRequest="20"
+                 VerticalOptions="Center">
+            <Image.Behaviors>
+              <toolkit:IconTintColorBehavior TintColor="#EF4444" />
+            </Image.Behaviors>
+          </Image>
+
+          <Label Grid.Column="1"
+                 Text="Delete"
+                 FontFamily="MontserratMedium"
+                 FontSize="16"
+                 Margin="12,0,0,0"
+                 VerticalOptions="Center"
+                 TextColor="#EF4444" />
+        </Grid>
+
+        <!-- Divider above cancel -->
+        <BoxView HeightRequest="1"
+                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                 HorizontalOptions="Fill" />
+
+        <!-- Cancel Button -->
+        <Border Margin="24,16,24,40"
+                Padding="0"
+                StrokeThickness="1"
+                Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                BackgroundColor="Transparent"
+                HeightRequest="50">
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="10" />
+          </Border.StrokeShape>
+          <Border.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnCancelTapped" />
+          </Border.GestureRecognizers>
+
+          <Label Text="Cancel"
+                 FontFamily="MontserratSemiBold"
+                 FontSize="15"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+        </Border>
+
+      </VerticalStackLayout>
+
+    </Border>
+
+  </Grid>
+
+</toolkit:Popup>
