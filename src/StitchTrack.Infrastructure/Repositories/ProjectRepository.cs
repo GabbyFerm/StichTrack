@@ -46,7 +46,7 @@ public class ProjectRepository : IProjectRepository
     public async Task<IEnumerable<Project>> GetActiveProjectsAsync(Guid? userId = null)
     {
         var query = _context.Projects
-        .AsNoTracking()  
+        .AsNoTracking()
         .Where(p => !p.IsArchived);
 
         if (userId.HasValue)
@@ -68,7 +68,7 @@ public class ProjectRepository : IProjectRepository
     public async Task<IEnumerable<Project>> GetArchivedProjectsAsync(Guid? userId = null)
     {
         var query = _context.Projects
-        .AsNoTracking()  
+        .AsNoTracking()
         .Where(p => p.IsArchived);
 
         if (userId.HasValue)
