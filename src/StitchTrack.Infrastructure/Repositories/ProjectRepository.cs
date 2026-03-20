@@ -35,10 +35,19 @@ public class ProjectRepository : IProjectRepository
             .ConfigureAwait(false);
     }
 
+    public async Task<Project?> GetByIdWithoutHistoryAsync(Guid id)
+    {
+        return await _context.Projects
+            .Include(p => p.Sessions)
+            .FirstOrDefaultAsync(p => p.Id == id)
+            .ConfigureAwait(false);
+    }
+
     public async Task<IEnumerable<Project>> GetActiveProjectsAsync(Guid? userId = null)
     {
         var query = _context.Projects
-            .Where(p => !p.IsArchived);
+        .AsNoTracking()
+        .Where(p => !p.IsArchived);
 
         if (userId.HasValue)
         {
@@ -59,7 +68,8 @@ public class ProjectRepository : IProjectRepository
     public async Task<IEnumerable<Project>> GetArchivedProjectsAsync(Guid? userId = null)
     {
         var query = _context.Projects
-            .Where(p => p.IsArchived);
+        .AsNoTracking()
+        .Where(p => p.IsArchived);
 
         if (userId.HasValue)
         {
@@ -80,10 +90,31 @@ public class ProjectRepository : IProjectRepository
     {
         ArgumentNullException.ThrowIfNull(project);
 
-        _context.Projects.Update(project);
-        System.Diagnostics.Debug.WriteLine($"🔄 Project updated: {project.Name}");
+        // If the project was loaded via GetByIdAsync in this same DbContext instance,
+        // EF Core is already tracking it and knows what changed.
+        // Calling Update() would override child entity states (e.g. Added → Modified)
+        // causing INSERT to become UPDATE on rows that don't exist yet.
+        var entry = _context.Entry(project);
+        if (entry.State == EntityState.Detached)
+        {
+            // Only attach and mark modified if not already tracked
+            _context.Projects.Update(project);
+        }
 
+        System.Diagnostics.Debug.WriteLine($"🔄 Project updated: {project.Name}");
         await Task.CompletedTask.ConfigureAwait(false);
+    }
+
+    public async Task UpdateCountAsync(Guid projectId, int newCount, DateTime updatedAt)
+    {
+        await _context.Projects
+            .Where(p => p.Id == projectId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(p => p.CurrentCount, newCount)
+                .SetProperty(p => p.UpdatedAt, updatedAt))
+            .ConfigureAwait(false);
+
+        System.Diagnostics.Debug.WriteLine($"💾 Count updated to {newCount}");
     }
 
     /// <summary>

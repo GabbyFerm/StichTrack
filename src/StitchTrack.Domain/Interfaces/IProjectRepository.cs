@@ -19,6 +19,12 @@ public interface IProjectRepository
     Task<Project?> GetByIdAsync(Guid id);
 
     /// <summary>
+    /// Gets a project by ID without loading CounterHistory entries.
+    /// Use for the counter page where history tracking causes EF state conflicts.
+    /// </summary>
+    Task<Project?> GetByIdWithoutHistoryAsync(Guid id);
+
+    /// <summary>
     /// Gets all non-archived projects for the current user.
     /// </summary>
     Task<IEnumerable<Project>> GetActiveProjectsAsync(Guid? userId = null);
@@ -32,6 +38,10 @@ public interface IProjectRepository
     /// Updates an existing project.
     /// </summary>
     Task UpdateAsync(Project project);
+    /// <summary>
+    /// Updates only the Count and UpdatedAt fields of a project.
+    /// </summary>
+    Task UpdateCountAsync(Guid projectId, int newCount, DateTime updatedAt);
 
     /// <summary>
     /// Soft delete — sets IsArchived = true. Project remains in the database.
