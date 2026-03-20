@@ -47,6 +47,7 @@ public static class MauiProgram
         // REPOSITORIES
         builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
         builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
+        builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
         // SERVICES
         builder.Services.AddSingleton<IDialogService, MauiDialogService>();
@@ -57,6 +58,7 @@ public static class MauiProgram
         builder.Services.AddTransient<QuickCounterViewModel>();
         builder.Services.AddTransient<ProjectsViewModel>();
         builder.Services.AddTransient<SingleProjectViewModel>();
+        builder.Services.AddTransient<ProjectCounterViewModel>();
         // TODO: Add other ViewModels as we create them
         // builder.Services.AddTransient<SessionViewModel>();
         // builder.Services.AddTransient<SettingsViewModel>();
@@ -65,6 +67,7 @@ public static class MauiProgram
         builder.Services.AddTransient<QuickCounterPage>();
         builder.Services.AddTransient<ProjectsPage>();
         builder.Services.AddTransient<SingleProjectPage>();
+        builder.Services.AddTransient<ProjectCounterPage>();
         // TODO: Add other Pages as we create them
         // builder.Services.AddTransient<SessionPage>();
         // builder.Services.AddTransient<SettingsPage>();

@@ -44,22 +44,6 @@
     </Grid>
 
     <!-- ============================================ -->
-    <!-- HEADER: Project Name                  -->
-    <!-- ============================================ -->
-    <Grid Grid.Row="1"
-          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-          HeightRequest="60"
-          Padding="20,15">
-
-      <!-- Project Name -->
-      <Label Text="{Binding ProjectName}"
-             Style="{StaticResource HeaderTitle}"
-             HorizontalOptions="Start"
-             VerticalOptions="Center" />
-
-    </Grid>
-
-    <!-- ============================================ -->
     <!-- SCROLLABLE CONTENT                           -->
     <!-- ============================================ -->
     <ScrollView Grid.Row="2">

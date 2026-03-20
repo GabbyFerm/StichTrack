@@ -10,6 +10,7 @@ public partial class AppShell : Shell
 
         // Register child/modal pages only
         Routing.RegisterRoute("SingleProjectPage", typeof(SingleProjectPage));
+        Routing.RegisterRoute("ProjectCounterPage", typeof(ProjectCounterPage));
 
         // Handle tab navigation
         Navigating += OnShellNavigating;
@@ -21,7 +22,8 @@ public partial class AppShell : Shell
 
         // Prevent Shell from restoring cached child pages when switching tabs
         if (target.Contains("//projects", StringComparison.OrdinalIgnoreCase) &&
-            target.Contains("SingleProjectPage", StringComparison.OrdinalIgnoreCase))
+             (target.Contains("SingleProjectPage", StringComparison.OrdinalIgnoreCase) ||
+             target.Contains("ProjectCounterPage", StringComparison.OrdinalIgnoreCase)))
         {
             System.Diagnostics.Debug.WriteLine("⛔ Blocked navigation to cached child page");
             e.Cancel();

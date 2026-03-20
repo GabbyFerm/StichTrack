@@ -282,10 +282,12 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         // TODO: Implement sync
     }
 
-    private void OnContinueCounting()
+    private async void OnContinueCounting()
     {
-        System.Diagnostics.Debug.WriteLine("▶️ Continue Counting tapped");
-        // TODO: Navigate to counter page with project context
+        if (_project == null) return;
+        await _navigationService.NavigateToAsync(
+            $"ProjectCounterPage?ProjectId={_project.Id}"
+        ).ConfigureAwait(false);
     }
 
     private void OnViewPattern()

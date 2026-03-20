@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:StitchTrack.Application.ViewModels;assembly=StitchTrack.Application"
+             x:Class="StitchTrack.MAUI.Views.ProjectCounterPage"
+             x:DataType="viewModels:ProjectCounterViewModel"
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
+             Shell.NavBarIsVisible="False">
+
+  <Grid RowDefinitions="Auto,Auto,*">
+
+    <!-- TOP BAR: Logo only — matches SingleProjectPage pattern -->
+    <Grid Grid.Row="0"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="30,30">
+
+      <Image Source="logo.svg"
+             HeightRequest="35"
+             HorizontalOptions="Start"
+             Aspect="AspectFit" />
+
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- SCROLLABLE CONTENT                           -->
+    <!-- ============================================ -->
+    <ScrollView Grid.Row="2">
+
+      <VerticalStackLayout Spacing="0" Padding="16">
+
+        <!-- SUB-HEADER: Project name + color dot -->
+        <Grid Grid.Row="1"
+              BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+              Padding="20,0,20,16">
+
+          <HorizontalStackLayout Spacing="10"
+                                 HorizontalOptions="Start"
+                                 VerticalOptions="Center">
+
+            <Border WidthRequest="12"
+                    HeightRequest="12"
+                    StrokeThickness="0"
+                    BackgroundColor="{Binding ColorHex}"
+                    VerticalOptions="Center">
+              <Border.StrokeShape>
+                <RoundRectangle CornerRadius="6" />
+              </Border.StrokeShape>
+            </Border>
+
+            <Label Text="{Binding ProjectName}"
+                   Style="{StaticResource HeaderTitle}"
+                   FontSize="16" />
+
+          </HorizontalStackLayout>
+
+        </Grid>
+
+        <!-- ============================================ -->
+        <!-- SESSION CARD                                 -->
+        <!-- ============================================ -->
+        <Border Padding="16,14"
+                Margin="0,16,0,0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}">
+
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+          </Border.StrokeShape>
+
+          <Grid ColumnDefinitions="*,Auto"
+                ColumnSpacing="12">
+
+            <!-- Timer display -->
+            <VerticalStackLayout Grid.Column="0"
+                                 Spacing="2"
+                                 VerticalOptions="Center">
+
+              <Label Text="SESSION"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="11"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                     Opacity="0.7" />
+
+              <Label Text="{Binding SessionTimerText}"
+                     FontFamily="MontserratBold"
+                     FontSize="28"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+            </VerticalStackLayout>
+
+            <!-- Play/Pause button -->
+            <Border Grid.Column="1"
+                    Padding="16,10"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource ButtonSecondary}"
+                    VerticalOptions="Center">
+              <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+              </Border.StrokeShape>
+              <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ToggleSessionCommand}" />
+              </Border.GestureRecognizers>
+
+              <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                <Image x:Name="SessionIcon"
+                       Source="{Binding SessionButtonIcon}"
+                       WidthRequest="16"
+                       HeightRequest="16"
+                       VerticalOptions="Center">
+                  <Image.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                  </Image.Behaviors>
+                </Image>
+                <Label Text="{Binding SessionButtonText}"
+                       FontFamily="MontserratSemiBold"
+                       FontSize="13"
+                       TextColor="White"
+                       VerticalOptions="Center" />
+              </HorizontalStackLayout>
+            </Border>
+
+          </Grid>
+
+        </Border>
+
+        <!-- ============================================ -->
+        <!-- COUNTER CARD                                 -->
+        <!-- ============================================ -->
+        <Border Padding="20"
+                Margin="0,16,0,0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}">
+
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+          </Border.StrokeShape>
+
+          <VerticalStackLayout Spacing="16">
+
+            <!-- Row count display -->
+            <Label Text="{Binding CurrentCount}"
+                   Style="{StaticResource CounterLabel}"
+                   HorizontalOptions="Center" />
+
+            <!-- Progress bar — only shown when TotalRows is set -->
+            <VerticalStackLayout Spacing="6"
+                                 IsVisible="{Binding HasTotalRows}">
+
+              <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0"
+                       Text="{Binding ProgressText}"
+                       FontFamily="MontserratMedium"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+
+                <Label Grid.Column="1"
+                       Text="{Binding ProgressPercentage}"
+                       FontFamily="MontserratSemiBold"
+                       FontSize="13"
+                       TextColor="{StaticResource BrandGold}" />
+              </Grid>
+
+              <!-- Progress fill bar -->
+              <ProgressBar Progress="{Binding ProgressValue}"
+                     ProgressColor="{StaticResource BrandGold}"
+                     BackgroundColor="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                     HeightRequest="8" />
+
+            </VerticalStackLayout>
+
+            <!-- +/- buttons -->
+            <Grid ColumnDefinitions="*,*"
+                  ColumnSpacing="12"
+                  Margin="0,8,0,0">
+
+              <!-- Decrement -->
+              <Button Grid.Column="0"
+                      Text="−"
+                      Style="{StaticResource SecondaryButton}"
+                      FontSize="28"
+                      Command="{Binding DecrementCommand}" />
+
+              <!-- Increment -->
+              <Button Grid.Column="1"
+                      Text="+"
+                      Style="{StaticResource PrimaryButton}"
+                      FontSize="28"
+                      Command="{Binding IncrementCommand}" />
+
+            </Grid>
+
+            <!-- Undo & Reset -->
+            <Grid ColumnDefinitions="*,*"
+                  ColumnSpacing="15"
+                  Margin="0,0,0,0">
+
+              <!-- Undo Button -->
+              <Border Grid.Column="0"
+                      BackgroundColor="Transparent"
+                      HorizontalOptions="Center">
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding UndoCommand}" />
+                </Border.GestureRecognizers>
+
+                <HorizontalStackLayout Spacing="6"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       Padding="10,8">
+                  <Image Source="undo.svg"
+                         HeightRequest="16"
+                         WidthRequest="16"
+                         VerticalOptions="Center">
+                    <Image.Behaviors>
+                      <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
+                    </Image.Behaviors>
+                  </Image>
+                  <Label Text="Undo"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
+                         FontFamily="MontserratBold"
+                         FontSize="12"
+                         VerticalOptions="Center" />
+                </HorizontalStackLayout>
+              </Border>
+
+
+              <!-- Reset Button -->
+              <Border Grid.Column="1"
+                      BackgroundColor="Transparent"
+                      HorizontalOptions="Center">
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding ResetCommand}" />
+                </Border.GestureRecognizers>
+
+                <HorizontalStackLayout Spacing="6"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       Padding="10,8">
+                  <Image Source="reset.svg"
+                         HeightRequest="16"
+                         WidthRequest="16"
+                         VerticalOptions="Center">
+                    <Image.Behaviors>
+                      <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
+                    </Image.Behaviors>
+                  </Image>
+                  <Label Text="Reset"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
+                         FontFamily="MontserratBold"
+                         FontSize="12"
+                         VerticalOptions="Center" />
+                </HorizontalStackLayout>
+              </Border>
+
+            </Grid>
+
+          </VerticalStackLayout>
+
+        </Border>
+
+        <!-- ============================================ -->
+        <!-- NOTES CARD (only shown if project has notes) -->
+        <!-- ============================================ -->
+        <Border Padding="16"
+                Margin="0,16,0,0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}"
+                IsVisible="{Binding HasNotes}">
+
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+          </Border.StrokeShape>
+
+          <VerticalStackLayout Spacing="8">
+
+            <Label Text="📝 Notes"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="14"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+            <Label Text="{Binding Notes}"
+                   FontFamily="MontserratRegular"
+                   FontSize="14"
+                   LineBreakMode="WordWrap"
+                   MaxLines="{Binding NotesMaxLines}"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+
+            <Label Text="{Binding NotesToggleText}"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   TextColor="{StaticResource BrandGold}"
+                   IsVisible="{Binding NotesCanExpand}">
+              <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ToggleNotesCommand}" />
+              </Label.GestureRecognizers>
+            </Label>
+
+          </VerticalStackLayout>
+
+        </Border>
+
+        <!-- ============================================ -->
+        <!-- BOTTOM BUTTONS: Save Progress | End Session  -->
+        <!-- ============================================ -->
+        <Grid ColumnDefinitions="*,*"
+              ColumnSpacing="12"
+              Margin="0,24,0,32">
+
+          <!-- Save Progress — stays on page -->
+          <Button Grid.Column="0"
+                  Text="SAVE PROGRESS"
+                  Style="{StaticResource SecondaryButton}"
+                  Command="{Binding SaveProgressCommand}" />
+
+          <!-- End Session — saves + navigates back -->
+          <Button Grid.Column="1"
+                  Text="END SESSION"
+                  Style="{StaticResource PrimaryButton}"
+                  Command="{Binding EndSessionCommand}" />
+
+        </Grid>
+
+      </VerticalStackLayout>
+
+    </ScrollView>
+
+  </Grid>
+
+</ContentPage>
