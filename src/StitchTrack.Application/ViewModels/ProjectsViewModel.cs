@@ -3,6 +3,7 @@ using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.Models;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -17,6 +18,7 @@ namespace StitchTrack.Application.ViewModels;
 public class ProjectsViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly IPatternFileRepository _patternFileRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly SynchronizationContext? _syncContext;
@@ -111,10 +113,12 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
     public ProjectsViewModel(
         IProjectRepository projectRepository,
+        IPatternFileRepository patternFileRepository,
         IDialogService dialogService,
         INavigationService navigationService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
+        _patternFileRepository = patternFileRepository ?? throw new ArgumentNullException(nameof(patternFileRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
@@ -234,6 +238,26 @@ public class ProjectsViewModel : INotifyPropertyChanged
             await _projectRepository.AddAsync(newProject).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
+            // Set project image if one was picked
+            if (!string.IsNullOrWhiteSpace(result.ImagePath))
+            {
+                newProject.SetProjectImage(result.ImagePath);
+                await _projectRepository.UpdateAsync(newProject).ConfigureAwait(false);
+                await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+            }
+
+            // Save PDF pattern if one was picked
+            if (!string.IsNullOrWhiteSpace(result.PatternFilePath))
+            {
+                var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);
+                var fileSize = new FileInfo(result.PatternFilePath).Length;
+                var pattern = PatternFile.CreatePatternFile(
+                    newProject.Id, fileName, result.PatternFilePath, fileSize, "application/pdf");
+
+                await _patternFileRepository.AddAsync(pattern).ConfigureAwait(false);
+                await _patternFileRepository.SaveChangesAsync().ConfigureAwait(false);
+            }
+
             System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Name}");
 
             await LoadProjectsAsync().ConfigureAwait(false);
@@ -285,6 +309,26 @@ public class ProjectsViewModel : INotifyPropertyChanged
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
             System.Diagnostics.Debug.WriteLine($"✅ Project updated: {project.Name}");
+
+            // Set project image if one was picked
+            if (!string.IsNullOrWhiteSpace(result.ImagePath))
+            {
+                project.SetProjectImage(result.ImagePath);  // ← project, not newProject
+                await _projectRepository.UpdateAsync(project).ConfigureAwait(false);
+                await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+            }
+
+            // Save PDF pattern if one was picked
+            if (!string.IsNullOrWhiteSpace(result.PatternFilePath))
+            {
+                var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);
+                var fileSize = new FileInfo(result.PatternFilePath).Length;
+                var pattern = PatternFile.CreatePatternFile(
+                    project.Id, fileName, result.PatternFilePath, fileSize, "application/pdf");
+
+                await _patternFileRepository.AddAsync(pattern).ConfigureAwait(false);
+                await _patternFileRepository.SaveChangesAsync().ConfigureAwait(false);
+            }
 
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{result.Name}' updated!").ConfigureAwait(false);

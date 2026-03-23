@@ -21,6 +21,38 @@ public partial class SingleProjectPage : ContentPage
         // Wire popup callback — same pattern as ProjectsPage
         _viewModel.ShowProjectFormAsync = ShowProjectFormPopupAsync;
 
+        _viewModel.OpenFileAsync = async (filePath) =>
+        {
+            try
+            {
+                await Launcher.Default.OpenAsync(new OpenFileRequest
+                {
+                    File = new ReadOnlyFile(filePath)
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Invalid file path: {ex.Message}");
+                await DisplayAlert("Cannot Open File", "The specified file path is invalid.", "OK");
+            }
+            catch (InvalidOperationException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Invalid operation: {ex.Message}");
+                await DisplayAlert("Cannot Open File", "Could not open the pattern file due to an invalid operation.", "OK");
+            }
+            catch (System.IO.IOException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ IO error: {ex.Message}");
+                await DisplayAlert("Cannot Open File", "There was an error accessing the file.", "OK");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Unexpected error opening file: {ex.Message}");
+                await DisplayAlert("Cannot Open File", "Could not open the pattern file.", "OK");
+                throw;
+            }
+        };
+
         System.Diagnostics.Debug.WriteLine("✅ SingleProjectPage initialized");
     }
 

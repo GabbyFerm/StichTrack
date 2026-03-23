@@ -10,7 +10,7 @@
 
   <Grid RowDefinitions="Auto,Auto,*">
 
-    <!-- TOP BAR: Logo only — matches SingleProjectPage pattern -->
+    <!-- TOP BAR: Logo only & project title -->
     <Grid Grid.Row="0"
           BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
           Padding="30,30">
@@ -22,39 +22,41 @@
 
     </Grid>
 
+    <!-- PROJECT NAME: on golden background -->
+    <Grid Grid.Row="1"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="20,0,20,16">
+
+      <HorizontalStackLayout Spacing="10"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center">
+
+        <Border WidthRequest="12"
+                HeightRequest="12"
+                StrokeThickness="0"
+                BackgroundColor="{Binding ColorHex}"
+                VerticalOptions="Center">
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="6" />
+          </Border.StrokeShape>
+        </Border>
+
+        <Label Text="{Binding ProjectName}"
+               Style="{StaticResource HeaderTitle}"
+               TextTransform="Uppercase"
+               FontSize="16"
+               VerticalOptions="Center" />
+
+      </HorizontalStackLayout>
+
+    </Grid>
+
     <!-- ============================================ -->
     <!-- SCROLLABLE CONTENT                           -->
     <!-- ============================================ -->
     <ScrollView Grid.Row="2">
 
       <VerticalStackLayout Spacing="0" Padding="16">
-
-        <!-- SUB-HEADER: Project name + color dot -->
-        <Grid Grid.Row="1"
-              BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-              Padding="20,0,20,16">
-
-          <HorizontalStackLayout Spacing="10"
-                                 HorizontalOptions="Start"
-                                 VerticalOptions="Center">
-
-            <Border WidthRequest="12"
-                    HeightRequest="12"
-                    StrokeThickness="0"
-                    BackgroundColor="{Binding ColorHex}"
-                    VerticalOptions="Center">
-              <Border.StrokeShape>
-                <RoundRectangle CornerRadius="6" />
-              </Border.StrokeShape>
-            </Border>
-
-            <Label Text="{Binding ProjectName}"
-                   Style="{StaticResource HeaderTitle}"
-                   FontSize="16" />
-
-          </HorizontalStackLayout>
-
-        </Grid>
 
         <!-- ============================================ -->
         <!-- SESSION CARD                                 -->

@@ -46,6 +46,7 @@ public static class MauiProgram
 
         // REPOSITORIES
         builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+        builder.Services.AddScoped<IPatternFileRepository, PatternFileRepository>();
         builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
         builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
@@ -82,6 +83,25 @@ public static class MauiProgram
 #endif
 
         var app = builder.Build();
+
+        // Remove Android Material underline from all Entry and Editor controls
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(
+            "NoUnderline", (handler, view) =>
+            {
+#if ANDROID
+                handler.PlatformView.BackgroundTintList =
+                    Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
+            });
+
+        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping(
+            "NoUnderline", (handler, view) =>
+            {
+#if ANDROID
+                handler.PlatformView.BackgroundTintList =
+                    Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
+            });
 
         Task.Run(async () =>
         {

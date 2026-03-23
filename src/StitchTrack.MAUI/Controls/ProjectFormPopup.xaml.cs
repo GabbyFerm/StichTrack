@@ -5,19 +5,15 @@ using StitchTrack.Domain.Entities;
 namespace StitchTrack.MAUI.Controls;
 
 /// <summary>
-/// Reusable popup for creating a new project or editing an existing one.
-/// - Create mode: pass null for project
-/// - Edit mode:   pass the existing Project to pre-fill the form
-///
-/// Returns a ProjectFormResult when saved, or null when cancelled.
-/// The caller is responsible for persisting the result.
+/// Reusable popup for creating or editing a project.
+/// Handles photo upload (camera/library) and PDF pattern upload (file picker).
+/// Returns a ProjectFormResult on save, or null on cancel.
 /// </summary>
 public partial class ProjectFormPopup : Popup
 {
-    // Tracks which color dot the user has selected
     private string _selectedColorHex;
-
-    // True when editing an existing project, false when creating a new one
+    private string? _selectedImagePath;
+    private string? _selectedPatternFilePath;
     private readonly bool _isEditMode;
 
     public ProjectFormPopup(Project? existingProject = null)
@@ -26,47 +22,68 @@ public partial class ProjectFormPopup : Popup
 
         _isEditMode = existingProject != null;
 
-        // Set mode-specific labels
         FormTitleLabel.Text = _isEditMode ? "Edit Project" : "New Project";
         SaveButtonLabel.Text = _isEditMode ? "SAVE" : "CREATE";
 
-        // Seed color selection — use existing color or a random one for new projects
         _selectedColorHex = existingProject?.ColorHex ?? ProjectColors.GetRandomColor();
+        _selectedImagePath = existingProject?.ImagePath;
 
-        // Build the color dot picker from the palette
         BuildColorPicker();
 
-        // Pre-fill fields when editing
         if (_isEditMode && existingProject != null)
         {
             NameEntry.Text = existingProject.Name;
-            TotalRowsEntry.Text = existingProject.TotalRows?.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            TotalRowsEntry.Text = existingProject.TotalRows?.ToString(
+                System.Globalization.CultureInfo.InvariantCulture);
             NotesEditor.Text = existingProject.Notes;
+
+            // Show existing image name if set
+            if (!string.IsNullOrWhiteSpace(existingProject.ImagePath))
+            {
+                PhotoFileNameLabel.Text = Path.GetFileName(existingProject.ImagePath);
+                PhotoFileNameLabel.IsVisible = true;
+                PhotoLabel.Text = "📷 Change Photo";
+            }
+
+            // Show existing pattern name if any
+            var existingPattern = existingProject.PatternFiles.FirstOrDefault();
+            if (existingPattern != null && !string.IsNullOrWhiteSpace(existingPattern.FilePath))
+            {
+                _selectedPatternFilePath = existingPattern.FilePath;
+                PatternFileNameLabel.Text = existingPattern.FileName;
+                PatternFileNameLabel.IsVisible = true;
+                PatternLabel.Text = "📄 Change Pattern";
+            }
         }
     }
 
-    /// <summary>
-    /// Dynamically builds the color dot row from ProjectColors.Palette.
-    /// Adds a visual "selected" ring around the active color.
-    /// </summary>
+    // Static to avoid allocating new arrays on every file picker call
+    private static readonly FilePickerFileType PdfFileType = new(
+        new Dictionary<DevicePlatform, IEnumerable<string>>
+        {
+        { DevicePlatform.Android, new[] { "application/pdf" } },
+        { DevicePlatform.iOS,     new[] { "com.adobe.pdf" } },
+        { DevicePlatform.WinUI,   new[] { ".pdf" } }
+        });
+
+    // ─── Color picker ────────────────────────────────────────────
+
     private void BuildColorPicker()
     {
         ColorPickerContainer.Children.Clear();
 
         foreach (var hex in ProjectColors.Palette)
         {
-            // Outer border acts as the selection ring
             var ring = new Border
             {
                 WidthRequest = 36,
                 HeightRequest = 36,
                 StrokeThickness = _selectedColorHex == hex ? 2 : 0,
-                Stroke = Color.FromArgb("#F59E0B"), // BrandGold ring
+                Stroke = Color.FromArgb("#F59E0B"),
                 BackgroundColor = Colors.Transparent,
                 StrokeShape = new Microsoft.Maui.Controls.Shapes.Ellipse()
             };
 
-            // Inner colored dot
             var dot = new Border
             {
                 WidthRequest = 28,
@@ -80,45 +97,147 @@ public partial class ProjectFormPopup : Popup
 
             ring.Content = dot;
 
-            // Capture hex in local var so the lambda closes over the right value
             var capturedHex = hex;
-            var tapGesture = new TapGestureRecognizer();
-            tapGesture.Tapped += (_, _) => OnColorSelected(capturedHex);
-            ring.GestureRecognizers.Add(tapGesture);
+            var tap = new TapGestureRecognizer();
+            tap.Tapped += (_, _) => OnColorSelected(capturedHex);
+            ring.GestureRecognizers.Add(tap);
 
             ColorPickerContainer.Children.Add(ring);
         }
     }
 
-    /// <summary>
-    /// Updates the selected color and redraws the picker to reflect the new selection ring.
-    /// </summary>
     private void OnColorSelected(string hex)
     {
         _selectedColorHex = hex;
-        BuildColorPicker(); // Rebuild so only the selected dot has the ring
+        BuildColorPicker();
+    }
+
+    // ─── File pickers ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Opens a choice between camera and photo library.
+    /// Copies the chosen photo to the app's local storage folder.
+    /// </summary>
+    private async void OnPhotoUploadTapped(object sender, TappedEventArgs e)
+    {
+        try
+        {
+            var action = await Microsoft.Maui.Controls.Application.Current!.MainPage!
+                .DisplayActionSheet("Add Photo", "Cancel", null, "Take Photo", "Choose from Library");
+
+            if (action == null || action == "Cancel") return;
+
+            FileResult? photo = null;
+
+            if (action == "Take Photo")
+            {
+                if (MediaPicker.Default.IsCaptureSupported)
+                    photo = await MediaPicker.Default.CapturePhotoAsync();
+            }
+            else
+            {
+                photo = await MediaPicker.Default.PickPhotoAsync();
+            }
+
+            if (photo == null) return;
+
+            // Copy to app's local storage so it persists
+            _selectedImagePath = await CopyFileToLocalStorageAsync(photo.FullPath, "Images");
+
+            PhotoLabel.Text = "📷 Photo Added ✓";
+            PhotoFileNameLabel.Text = photo.FileName;
+            PhotoFileNameLabel.IsVisible = true;
+
+            System.Diagnostics.Debug.WriteLine($"📷 Photo saved: {_selectedImagePath}");
+        }
+        catch (PermissionException)
+        {
+            await ShowAlertAsync("Permission Needed", "Please allow access to your photos in Settings.");
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Photo upload error: {ex.Message}");
+        }
     }
 
     /// <summary>
-    /// Save tapped — validates the form, then closes with the result.
-    /// The ViewModel handles persistence after receiving the result.
+    /// Opens the file picker filtered to PDF files.
+    /// Copies the chosen PDF to the app's local storage folder.
     /// </summary>
+    private async void OnPatternUploadTapped(object sender, TappedEventArgs e)
+    {
+        try
+        {
+            var options = new PickOptions
+            {
+                PickerTitle = "Select PDF Pattern",
+                FileTypes = PdfFileType
+            };
+
+            var result = await FilePicker.Default.PickAsync(options);
+            if (result == null) return;
+
+            // Copy to app's local storage
+            _selectedPatternFilePath = await CopyFileToLocalStorageAsync(result.FullPath, "Patterns");
+
+            PatternLabel.Text = "📄 Pattern Added ✓";
+            PatternFileNameLabel.Text = result.FileName;
+            PatternFileNameLabel.IsVisible = true;
+
+            System.Diagnostics.Debug.WriteLine($"📄 Pattern saved: {_selectedPatternFilePath}");
+        }
+        catch (PermissionException)
+        {
+            await ShowAlertAsync("Permission Needed", "Please allow file access in Settings.");
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Pattern upload error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Copies a file to the app's local data directory under the given subfolder.
+    /// Returns the destination path.
+    /// </summary>
+    private static async Task<string> CopyFileToLocalStorageAsync(string sourcePath, string subfolder)
+    {
+        // Store under app's local data folder — survives app restarts, not user-accessible
+        var destFolder = Path.Combine(FileSystem.AppDataDirectory, subfolder);
+        Directory.CreateDirectory(destFolder);
+
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(sourcePath)}";
+        var destPath = Path.Combine(destFolder, fileName);
+
+        using var sourceStream = File.OpenRead(sourcePath);
+        using var destStream = File.Create(destPath);
+        await sourceStream.CopyToAsync(destStream).ConfigureAwait(false);
+
+        return destPath;
+    }
+
+    private static async Task ShowAlertAsync(string title, string message)
+    {
+        await Microsoft.Maui.Controls.Application.Current!.MainPage!
+            .DisplayAlert(title, message, "OK");
+    }
+
+    // ─── Save & Cancel ────────────────────────────────────────────
+
     private async void OnSaveClicked(object sender, TappedEventArgs e)
     {
         var name = NameEntry.Text?.Trim();
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            // Keep it simple — inline feedback without closing the popup
-            await Microsoft.Maui.Controls.Application.Current!.MainPage!.DisplayAlert(
-                "Name Required",
-                "Please enter a project name.",
-                "OK"
-            );
+            await ShowAlertAsync("Name Required", "Please enter a project name.");
             return;
         }
 
-        // Parse total rows — null if empty or invalid
         int? totalRows = null;
         if (!string.IsNullOrWhiteSpace(TotalRowsEntry.Text) &&
             int.TryParse(TotalRowsEntry.Text, out var parsed) &&
@@ -131,31 +250,15 @@ public partial class ProjectFormPopup : Popup
             Name: name,
             ColorHex: _selectedColorHex,
             TotalRows: totalRows,
-            Notes: string.IsNullOrWhiteSpace(NotesEditor.Text) ? null : NotesEditor.Text.Trim()
+            Notes: string.IsNullOrWhiteSpace(NotesEditor.Text) ? null : NotesEditor.Text.Trim(),
+            ImagePath: _selectedImagePath,
+            PatternFilePath: _selectedPatternFilePath,
+            PatternFileName: PatternFileNameLabel.Text
         );
 
-        // Pass result back to the caller (Page code-behind)
         await CloseAsync(result);
     }
 
-    /// <summary>
-    /// Cancel or X tapped — closes without returning a result.
-    /// Caller receives null and does nothing.
-    /// </summary>
     private async void OnCancelClicked(object sender, EventArgs e)
-    {
-        await CloseAsync(null);
-    }
-
-    /// <summary>
-    /// Photo upload tapped — placeholder until Phase 2.
-    /// </summary>
-    private async void OnPhotoUploadTapped(object sender, TappedEventArgs e)
-    {
-        await Microsoft.Maui.Controls.Application.Current!.MainPage!.DisplayAlert(
-            "Coming Soon",
-            "Photo upload will be available in Phase 2.",
-            "OK"
-        );
-    }
+        => await CloseAsync(null);
 }
