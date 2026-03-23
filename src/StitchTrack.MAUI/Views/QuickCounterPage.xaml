@@ -6,16 +6,6 @@
              BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
              Shell.NavBarIsVisible="False">
 
-  <!-- 
-  QUICK COUNTER PAGE - Minimalist Design
-  - Flat layout (no golden header, no card shadows)
-  - Session timer with Play/Pause
-  - Large counter display
-  - Decrease/Increase buttons (gray/golden)
-  - Undo/Reset text buttons
-  - Save to project outline button
-  -->
-
   <Grid RowDefinitions="Auto,Auto,*"
         RowSpacing="0">
 
@@ -28,15 +18,12 @@
           ColumnDefinitions="*,Auto"
           ColumnSpacing="15">
 
-      <!-- Logo  -->
       <Image Grid.Column="0"
              Source="logo.svg"
              HeightRequest="35"
              HorizontalOptions="Start"
-             Aspect="AspectFit">
-      </Image>
+             Aspect="AspectFit" />
 
-      <!-- Sync Icon -->
       <Image Grid.Column="1"
              Source="refresh.svg"
              HeightRequest="24"
@@ -45,16 +32,16 @@
              VerticalOptions="Center">
         <Image.Behaviors>
           <toolkit:IconTintColorBehavior TintColor="White" />
-          </Image.Behaviors>
-          <Image.GestureRecognizers>
-            <TapGestureRecognizer Tapped="OnSyncTapped" />
-            </Image.GestureRecognizers>
+        </Image.Behaviors>
+        <Image.GestureRecognizers>
+          <TapGestureRecognizer Tapped="OnSyncTapped" />
+        </Image.GestureRecognizers>
       </Image>
 
     </Grid>
 
     <!-- ============================================ -->
-    <!-- PAGE TITLE with Yellow Background            -->
+    <!-- PAGE TITLE                                   -->
     <!-- ============================================ -->
     <Grid Grid.Row="1"
           BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
@@ -68,71 +55,7 @@
     <!-- MAIN CONTENT                                 -->
     <!-- ============================================ -->
     <ScrollView Grid.Row="2">
-      <VerticalStackLayout Spacing="20" Padding="20,20,20,20">
-
-
-
-        <!-- Session Timer & Play/Pause -->
-        <Grid ColumnDefinitions="*,Auto"
-              ColumnSpacing="10"
-              Margin="0,5,0,10">
-
-          <!-- Session Timer -->
-          <HorizontalStackLayout Grid.Column="0"
-                                Spacing="8"
-                                VerticalOptions="Center">
-            <Image Source="clock.svg"
-                   HeightRequest="18"
-                   WidthRequest="18">
-              <Image.Behaviors>
-                <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
-              </Image.Behaviors>
-            </Image>
-            <Label Text="SESSION: "
-                   FontFamily="MontserratBold"
-                   FontSize="12"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
-                   VerticalOptions="Center" />
-            <Label Text="0h 0m"
-                   x:Name="SessionTimerLabel"
-                   FontFamily="MontserratSemiBold"
-                   FontSize="12"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
-                   VerticalOptions="Center" />
-          </HorizontalStackLayout>
-
-          <!-- Play/Pause Button -->
-          <Border Grid.Column="1"
-                  BackgroundColor="{StaticResource BrandGold}"
-                  HeightRequest="36"
-                  Padding="14,8,18,8"
-                  StrokeThickness="0">
-            <Border.StrokeShape>
-              <RoundRectangle CornerRadius="18" />
-            </Border.StrokeShape>
-            <Border.GestureRecognizers>
-              <TapGestureRecognizer Tapped="OnSessionButtonClicked" />
-            </Border.GestureRecognizers>
-
-            <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
-              <Image x:Name="SessionIcon"
-                     Source="play.svg"
-                     HeightRequest="18"
-                     WidthRequest="18"
-                     VerticalOptions="Center">
-                <Image.Behaviors>
-                  <toolkit:IconTintColorBehavior TintColor="White" />
-                </Image.Behaviors>
-              </Image>
-              <Label x:Name="SessionLabel"
-                     Text="PLAY"
-                     TextColor="White"
-                     FontFamily="MontserratBold"
-                     FontSize="13"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
-          </Border>
-        </Grid>
+      <VerticalStackLayout Spacing="20" Padding="20">
 
         <!-- Counter Display -->
         <Frame Style="{StaticResource CounterCard}">
@@ -167,8 +90,8 @@
               <TapGestureRecognizer Command="{Binding DecrementCommand}" />
             </Border.GestureRecognizers>
 
-            <HorizontalStackLayout Spacing="10" 
-                                   HorizontalOptions="Center" 
+            <HorizontalStackLayout Spacing="10"
+                                   HorizontalOptions="Center"
                                    VerticalOptions="Center">
               <Image Source="minus.svg"
                      HeightRequest="20"
@@ -176,7 +99,7 @@
                      VerticalOptions="Center">
                 <Image.Behaviors>
                   <toolkit:IconTintColorBehavior TintColor="White" />
-                  </Image.Behaviors>
+                </Image.Behaviors>
               </Image>
               <Label Text="DECREASE"
                      TextColor="{StaticResource ButtonTextOnDark}"
@@ -199,8 +122,8 @@
               <TapGestureRecognizer Command="{Binding IncrementCommand}" />
             </Border.GestureRecognizers>
 
-            <HorizontalStackLayout Spacing="10" 
-                                   HorizontalOptions="Center" 
+            <HorizontalStackLayout Spacing="10"
+                                   HorizontalOptions="Center"
                                    VerticalOptions="Center">
               <Image Source="plus.svg"
                      HeightRequest="20"
@@ -222,8 +145,7 @@
 
         <!-- Undo & Reset -->
         <Grid ColumnDefinitions="*,*"
-              ColumnSpacing="15"
-              Margin="0,0,0,0">
+              ColumnSpacing="15">
 
           <!-- Undo Button -->
           <Border Grid.Column="0"
@@ -233,8 +155,8 @@
               <TapGestureRecognizer Command="{Binding UndoCommand}" />
             </Border.GestureRecognizers>
 
-            <HorizontalStackLayout Spacing="6" 
-                                   HorizontalOptions="Center" 
+            <HorizontalStackLayout Spacing="6"
+                                   HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    Padding="10,8">
               <Image Source="undo.svg"
@@ -243,7 +165,7 @@
                      VerticalOptions="Center">
                 <Image.Behaviors>
                   <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
-                  </Image.Behaviors>
+                </Image.Behaviors>
               </Image>
               <Label Text="Undo"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
@@ -253,7 +175,6 @@
             </HorizontalStackLayout>
           </Border>
 
-
           <!-- Reset Button -->
           <Border Grid.Column="1"
                   BackgroundColor="Transparent"
@@ -262,11 +183,11 @@
               <TapGestureRecognizer Command="{Binding ResetCommand}" />
             </Border.GestureRecognizers>
 
-            <HorizontalStackLayout Spacing="6" 
-                                   HorizontalOptions="Center" 
+            <HorizontalStackLayout Spacing="6"
+                                   HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    Padding="10,8">
-              <Image Source="reset. svg"
+              <Image Source="reset.svg"
                      HeightRequest="16"
                      WidthRequest="16"
                      VerticalOptions="Center">
@@ -288,13 +209,13 @@
         <HorizontalStackLayout Spacing="8"
                                HorizontalOptions="Center"
                                Margin="0,0,0,8">
-          <Image Source="lightbulb. svg"
+          <Image Source="lightbulb.svg"
                  HeightRequest="20"
                  WidthRequest="20"
                  VerticalOptions="Center">
             <Image.Behaviors>
               <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
-              </Image.Behaviors>
+            </Image.Behaviors>
           </Image>
           <Label Style="{StaticResource CaptionLabel}"
                  LineBreakMode="WordWrap"
@@ -312,7 +233,7 @@
         <!-- Save to Project Button -->
         <Border BackgroundColor="Transparent"
                 HeightRequest="30"
-                Padding="10,0,10, 5"
+                Padding="10,0,10,5"
                 StrokeThickness="0"
                 Margin="0,0,0,20"
                 HorizontalOptions="Center">
@@ -323,8 +244,8 @@
             <TapGestureRecognizer Command="{Binding SaveToProjectCommand}" />
           </Border.GestureRecognizers>
 
-          <HorizontalStackLayout Spacing="10" 
-                                 HorizontalOptions="Center" 
+          <HorizontalStackLayout Spacing="10"
+                                 HorizontalOptions="Center"
                                  VerticalOptions="Center">
             <Image Source="disk.svg"
                    HeightRequest="18"
@@ -332,7 +253,7 @@
                    VerticalOptions="Center">
               <Image.Behaviors>
                 <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource BrandSave}, Dark={StaticResource BrandGold}}" />
-                </Image.Behaviors>
+              </Image.Behaviors>
             </Image>
             <Label Text="SAVE TO PROJECT"
                    TextColor="{AppThemeBinding Light={StaticResource BrandSave}, Dark={StaticResource BrandGold}}"
@@ -342,14 +263,8 @@
           </HorizontalStackLayout>
         </Border>
 
-
       </VerticalStackLayout>
     </ScrollView>
-
-    <!-- ============================================ -->
-    <!-- BOTTOM NAVIGATION (Managed by AppShell)      -->
-    <!-- ============================================ -->
-    <!-- TabBar will appear here automatically -->
 
   </Grid>
 

@@ -8,5 +8,8 @@ public record ProjectFormResult(
     string Name,
     string? ColorHex,
     int? TotalRows,
-    string? Notes
+    string? Notes,
+    string? ImagePath,
+    string? PatternFilePath,
+    string? PatternFileName
 );

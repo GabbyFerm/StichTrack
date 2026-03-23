@@ -29,8 +29,10 @@ public class ProjectRepository : IProjectRepository
     public async Task<Project?> GetByIdAsync(Guid id)
     {
         return await _context.Projects
+            .AsNoTracking()  
             .Include(p => p.CounterHistoryEntries)
             .Include(p => p.Sessions)
+            .Include(p => p.PatternFiles)
             .FirstOrDefaultAsync(p => p.Id == id)
             .ConfigureAwait(false);
     }
