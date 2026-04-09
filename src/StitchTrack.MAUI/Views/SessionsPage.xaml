@@ -1,14 +1,400 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:StitchTrack.Application.ViewModels;assembly=StitchTrack.Application"
              x:Class="StitchTrack.MAUI.Views.SessionsPage"
-             Title="Sessions">
-  <VerticalStackLayout Padding="20" Spacing="10">
-    <Label Text="Sessions List" 
-           FontSize="24" 
-           FontAttributes="Bold"/>
-    <Label Text="Coming soon in Phase 2!" 
-           FontSize="14" 
-           TextColor="Gray"/>
-  </VerticalStackLayout>
+             x:DataType="viewModels:SessionsViewModel"
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
+             Shell.NavBarIsVisible="False">
+
+  <Grid RowDefinitions="Auto,Auto,*">
+
+    <!-- ============================================ -->
+    <!-- TOP BAR: Logo                                -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="0"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="30,30">
+
+      <Image Source="logo.svg"
+             HeightRequest="35"
+             HorizontalOptions="Start"
+             Aspect="AspectFit" />
+
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- HEADER: Icon + Title                         -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="1"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="20,0,20,20">
+
+      <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+        <Image Source="session.svg"
+               WidthRequest="22"
+               HeightRequest="22"
+               VerticalOptions="Center">
+          <Image.Behaviors>
+            <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+        </Image>
+        <Label Text="YOUR STATS"
+               Style="{StaticResource HeaderTitle}"
+               FontSize="20"
+               VerticalOptions="Center" />
+      </HorizontalStackLayout>
+
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- SCROLLABLE CONTENT                           -->
+    <!-- ============================================ -->
+    <ScrollView Grid.Row="2">
+
+      <VerticalStackLayout Spacing="0" Margin="0,16,0,0">
+
+        <!-- Tab labels -->
+        <Grid Padding="16,0,16,10" ColumnDefinitions="*,*,*,*">
+
+          <Label Grid.Column="0" Text="Today" FontFamily="MontserratMedium" FontSize="14"
+           HorizontalOptions="Center"
+           TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+            <Label.Triggers>
+              <DataTrigger TargetType="Label" Binding="{Binding IsTodaySelected}" Value="True">
+                <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
+                <Setter Property="FontFamily" Value="MontserratSemiBold" />
+              </DataTrigger>
+            </Label.Triggers>
+            <Label.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ShowTodayCommand}" />
+            </Label.GestureRecognizers>
+          </Label>
+
+          <Label Grid.Column="1" Text="This Week" FontFamily="MontserratMedium" FontSize="14"
+           HorizontalOptions="Center"
+           TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+            <Label.Triggers>
+              <DataTrigger TargetType="Label" Binding="{Binding IsThisWeekSelected}" Value="True">
+                <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
+                <Setter Property="FontFamily" Value="MontserratSemiBold" />
+              </DataTrigger>
+            </Label.Triggers>
+            <Label.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ShowThisWeekCommand}" />
+            </Label.GestureRecognizers>
+          </Label>
+
+          <Label Grid.Column="2" Text="This Month" FontFamily="MontserratMedium" FontSize="14"
+           HorizontalOptions="Center"
+           TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+            <Label.Triggers>
+              <DataTrigger TargetType="Label" Binding="{Binding IsThisMonthSelected}" Value="True">
+                <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
+                <Setter Property="FontFamily" Value="MontserratSemiBold" />
+              </DataTrigger>
+            </Label.Triggers>
+            <Label.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ShowThisMonthCommand}" />
+            </Label.GestureRecognizers>
+          </Label>
+
+          <Label Grid.Column="3" Text="All" FontFamily="MontserratMedium" FontSize="14"
+           HorizontalOptions="Center"
+           TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+            <Label.Triggers>
+              <DataTrigger TargetType="Label" Binding="{Binding IsAllSelected}" Value="True">
+                <Setter Property="TextColor" Value="{StaticResource BrandGold}" />
+                <Setter Property="FontFamily" Value="MontserratSemiBold" />
+              </DataTrigger>
+            </Label.Triggers>
+            <Label.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ShowAllCommand}" />
+            </Label.GestureRecognizers>
+          </Label>
+
+        </Grid>
+
+        <!-- Underlines — gold for active, dark for inactive -->
+        <Grid Padding="16,0" ColumnDefinitions="*,*,*,*" ColumnSpacing="0">
+
+          <BoxView Grid.Column="0" HeightRequest="2" HorizontalOptions="Fill"
+             Color="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+            <BoxView.Triggers>
+              <DataTrigger TargetType="BoxView" Binding="{Binding IsTodaySelected}" Value="True">
+                <Setter Property="Color" Value="{StaticResource BrandGold}" />
+              </DataTrigger>
+            </BoxView.Triggers>
+          </BoxView>
+
+          <BoxView Grid.Column="1" HeightRequest="2" HorizontalOptions="Fill"
+             Color="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+            <BoxView.Triggers>
+              <DataTrigger TargetType="BoxView" Binding="{Binding IsThisWeekSelected}" Value="True">
+                <Setter Property="Color" Value="{StaticResource BrandGold}" />
+              </DataTrigger>
+            </BoxView.Triggers>
+          </BoxView>
+
+          <BoxView Grid.Column="2" HeightRequest="2" HorizontalOptions="Fill"
+             Color="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+            <BoxView.Triggers>
+              <DataTrigger TargetType="BoxView" Binding="{Binding IsThisMonthSelected}" Value="True">
+                <Setter Property="Color" Value="{StaticResource BrandGold}" />
+              </DataTrigger>
+            </BoxView.Triggers>
+          </BoxView>
+
+          <BoxView Grid.Column="3" HeightRequest="2" HorizontalOptions="Fill"
+             Color="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+            <BoxView.Triggers>
+              <DataTrigger TargetType="BoxView" Binding="{Binding IsAllSelected}" Value="True">
+                <Setter Property="Color" Value="{StaticResource BrandGold}" />
+              </DataTrigger>
+            </BoxView.Triggers>
+          </BoxView>
+
+        </Grid>
+
+        <!-- ============================================ -->
+        <!-- STATS CARDS: 2x2 grid                        -->
+        <!-- ============================================ -->
+        <Grid ColumnDefinitions="*,*"
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="12"
+              RowSpacing="12"
+              Margin="16,16,16,16">
+
+          <!-- Total Time -->
+          <Border Grid.Row="0" Grid.Column="0"
+                  Padding="16,20"
+                  StrokeThickness="0"
+                  BackgroundColor="{StaticResource ButtonSecondary}">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
+            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+              <Label Text="{Binding TotalTime}"
+                     FontFamily="MontserratBold"
+                     FontSize="28"
+                     TextColor="{StaticResource BrandGold}"
+                     HorizontalOptions="Center" />
+              <Label Text="Total Time"
+                     FontFamily="MontserratMedium"
+                     FontSize="13"
+                     TextColor="White"
+                     Opacity="0.85"
+                     HorizontalOptions="Center" />
+            </VerticalStackLayout>
+          </Border>
+
+          <!-- Sessions count -->
+          <Border Grid.Row="0" Grid.Column="1"
+                  Padding="16,20"
+                  StrokeThickness="0"
+                  BackgroundColor="{StaticResource ButtonSecondary}">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
+            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+              <Label Text="{Binding SessionCount}"
+                     FontFamily="MontserratBold"
+                     FontSize="28"
+                     TextColor="{StaticResource BrandGold}"
+                     HorizontalOptions="Center" />
+              <Label Text="Sessions"
+                     FontFamily="MontserratMedium"
+                     FontSize="13"
+                     TextColor="White"
+                     Opacity="0.85"
+                     HorizontalOptions="Center" />
+            </VerticalStackLayout>
+          </Border>
+
+          <!-- Avg Session -->
+          <Border Grid.Row="1" Grid.Column="0"
+                  Padding="16,20"
+                  StrokeThickness="0"
+                  BackgroundColor="{StaticResource ButtonSecondary}">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
+            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+              <Label Text="{Binding AvgSessionDuration}"
+                     FontFamily="MontserratBold"
+                     FontSize="28"
+                     TextColor="{StaticResource BrandGold}"
+                     HorizontalOptions="Center" />
+              <Label Text="Avg Session"
+                     FontFamily="MontserratMedium"
+                     FontSize="13"
+                     TextColor="White"
+                     Opacity="0.85"
+                     HorizontalOptions="Center" />
+            </VerticalStackLayout>
+          </Border>
+
+          <!-- Total Rows -->
+          <Border Grid.Row="1" Grid.Column="1"
+                  Padding="16,20"
+                  StrokeThickness="0"
+                  BackgroundColor="{StaticResource ButtonSecondary}">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
+            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+              <Label Text="{Binding TotalRowsCompleted}"
+                     FontFamily="MontserratBold"
+                     FontSize="28"
+                     TextColor="{StaticResource BrandGold}"
+                     HorizontalOptions="Center" />
+              <Label Text="Total Rows"
+                     FontFamily="MontserratMedium"
+                     FontSize="13"
+                     TextColor="White"
+                     Opacity="0.85"
+                     HorizontalOptions="Center" />
+            </VerticalStackLayout>
+          </Border>
+
+        </Grid>
+
+        <!-- ============================================ -->
+        <!-- MOST ACTIVE DAY CARD                         -->
+        <!-- ============================================ -->
+        <Border Padding="16,14"
+                Margin="16,0,16,20"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource ButtonSecondary}, Dark={StaticResource DarkCardBackground}}"
+                IsVisible="{Binding HasMostActiveDay}">
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+          </Border.StrokeShape>
+
+          <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+
+            <Image Source="sparkles.svg"
+                   WidthRequest="24"
+                   HeightRequest="24"
+                   VerticalOptions="Center">
+              <Image.Behaviors>
+                <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
+              </Image.Behaviors>
+            </Image>
+
+            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+              <Label Text="Most Active Day:"
+                     FontFamily="MontserratBold"
+                     FontSize="14"
+                     TextColor="White" />
+              <Label Text="{Binding MostActiveDay}"
+                     FontFamily="MontserratRegular"
+                     FontSize="13"
+                     TextColor="White"
+                     Opacity="0.85" />
+            </VerticalStackLayout>
+
+          </HorizontalStackLayout>
+
+        </Border>
+
+        <!-- ============================================ -->
+        <!-- RECENT SESSIONS                              -->
+        <!-- ============================================ -->
+        <VerticalStackLayout Margin="16,0,16,12" Spacing="8">
+          <Label Text="Recent Sessions"
+             FontFamily="MontserratBold"
+             FontSize="18"
+             TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+          <BoxView HeightRequest="1"
+               BackgroundColor="{StaticResource BrandGold}"
+               HorizontalOptions="Fill"
+               Opacity="0.4" />
+        </VerticalStackLayout>
+
+      <!-- Empty state -->
+        <VerticalStackLayout Padding="20,40"
+                             Spacing="12"
+                             IsVisible="{Binding IsEmpty}"
+                             HorizontalOptions="Center">
+          <Label Text="No sessions yet."
+                 FontFamily="MontserratSemiBold"
+                 FontSize="16"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                 HorizontalOptions="Center" />
+          <Label Text="Start a timer on any project to track your progress."
+                 FontFamily="MontserratRegular"
+                 FontSize="14"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                 HorizontalOptions="Center"
+                 HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+        <!-- Sessions list -->
+        <CollectionView ItemsSource="{Binding RecentSessions}"
+                        Margin="16,0,16,32"
+                        IsVisible="{Binding HasSessions}">
+          <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:SessionDisplayItem">
+
+              <VerticalStackLayout Spacing="0">
+
+                <!-- Session row -->
+                <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="12"
+                      Padding="0,12">
+
+                  <!-- Yarn icon -->
+                  <Image Grid.Column="0"
+                         Source="ball_of_wool.svg"
+                         WidthRequest="32"
+                         HeightRequest="32"
+                         VerticalOptions="Start">
+                    <Image.Behaviors>
+                      <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
+                    </Image.Behaviors>
+                  </Image>
+
+                  <!-- Session details -->
+                  <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Label Text="{Binding ProjectName}"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+                    <Label Text="{Binding DateText}"
+                           FontFamily="MontserratRegular"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+                    <Label Text="{Binding DurationText}"
+                           FontFamily="MontserratRegular"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+                    <Label Text="{Binding RowsText}"
+                           FontFamily="MontserratRegular"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                           IsVisible="{Binding HasRows}" />
+                  </VerticalStackLayout>
+
+                </Grid>
+
+                <!-- Divider between sessions -->
+                <BoxView HeightRequest="1"
+                         BackgroundColor="{StaticResource BrandGold}"
+                         HorizontalOptions="Fill"
+                         Opacity="0.4" />
+
+              </VerticalStackLayout>
+
+            </DataTemplate>
+          </CollectionView.ItemTemplate>
+        </CollectionView>
+
+      </VerticalStackLayout>
+
+    </ScrollView>
+
+  </Grid>
+
 </ContentPage>

@@ -25,15 +25,20 @@ public interface ISessionRepository
 
     /// <summary>
     /// Returns all sessions for a given project, ordered newest first.
-    /// Used for session history on SingleProjectPage.
     /// </summary>
     Task<IEnumerable<Session>> GetByProjectIdAsync(Guid projectId);
 
     /// <summary>
-    /// Returns all sessions across all projects for the current user.
-    /// Used for the Stats page overview.
+    /// Returns all sessions across all projects, ordered newest first.
+    /// Does not include Project navigation property.
     /// </summary>
     Task<IEnumerable<Session>> GetAllAsync();
+
+    /// <summary>
+    /// Returns all sessions with Project navigation property included.
+    /// Used by the Stats page to display project names alongside sessions.
+    /// </summary>
+    Task<IEnumerable<Session>> GetAllWithProjectAsync();
 
     /// <summary>
     /// Returns sessions that started within the given date range.
@@ -43,7 +48,6 @@ public interface ISessionRepository
 
     /// <summary>
     /// Returns the most recent N sessions across all projects.
-    /// Used for "Recent Sessions" list on the Stats page.
     /// </summary>
     Task<IEnumerable<Session>> GetRecentAsync(int count = 10);
 

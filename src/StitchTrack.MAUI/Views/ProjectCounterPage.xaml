@@ -176,21 +176,52 @@
                   ColumnSpacing="12"
                   Margin="0,8,0,0">
 
-              <!-- Decrement -->
-              <Button Grid.Column="0"
-                      Text="−"
-                      Style="{StaticResource SecondaryButton}"
-                      FontSize="28"
-                      Command="{Binding DecrementCommand}" />
+              <!-- Decrease -->
+              <Border Grid.Column="0"
+                      BackgroundColor="{StaticResource ButtonDecrease}"
+                      HeightRequest="60"
+                      StrokeThickness="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding DecrementCommand}" />
+                </Border.GestureRecognizers>
+                <Image Source="minus.svg"
+                       HeightRequest="28"
+                       WidthRequest="28"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                  <Image.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                  </Image.Behaviors>
+                </Image>
+              </Border>
 
-              <!-- Increment -->
-              <Button Grid.Column="1"
-                      Text="+"
-                      Style="{StaticResource PrimaryButton}"
-                      FontSize="28"
-                      Command="{Binding IncrementCommand}" />
+              <!-- Increase -->
+              <Border Grid.Column="1"
+                      BackgroundColor="{StaticResource ButtonIncrease}"
+                      HeightRequest="60"
+                      StrokeThickness="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding IncrementCommand}" />
+                </Border.GestureRecognizers>
+                <Image Source="plus.svg"
+                       HeightRequest="28"
+                       WidthRequest="28"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                  <Image.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                  </Image.Behaviors>
+                </Image>
+              </Border>
 
             </Grid>
+
 
             <!-- Undo & Reset -->
             <Grid ColumnDefinitions="*,*"

@@ -27,13 +27,13 @@ public class SessionRepository : ISessionRepository
     public async Task<int> SaveChangesAsync()
     {
         // Detach stale CounterHistory entries tracked from previous page loads
-        // to prevent EF trying to UPDATE rows that were never inserted in this session
-        var staleHistoryEntries = _context.ChangeTracker
+        // to prevent EF trying to UPDATE rows that were never inserted
+        var staleEntries = _context.ChangeTracker
             .Entries<CounterHistory>()
             .Where(e => e.State == EntityState.Modified)
             .ToList();
 
-        foreach (var entry in staleHistoryEntries)
+        foreach (var entry in staleEntries)
             entry.State = EntityState.Detached;
 
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
@@ -41,56 +41,58 @@ public class SessionRepository : ISessionRepository
         return changes;
     }
 
-    /// <summary>
-    /// Returns all sessions for a project, newest first.
-    /// </summary>
     public async Task<IEnumerable<Session>> GetByProjectIdAsync(Guid projectId)
     {
         return await _context.Sessions
+            .AsNoTracking()
             .Where(s => s.ProjectId == projectId)
             .OrderByDescending(s => s.StartedAt)
             .ToListAsync()
             .ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Returns all sessions across all projects.
-    /// </summary>
     public async Task<IEnumerable<Session>> GetAllAsync()
     {
         return await _context.Sessions
+            .AsNoTracking()
             .OrderByDescending(s => s.StartedAt)
             .ToListAsync()
             .ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Returns sessions within a date range for Stats page filters.
+    /// Includes Project navigation property so the Stats page can show project names.
     /// </summary>
+    public async Task<IEnumerable<Session>> GetAllWithProjectAsync()
+    {
+        return await _context.Sessions
+            .AsNoTracking()
+            .Include(s => s.Project)
+            .OrderByDescending(s => s.StartedAt)
+            .ToListAsync()
+            .ConfigureAwait(false);
+    }
+
     public async Task<IEnumerable<Session>> GetByDateRangeAsync(DateTime fromDate, DateTime toDate)
     {
         return await _context.Sessions
+            .AsNoTracking()
             .Where(s => s.StartedAt >= fromDate && s.StartedAt <= toDate)
             .OrderByDescending(s => s.StartedAt)
             .ToListAsync()
             .ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Returns the most recent N sessions for the Recent Sessions list.
-    /// </summary>
     public async Task<IEnumerable<Session>> GetRecentAsync(int count = 10)
     {
         return await _context.Sessions
+            .AsNoTracking()
             .OrderByDescending(s => s.StartedAt)
             .Take(count)
             .ToListAsync()
             .ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Deletes all sessions for a project — called before hard-deleting a project.
-    /// </summary>
     public async Task DeleteByProjectIdAsync(Guid projectId)
     {
         var sessions = await _context.Sessions

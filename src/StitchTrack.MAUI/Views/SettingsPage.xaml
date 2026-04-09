@@ -1,14 +1,327 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:StitchTrack.Application.ViewModels;assembly=StitchTrack.Application"
              x:Class="StitchTrack.MAUI.Views.SettingsPage"
-             Title="Settings">
-  <VerticalStackLayout Padding="20" Spacing="10">
-    <Label Text="Settings List" 
-           FontSize="24" 
-           FontAttributes="Bold"/>
-    <Label Text="Coming soon in Phase 2!" 
-           FontSize="14" 
-           TextColor="Gray"/>
-  </VerticalStackLayout>
+             x:DataType="viewModels:SettingsViewModel"
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
+             Shell.NavBarIsVisible="False">
+
+  <Grid RowDefinitions="Auto,Auto,*">
+
+    <!-- ============================================ -->
+    <!-- TOP BAR: Logo                                -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="0"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="30,30">
+      <Image Source="logo.svg"
+             HeightRequest="35"
+             HorizontalOptions="Start"
+             Aspect="AspectFit" />
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- HEADER: Icon + Title                         -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="1"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="20,0,20,20">
+      <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+        <Image Source="settings.svg"
+               WidthRequest="22"
+               HeightRequest="22"
+               VerticalOptions="Center">
+          <Image.Behaviors>
+            <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+        </Image>
+        <Label Text="SETTINGS"
+               Style="{StaticResource HeaderTitle}"
+               VerticalOptions="Center" />
+      </HorizontalStackLayout>
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- SCROLLABLE CONTENT                           -->
+    <!-- ============================================ -->
+    <ScrollView Grid.Row="2">
+      <VerticalStackLayout Spacing="0" Padding="20,24,20,32">
+
+        <!-- ============================================ -->
+        <!-- SECTION: App Settings                        -->
+        <!-- ============================================ -->
+        <Label Text="App Settings"
+               FontFamily="MontserratBold"
+               FontSize="16"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+               Margin="0,0,0,16" />
+
+        <!-- Theme row -->
+        <Grid ColumnDefinitions="Auto,*"
+              ColumnSpacing="12"
+              Margin="0,0,0,20">
+
+          <Image Grid.Column="0"
+                 Source="sun.svg"
+                 WidthRequest="20"
+                 HeightRequest="20"
+                 VerticalOptions="Center">
+            <Image.Behaviors>
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+            </Image.Behaviors>
+          </Image>
+
+          <VerticalStackLayout Grid.Column="1" Spacing="10">
+
+            <Label Text="Theme"
+                   FontFamily="MontserratMedium"
+                   FontSize="15"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+            <!-- Segmented control: Light / Auto / Dark -->
+            <Border StrokeThickness="1"
+                    Stroke="{StaticResource BrandGold}"
+                    BackgroundColor="Transparent"
+                    HeightRequest="40">
+              <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+              </Border.StrokeShape>
+
+              <Grid ColumnDefinitions="*,*,*" ColumnSpacing="0">
+
+                <!-- Light -->
+                <Border Grid.Column="0"
+                        StrokeThickness="0"
+                        BackgroundColor="Transparent">
+                  <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsLightTheme}" Value="True">
+                      <Setter Property="BackgroundColor" Value="{StaticResource BrandGold}" />
+                    </DataTrigger>
+                  </Border.Triggers>
+                  <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SetLightThemeCommand}" />
+                  </Border.GestureRecognizers>
+                  <Label Text="Light"
+                         FontFamily="MontserratMedium"
+                         FontSize="13"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+                    <Label.Triggers>
+                      <DataTrigger TargetType="Label" Binding="{Binding IsLightTheme}" Value="True">
+                        <Setter Property="TextColor" Value="White" />
+                        <Setter Property="FontFamily" Value="MontserratBold" />
+                      </DataTrigger>
+                    </Label.Triggers>
+                  </Label>
+                </Border>
+
+                <!-- Auto -->
+                <Border Grid.Column="1"
+                        StrokeThickness="0"
+                        BackgroundColor="Transparent">
+                  <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsAutoTheme}" Value="True">
+                      <Setter Property="BackgroundColor" Value="{StaticResource BrandGold}" />
+                    </DataTrigger>
+                  </Border.Triggers>
+                  <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SetAutoThemeCommand}" />
+                  </Border.GestureRecognizers>
+                  <Label Text="Auto"
+                         FontFamily="MontserratMedium"
+                         FontSize="13"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+                    <Label.Triggers>
+                      <DataTrigger TargetType="Label" Binding="{Binding IsAutoTheme}" Value="True">
+                        <Setter Property="TextColor" Value="White" />
+                        <Setter Property="FontFamily" Value="MontserratBold" />
+                      </DataTrigger>
+                    </Label.Triggers>
+                  </Label>
+                </Border>
+
+                <!-- Dark -->
+                <Border Grid.Column="2"
+                        StrokeThickness="0"
+                        BackgroundColor="Transparent">
+                  <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsDarkTheme}" Value="True">
+                      <Setter Property="BackgroundColor" Value="{StaticResource BrandGold}" />
+                    </DataTrigger>
+                  </Border.Triggers>
+                  <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SetDarkThemeCommand}" />
+                  </Border.GestureRecognizers>
+                  <Label Text="Dark"
+                         FontFamily="MontserratMedium"
+                         FontSize="13"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
+                    <Label.Triggers>
+                      <DataTrigger TargetType="Label" Binding="{Binding IsDarkTheme}" Value="True">
+                        <Setter Property="TextColor" Value="White" />
+                        <Setter Property="FontFamily" Value="MontserratBold" />
+                      </DataTrigger>
+                    </Label.Triggers>
+                  </Label>
+                </Border>
+
+              </Grid>
+            </Border>
+
+          </VerticalStackLayout>
+
+        </Grid>
+
+        <!-- Haptic Feedback row -->
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="12"
+              Margin="0,0,0,20">
+
+          <Image Grid.Column="0"
+                 Source="vibration.svg"
+                 WidthRequest="20"
+                 HeightRequest="20"
+                 VerticalOptions="Center">
+            <Image.Behaviors>
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+            </Image.Behaviors>
+          </Image>
+
+          <Label Grid.Column="1"
+                 Text="Haptic Feedback"
+                 FontFamily="MontserratMedium"
+                 FontSize="15"
+                 VerticalOptions="Center"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+          <Switch Grid.Column="2"
+                  IsToggled="{Binding HapticFeedbackEnabled}"
+                  OnColor="{StaticResource BrandGold}"
+                  VerticalOptions="Center">
+            <Switch.Behaviors>
+              <toolkit:EventToCommandBehavior EventName="Toggled"
+                                             Command="{Binding ToggleHapticFeedbackCommand}" />
+            </Switch.Behaviors>
+          </Switch>
+
+        </Grid>
+
+        <!-- Divider -->
+        <BoxView HeightRequest="1"
+                 BackgroundColor="{StaticResource BrandGold}"
+                 Opacity="0.3"
+                 Margin="0,4,0,24" />
+
+        <!-- ============================================ -->
+        <!-- SECTION: Backup & Sync                       -->
+        <!-- ============================================ -->
+        <Label Text="Backup &amp; Sync"
+               FontFamily="MontserratBold"
+               FontSize="16"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+               Margin="0,0,0,16" />
+
+        <!-- Cloud Backup — disabled Phase 1 -->
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="12"
+              Margin="0,0,0,8">
+
+          <Image Grid.Column="0"
+                 Source="cloud.svg"
+                 WidthRequest="20"
+                 HeightRequest="20"
+                 VerticalOptions="Start"
+                 Margin="0,2,0,0">
+            <Image.Behaviors>
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+            </Image.Behaviors>
+          </Image>
+
+          <VerticalStackLayout Grid.Column="1" Spacing="2">
+            <Label Text="Cloud Backup"
+                   FontFamily="MontserratMedium"
+                   FontSize="15"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+            <Label Text="Coming in Phase 3"
+                   FontFamily="MontserratRegular"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                   Opacity="0.6" />
+          </VerticalStackLayout>
+
+          <!-- Disabled toggle -->
+          <Switch Grid.Column="2"
+                  IsToggled="False"
+                  IsEnabled="False"
+                  VerticalOptions="Center" />
+
+        </Grid>
+
+        <!-- Divider -->
+        <BoxView HeightRequest="1"
+                 BackgroundColor="{StaticResource BrandGold}"
+                 Opacity="0.3"
+                 Margin="0,4,0,24" />
+
+        <!-- ============================================ -->
+        <!-- SECTION: About                               -->
+        <!-- ============================================ -->
+        <Label Text="About"
+               FontFamily="MontserratBold"
+               FontSize="16"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+               Margin="0,0,0,16" />
+
+        <VerticalStackLayout Spacing="8">
+
+          <Label FontFamily="MontserratRegular"
+                 FontSize="14"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+            <Label.FormattedText>
+              <FormattedString>
+                <Span Text="App version: " FontFamily="MontserratMedium" />
+                <Span Text="{Binding AppVersion}" />
+              </FormattedString>
+            </Label.FormattedText>
+          </Label>
+
+          <Label FontFamily="MontserratRegular"
+                 FontSize="14"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+            <Label.FormattedText>
+              <FormattedString>
+                <Span Text="Author: " FontFamily="MontserratMedium" />
+                <Span Text="{Binding Author}" />
+              </FormattedString>
+            </Label.FormattedText>
+          </Label>
+
+        </VerticalStackLayout>
+
+        <!-- Divider -->
+        <BoxView HeightRequest="1"
+                 BackgroundColor="{StaticResource BrandGold}"
+                 Opacity="0.3"
+                 Margin="0,24,0,16" />
+
+        <!-- Version at bottom -->
+        <Label Text="{Binding AppVersion}"
+               FontFamily="MontserratRegular"
+               FontSize="12"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+               Opacity="0.6"
+               HorizontalOptions="End" />
+
+      </VerticalStackLayout>
+    </ScrollView>
+
+  </Grid>
+
 </ContentPage>
