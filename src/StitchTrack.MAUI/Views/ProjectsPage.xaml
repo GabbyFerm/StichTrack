@@ -101,13 +101,12 @@
       <VerticalStackLayout Grid.Row="0" Spacing="0">
 
         <!-- Tab Labels -->
-        <Grid Padding="20,20,20,10"
-        ColumnDefinitions="*,*">
+        <Grid Padding="20,20,20,10" ColumnDefinitions="*,*">
           <!-- Active Projects Tab (Left) -->
           <Label Grid.Column="0"
                  Text="{Binding ActiveProjectsTabText}"
                  FontFamily="MontserratMedium"
-                 FontSize="16"
+                 FontSize="14"
                  HorizontalOptions="Start"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
             <Label.Triggers>
@@ -127,7 +126,7 @@
           <Label Grid.Column="1"
                  Text="{Binding ArchivedProjectsTabText}"
                  FontFamily="MontserratMedium"
-                 FontSize="16"
+                 FontSize="14"
                  HorizontalOptions="End"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
             <Label.Triggers>

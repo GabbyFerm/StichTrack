@@ -58,6 +58,15 @@ public class AppSettings
         Theme = theme;
     }
 
+    /// <summary>
+    /// Flips the haptic feedback toggle and returns the new value.
+    /// </summary>
+    public bool ToggleHapticFeedback()
+    {
+        HapticFeedbackEnabled = !HapticFeedbackEnabled;
+        return HapticFeedbackEnabled;
+    }
+
     public void IncrementProjectCreationCount()
     {
         ProjectCreationCount++;

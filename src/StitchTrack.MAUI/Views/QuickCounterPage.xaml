@@ -6,8 +6,7 @@
              BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
              Shell.NavBarIsVisible="False">
 
-  <Grid RowDefinitions="Auto,Auto,*"
-        RowSpacing="0">
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0">
 
     <!-- ============================================ -->
     <!-- TOP BAR: Logo + Sync Icon                    -->
@@ -55,190 +54,156 @@
     <!-- MAIN CONTENT                                 -->
     <!-- ============================================ -->
     <ScrollView Grid.Row="2">
-      <VerticalStackLayout Spacing="20" Padding="20">
+      <VerticalStackLayout Spacing="0" Padding="16">
 
-        <!-- Counter Display -->
-        <Frame Style="{StaticResource CounterCard}">
-          <VerticalStackLayout Spacing="0">
+        <!-- ============================================ -->
+        <!-- COUNTER CARD — number + all counter controls -->
+        <!-- ============================================ -->
+        <Border Padding="20"
+                Margin="0,16,0,0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}">
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+          </Border.StrokeShape>
 
+          <VerticalStackLayout Spacing="16">
+
+            <!-- Row count label -->
             <Label Text="Current Row"
-                   Style="{StaticResource SecondaryLabel}"
+                   FontFamily="MontserratMedium"
+                   FontSize="13"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                    HorizontalOptions="Center" />
 
+            <!-- Counter number — larger than before -->
             <Label Text="{Binding CurrentCount}"
                    Style="{StaticResource CounterLabel}"
-                   Margin="0,0,0,-15" />
+                   HorizontalOptions="Center" />
+
+            <!-- +/- buttons -->
+            <Grid ColumnDefinitions="*,*"
+                  ColumnSpacing="12"
+                  Margin="0,8,0,0">
+
+              <!-- Decrease -->
+              <Border Grid.Column="0"
+                      BackgroundColor="{StaticResource ButtonDecrease}"
+                      HeightRequest="60"
+                      StrokeThickness="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding DecrementCommand}" />
+                </Border.GestureRecognizers>
+                <Image Source="minus.svg"
+                       HeightRequest="28"
+                       WidthRequest="28"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                  <Image.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                  </Image.Behaviors>
+                </Image>
+              </Border>
+
+              <!-- Increase -->
+              <Border Grid.Column="1"
+                      BackgroundColor="{StaticResource ButtonIncrease}"
+                      HeightRequest="60"
+                      StrokeThickness="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding IncrementCommand}" />
+                </Border.GestureRecognizers>
+                <Image Source="plus.svg"
+                       HeightRequest="28"
+                       WidthRequest="28"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                  <Image.Behaviors>
+                    <toolkit:IconTintColorBehavior TintColor="White" />
+                  </Image.Behaviors>
+                </Image>
+              </Border>
+
+            </Grid>
+
+            <!-- Undo & Reset -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+
+              <!-- Undo -->
+              <Border Grid.Column="0"
+                      BackgroundColor="Transparent"
+                      HorizontalOptions="Center">
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding UndoCommand}" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout Spacing="6"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       Padding="10,8">
+                  <Image Source="undo.svg"
+                         HeightRequest="16"
+                         WidthRequest="16"
+                         VerticalOptions="Center">
+                    <Image.Behaviors>
+                      <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
+                    </Image.Behaviors>
+                  </Image>
+                  <Label Text="Undo"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
+                         FontFamily="MontserratMedium"
+                         FontSize="13"
+                         VerticalOptions="Center" />
+                </HorizontalStackLayout>
+              </Border>
+
+              <!-- Reset -->
+              <Border Grid.Column="1"
+                      BackgroundColor="Transparent"
+                      HorizontalOptions="Center">
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Command="{Binding ResetCommand}" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout Spacing="6"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       Padding="10,8">
+                  <Image Source="reset.svg"
+                         HeightRequest="16"
+                         WidthRequest="16"
+                         VerticalOptions="Center">
+                    <Image.Behaviors>
+                      <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
+                    </Image.Behaviors>
+                  </Image>
+                  <Label Text="Reset"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
+                         FontFamily="MontserratMedium"
+                         FontSize="13"
+                         VerticalOptions="Center" />
+                </HorizontalStackLayout>
+              </Border>
+
+            </Grid>
 
           </VerticalStackLayout>
-        </Frame>
 
-        <!-- Increase / Decrease Buttons -->
-        <Grid ColumnDefinitions="*,*"
-              ColumnSpacing="15"
-              Margin="0,5,0,0">
+        </Border>
 
-          <!-- Decrease Button -->
-          <Border Grid.Column="0"
-                  BackgroundColor="{StaticResource ButtonDecrease}"
-                  HeightRequest="50"
-                  StrokeThickness="0"
-                  Margin="0,5">
-            <Border.StrokeShape>
-              <RoundRectangle CornerRadius="8" />
-            </Border.StrokeShape>
-            <Border.GestureRecognizers>
-              <TapGestureRecognizer Command="{Binding DecrementCommand}" />
-            </Border.GestureRecognizers>
-
-            <HorizontalStackLayout Spacing="10"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center">
-              <Image Source="minus.svg"
-                     HeightRequest="20"
-                     WidthRequest="20"
-                     VerticalOptions="Center">
-                <Image.Behaviors>
-                  <toolkit:IconTintColorBehavior TintColor="White" />
-                </Image.Behaviors>
-              </Image>
-              <Label Text="DECREASE"
-                     TextColor="{StaticResource ButtonTextOnDark}"
-                     FontFamily="MontserratBold"
-                     FontSize="14"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
-          </Border>
-
-          <!-- Increase Button -->
-          <Border Grid.Column="1"
-                  BackgroundColor="{StaticResource ButtonIncrease}"
-                  HeightRequest="50"
-                  StrokeThickness="0"
-                  Margin="0,5">
-            <Border.StrokeShape>
-              <RoundRectangle CornerRadius="8" />
-            </Border.StrokeShape>
-            <Border.GestureRecognizers>
-              <TapGestureRecognizer Command="{Binding IncrementCommand}" />
-            </Border.GestureRecognizers>
-
-            <HorizontalStackLayout Spacing="10"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center">
-              <Image Source="plus.svg"
-                     HeightRequest="20"
-                     WidthRequest="20"
-                     VerticalOptions="Center">
-                <Image.Behaviors>
-                  <toolkit:IconTintColorBehavior TintColor="White" />
-                </Image.Behaviors>
-              </Image>
-              <Label Text="INCREASE"
-                     TextColor="{StaticResource ButtonTextOnGold}"
-                     FontFamily="MontserratBold"
-                     FontSize="14"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
-          </Border>
-
-        </Grid>
-
-        <!-- Undo & Reset -->
-        <Grid ColumnDefinitions="*,*"
-              ColumnSpacing="15">
-
-          <!-- Undo Button -->
-          <Border Grid.Column="0"
-                  BackgroundColor="Transparent"
-                  HorizontalOptions="Center">
-            <Border.GestureRecognizers>
-              <TapGestureRecognizer Command="{Binding UndoCommand}" />
-            </Border.GestureRecognizers>
-
-            <HorizontalStackLayout Spacing="6"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"
-                                   Padding="10,8">
-              <Image Source="undo.svg"
-                     HeightRequest="16"
-                     WidthRequest="16"
-                     VerticalOptions="Center">
-                <Image.Behaviors>
-                  <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
-                </Image.Behaviors>
-              </Image>
-              <Label Text="Undo"
-                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
-                     FontFamily="MontserratBold"
-                     FontSize="12"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
-          </Border>
-
-          <!-- Reset Button -->
-          <Border Grid.Column="1"
-                  BackgroundColor="Transparent"
-                  HorizontalOptions="Center">
-            <Border.GestureRecognizers>
-              <TapGestureRecognizer Command="{Binding ResetCommand}" />
-            </Border.GestureRecognizers>
-
-            <HorizontalStackLayout Spacing="6"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"
-                                   Padding="10,8">
-              <Image Source="reset.svg"
-                     HeightRequest="16"
-                     WidthRequest="16"
-                     VerticalOptions="Center">
-                <Image.Behaviors>
-                  <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
-                </Image.Behaviors>
-              </Image>
-              <Label Text="Reset"
-                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
-                     FontFamily="MontserratBold"
-                     FontSize="12"
-                     VerticalOptions="Center" />
-            </HorizontalStackLayout>
-          </Border>
-
-        </Grid>
-
-        <!-- Tip -->
-        <HorizontalStackLayout Spacing="8"
-                               HorizontalOptions="Center"
-                               Margin="0,0,0,8">
-          <Image Source="lightbulb.svg"
-                 HeightRequest="20"
-                 WidthRequest="20"
-                 VerticalOptions="Center">
-            <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
-            </Image.Behaviors>
-          </Image>
-          <Label Style="{StaticResource CaptionLabel}"
-                 LineBreakMode="WordWrap"
-                 MaximumWidthRequest="280"
-                 VerticalOptions="Center">
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="Tip: " FontAttributes="Bold" />
-                <Span Text="Tap 'Save to Project' to keep this counter" />
-              </FormattedString>
-            </Label.FormattedText>
-          </Label>
-        </HorizontalStackLayout>
-
-        <!-- Save to Project Button -->
-        <Border BackgroundColor="Transparent"
-                HeightRequest="30"
-                Padding="10,0,10,5"
+        <!-- ============================================ -->
+        <!-- SAVE TO PROJECT — full width, below card     -->
+        <!-- ============================================ -->
+        <Border BackgroundColor="{StaticResource BrandGold}"
+                HeightRequest="52"
                 StrokeThickness="0"
-                Margin="0,0,0,20"
-                HorizontalOptions="Center">
+                Margin="0,16,0,20">
           <Border.StrokeShape>
-            <RoundRectangle CornerRadius="25" />
+            <RoundRectangle CornerRadius="10" />
           </Border.StrokeShape>
           <Border.GestureRecognizers>
             <TapGestureRecognizer Command="{Binding SaveToProjectCommand}" />
@@ -248,17 +213,17 @@
                                  HorizontalOptions="Center"
                                  VerticalOptions="Center">
             <Image Source="disk.svg"
-                   HeightRequest="18"
-                   WidthRequest="18"
+                   HeightRequest="20"
+                   WidthRequest="20"
                    VerticalOptions="Center">
               <Image.Behaviors>
-                <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource BrandSave}, Dark={StaticResource BrandGold}}" />
+                <toolkit:IconTintColorBehavior TintColor="White" />
               </Image.Behaviors>
             </Image>
             <Label Text="SAVE TO PROJECT"
-                   TextColor="{AppThemeBinding Light={StaticResource BrandSave}, Dark={StaticResource BrandGold}}"
+                   TextColor="White"
                    FontFamily="MontserratBold"
-                   FontSize="12"
+                   FontSize="14"
                    VerticalOptions="Center" />
           </HorizontalStackLayout>
         </Border>

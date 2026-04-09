@@ -47,19 +47,19 @@
       </Tab>
 
       <!-- SESSION TAB -->
-      <Tab Title="SESSION" Icon="session. svg">
+      <Tab Title="SESSION" Icon="session.svg">
         <ShellContent Route="session"
                       ContentTemplate="{DataTemplate views:SessionsPage}" />
       </Tab>
 
       <!-- EXPORT TAB -->
-      <Tab Title="EXPORT" Icon="export. svg">
+      <Tab Title="EXPORT" Icon="export.svg">
         <ShellContent Route="export"
                       ContentTemplate="{DataTemplate views:ExportPage}" />
       </Tab>
 
       <!-- SETTINGS TAB -->
-      <Tab Title="SETTINGS" Icon="settings. svg">
+      <Tab Title="SETTINGS" Icon="settings.svg">
         <ShellContent Route="settings"
                       ContentTemplate="{DataTemplate views:SettingsPage}" />
       </Tab>

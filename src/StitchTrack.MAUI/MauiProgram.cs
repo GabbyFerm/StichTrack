@@ -60,18 +60,16 @@ public static class MauiProgram
         builder.Services.AddTransient<ProjectsViewModel>();
         builder.Services.AddTransient<SingleProjectViewModel>();
         builder.Services.AddTransient<ProjectCounterViewModel>();
-        // TODO: Add other ViewModels as we create them
-        // builder.Services.AddTransient<SessionViewModel>();
-        // builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<SessionsViewModel>();
+        builder.Services.AddTransient<SettingsViewModel>();
 
         // PAGES
         builder.Services.AddTransient<QuickCounterPage>();
         builder.Services.AddTransient<ProjectsPage>();
         builder.Services.AddTransient<SingleProjectPage>();
         builder.Services.AddTransient<ProjectCounterPage>();
-        // TODO: Add other Pages as we create them
-        // builder.Services.AddTransient<SessionPage>();
-        // builder.Services.AddTransient<SettingsPage>();
+        builder.Services.AddTransient<SessionsPage>();
+        builder.Services.AddTransient<SettingsPage>();
 
         // POPUPS (Community Toolkit)
         builder.Services.AddTransient<OnboardingPopup>();
