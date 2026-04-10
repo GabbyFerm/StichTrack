@@ -41,7 +41,9 @@ public class SettingsViewModel : INotifyPropertyChanged
     // ─── About ───────────────────────────────────────────────────
 
     public string AppVersion { get; set; } = string.Empty;
-    public static string Author => "Gabriella Frank Ferm";
+#pragma warning disable CA1822
+    public string Author => "Gabriella Frank Ferm";
+#pragma warning restore CA1822
 
     // ─── Commands ────────────────────────────────────────────────
 
