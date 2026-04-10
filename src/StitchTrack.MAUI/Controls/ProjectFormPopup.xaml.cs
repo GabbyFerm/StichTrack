@@ -131,17 +131,30 @@ public partial class ProjectFormPopup : Popup
 
             if (action == "Take Photo")
             {
+                // Check camera permission before attempting — avoids confusing exception
+                var cameraStatus = await Permissions.CheckStatusAsync<Permissions.Camera>();
+                if (cameraStatus != PermissionStatus.Granted)
+                    cameraStatus = await Permissions.RequestAsync<Permissions.Camera>();
+
+                if (cameraStatus != PermissionStatus.Granted)
+                {
+                    await ShowAlertAsync(
+                        "Camera Permission Needed",
+                        "Please allow camera access in your device Settings to take a photo.");
+                    return;
+                }
+
                 if (MediaPicker.Default.IsCaptureSupported)
                     photo = await MediaPicker.Default.CapturePhotoAsync();
             }
             else
             {
+                // Library access — no permission needed on Android 13+ or iOS 14+
                 photo = await MediaPicker.Default.PickPhotoAsync();
             }
 
             if (photo == null) return;
 
-            // Copy to app's local storage so it persists
             _selectedImagePath = await CopyFileToLocalStorageAsync(photo.FullPath, "Images");
 
             PhotoLabel.Text = "📷 Photo Added ✓";
@@ -150,15 +163,12 @@ public partial class ProjectFormPopup : Popup
 
             System.Diagnostics.Debug.WriteLine($"📷 Photo saved: {_selectedImagePath}");
         }
-        catch (PermissionException)
-        {
-            await ShowAlertAsync("Permission Needed", "Please allow access to your photos in Settings.");
-        }
 #pragma warning disable CA1031
         catch (Exception ex)
 #pragma warning restore CA1031
         {
             System.Diagnostics.Debug.WriteLine($"❌ Photo upload error: {ex.Message}");
+            await ShowAlertAsync("Could Not Add Photo", "Something went wrong. Please try again.");
         }
     }
 

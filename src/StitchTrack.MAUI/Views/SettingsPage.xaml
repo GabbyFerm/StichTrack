@@ -69,7 +69,7 @@
                  HeightRequest="20"
                  VerticalOptions="Center">
             <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
             </Image.Behaviors>
           </Image>
 
@@ -185,12 +185,12 @@
               Margin="0,0,0,20">
 
           <Image Grid.Column="0"
-                 Source="vibration.svg"
+                 Source="waves.svg"
                  WidthRequest="20"
                  HeightRequest="20"
                  VerticalOptions="Center">
             <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
             </Image.Behaviors>
           </Image>
 
@@ -204,6 +204,7 @@
           <Switch Grid.Column="2"
                   IsToggled="{Binding HapticFeedbackEnabled}"
                   OnColor="{StaticResource BrandGold}"
+                  ThumbColor="White"
                   VerticalOptions="Center">
             <Switch.Behaviors>
               <toolkit:EventToCommandBehavior EventName="Toggled"
@@ -234,13 +235,13 @@
               Margin="0,0,0,8">
 
           <Image Grid.Column="0"
-                 Source="cloud.svg"
+                 Source="cloud_upload.svg"
                  WidthRequest="20"
                  HeightRequest="20"
                  VerticalOptions="Start"
                  Margin="0,2,0,0">
             <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
             </Image.Behaviors>
           </Image>
 

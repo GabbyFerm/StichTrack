@@ -16,21 +16,28 @@
   <!-- ============================================ -->
   <Color x:Key="LightPageBackground">#FDFBF5</Color>
   <Color x:Key="LightAppBackground">#E1AD37</Color>
-  <Color x:Key="LightTextPrimary">#424B54</Color>
-  <Color x:Key="LightTextSecondary">#6B7280</Color>
+  <Color x:Key="LightTextPrimary">#2C3338</Color>
+  <!-- Darkened from #424B54 — better contrast on warm backgrounds -->
+  <Color x:Key="LightTextSecondary">#424B54</Color>
+  <!-- Darkened from #6B7280 — readable on cream card backgrounds -->
   <Color x:Key="LightLine">#E1AD37</Color>
   <Color x:Key="LightCardBackground">#F5EDD3</Color>
-  <Color x:Key="LightIconColor">#424B54</Color>
+  <Color x:Key="LightIconColor">#2C3338</Color>
+  <!-- Matches new LightTextPrimary -->
 
   <!-- ============================================ -->
   <!-- DARK MODE COLORS                             -->
   <!-- ============================================ -->
-  <Color x:Key="DarkPageBackground">#686F76</Color>
-  <Color x:Key="DarkAppBackground">#424B54</Color>
+  <Color x:Key="DarkPageBackground">#3D4449</Color>
+  <!-- Darkened from #686F76 — better contrast for text -->
+  <Color x:Key="DarkAppBackground">#2C3338</Color>
+  <!-- Darkened slightly for consistency -->
   <Color x:Key="DarkTextPrimary">#FFFFFF</Color>
-  <Color x:Key="DarkTextSecondary">#D1D5DB</Color>
+  <Color x:Key="DarkTextSecondary">#E5E7EB</Color>
+  <!-- Lightened from #D1D5DB — much more readable on dark grey -->
   <Color x:Key="DarkLine">#424B54</Color>
-  <Color x:Key="DarkCardBackground">#525A63</Color>
+  <Color x:Key="DarkCardBackground">#4A5259</Color>
+  <!-- Slightly darkened to match new page background -->
   <Color x:Key="DarkIconColor">#FFFFFF</Color>
 
   <!-- ============================================ -->
@@ -38,8 +45,8 @@
   <!-- Use AppThemeBinding in XAML where needed     -->
   <!-- ============================================ -->
 
-  <Color x:Key="TextPrimary">#424B54</Color>
-  <Color x:Key="TextSecondary">#6B7280</Color>
+  <Color x:Key="TextPrimary">#2C3338</Color>
+  <Color x:Key="TextSecondary">#424B54</Color>
   <Color x:Key="TextWhite">#ffffff</Color>
 
   <!-- ============================================ -->
