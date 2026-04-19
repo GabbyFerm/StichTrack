@@ -64,13 +64,12 @@
               Margin="0,0,0,20">
 
           <Image Grid.Column="0"
-                 Source="sun.svg"
                  WidthRequest="20"
                  HeightRequest="20"
                  VerticalOptions="Center">
-            <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
-            </Image.Behaviors>
+            <Image.Source>
+              <AppThemeBinding Light="sun_moon_light.svg" Dark="sun_moon_dark.svg" />
+            </Image.Source>
           </Image>
 
           <VerticalStackLayout Grid.Column="1" Spacing="10">
@@ -185,13 +184,12 @@
               Margin="0,0,0,20">
 
           <Image Grid.Column="0"
-                 Source="waves.svg"
                  WidthRequest="20"
                  HeightRequest="20"
                  VerticalOptions="Center">
-            <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
-            </Image.Behaviors>
+            <Image.Source>
+              <AppThemeBinding Light="waves_light.svg" Dark="waves_dark.svg" />
+            </Image.Source>
           </Image>
 
           <Label Grid.Column="1"
@@ -235,14 +233,12 @@
               Margin="0,0,0,8">
 
           <Image Grid.Column="0"
-                 Source="cloud_upload.svg"
                  WidthRequest="20"
                  HeightRequest="20"
-                 VerticalOptions="Start"
-                 Margin="0,2,0,0">
-            <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
-            </Image.Behaviors>
+                 VerticalOptions="Center">
+            <Image.Source>
+              <AppThemeBinding Light="cloud_upload_light.svg" Dark="cloud_upload_dark.svg" />
+            </Image.Source>
           </Image>
 
           <VerticalStackLayout Grid.Column="1" Spacing="2">
