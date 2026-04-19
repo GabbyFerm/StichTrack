@@ -190,13 +190,13 @@
                              IsVisible="{Binding HasPattern}">
 
           <HorizontalStackLayout Spacing="8">
-            <Image Source="file.svg"
+            <Image Grid.Column="0"
                    WidthRequest="16"
                    HeightRequest="16"
                    VerticalOptions="Center">
-              <Image.Behaviors>
-                <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
-              </Image.Behaviors>
+              <Image.Source>
+                <AppThemeBinding Light="file_light.svg" Dark="file_dark.svg" />
+              </Image.Source>
             </Image>
             <Label Text="Pattern"
                    FontFamily="MontserratSemiBold"
@@ -229,13 +229,13 @@
                              IsVisible="{Binding HasNotes}">
 
           <HorizontalStackLayout Spacing="8">
-            <Image Source="notes.svg"
+            <Image Grid.Column="0"
                    WidthRequest="16"
                    HeightRequest="16"
                    VerticalOptions="Center">
-              <Image.Behaviors>
-                <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
-              </Image.Behaviors>
+              <Image.Source>
+                <AppThemeBinding Light="notes_light.svg" Dark="notes_dark.svg" />
+              </Image.Source>
             </Image>
             <Label Text="Notes"
                    FontFamily="MontserratSemiBold"

@@ -146,13 +146,13 @@
                                        HorizontalOptions="Center"
                                        VerticalOptions="Center"
                                        Padding="10,8">
-                  <Image Source="undo.svg"
-                         HeightRequest="16"
+                  <Image Grid.Column="0"
                          WidthRequest="16"
+                         HeightRequest="16"
                          VerticalOptions="Center">
-                    <Image.Behaviors>
-                      <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
-                    </Image.Behaviors>
+                    <Image.Source>
+                      <AppThemeBinding Light="undo_light.svg" Dark="undo_dark.svg" />
+                    </Image.Source>
                   </Image>
                   <Label Text="Undo"
                          TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
@@ -173,13 +173,13 @@
                                        HorizontalOptions="Center"
                                        VerticalOptions="Center"
                                        Padding="10,8">
-                  <Image Source="reset.svg"
-                         HeightRequest="16"
+                  <Image Grid.Column="0"
                          WidthRequest="16"
+                         HeightRequest="16"
                          VerticalOptions="Center">
-                    <Image.Behaviors>
-                      <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}" />
-                    </Image.Behaviors>
+                    <Image.Source>
+                      <AppThemeBinding Light="reset_light.svg" Dark="reset_dark.svg" />
+                    </Image.Source>
                   </Image>
                   <Label Text="Reset"
                          TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
