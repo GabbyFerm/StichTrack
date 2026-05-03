@@ -27,7 +27,7 @@ jobs:
           dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
           dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
           dotnet restore tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj
-          dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
+          dotnet restore tests/StitchTrack.Integration.Tests/StitchTrack.IntegrationTests.csproj
 
       # Format only non-MAUI projects
       - name: Check formatting (errors only, ignore warnings)
@@ -36,4 +36,4 @@ jobs:
           dotnet format src/StitchTrack.Application/StitchTrack.Application.csproj --verify-no-changes --severity error
           dotnet format src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj --verify-no-changes --severity error
           dotnet format tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj --verify-no-changes --severity error
-          dotnet format tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj --verify-no-changes --severity error
+          dotnet format tests/StitchTrack.Integration.Tests/StitchTrack.IntegrationTests.csproj --verify-no-changes --severity error
