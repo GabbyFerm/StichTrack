@@ -1,14 +1,170 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="StitchTrack.MAUI.Views.ExportPage"
-             Title="Exports">
-  <VerticalStackLayout Padding="20" Spacing="10">
-    <Label Text="Export List" 
-           FontSize="24" 
-           FontAttributes="Bold"/>
-    <Label Text="Coming soon in Phase 2!" 
-           FontSize="14" 
-           TextColor="Gray"/>
-  </VerticalStackLayout>
+             BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
+             Shell.NavBarIsVisible="False">
+
+  <Grid RowDefinitions="Auto,Auto,*">
+
+    <!-- ============================================ -->
+    <!-- TOP BAR: Logo                                -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="0"
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="30,30">
+      <Image Source="logo.svg"
+             HeightRequest="35"
+             HorizontalOptions="Start"
+             Aspect="AspectFit" />
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- HEADER: Icon + Title                         -->
+    <!-- ============================================ -->
+    <Grid Grid.Row="1"
+      BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+      Padding="20,0,20,20">
+
+      <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+        <Image Source="export.svg"
+           WidthRequest="22"
+           HeightRequest="22"
+           VerticalOptions="Center">
+          <Image.Behaviors>
+            <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+        </Image>
+        <Label Text="EXPORT"
+           Style="{StaticResource HeaderTitle}"
+           FontSize="20"
+           VerticalOptions="Center" />
+      </HorizontalStackLayout>
+
+    </Grid>
+
+    <!-- ============================================ -->
+    <!-- CONTENT                                      -->
+    <!-- ============================================ -->
+    <ScrollView Grid.Row="2">
+      <VerticalStackLayout Spacing="0" Padding="20,24,20,32">
+
+        <!-- ============================================ -->
+        <!-- SECTION: Export Data                         -->
+        <!-- ============================================ -->
+        <Label Text="Export Data"
+               FontFamily="MontserratBold"
+               FontSize="16"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+               Margin="0,0,0,16" />
+
+        <!-- JSON Export row -->
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="12"
+              Margin="0,0,0,20">
+
+          <Image Grid.Column="0"
+                 WidthRequest="20"
+                 HeightRequest="20"
+                 VerticalOptions="Start"
+                 Margin="0,2,0,0">
+            <Image.Source>
+              <AppThemeBinding Light="json_light.svg" Dark="json_dark.svg" />
+            </Image.Source>
+          </Image>
+
+          <VerticalStackLayout Grid.Column="1" Spacing="2">
+            <Label Text="Export All Projects (JSON)"
+                   FontFamily="MontserratMedium"
+                   FontSize="15"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+            <Label Text="Includes projects, sessions and counter history"
+                   FontFamily="MontserratRegular"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                   Opacity="0.6" />
+            <Label Text="Coming in Phase 2"
+                   FontFamily="MontserratRegular"
+                   FontSize="12"
+                   TextColor="{StaticResource BrandGold}"
+                   Opacity="0.7" />
+          </VerticalStackLayout>
+
+          <!-- Disabled export button -->
+          <Border Grid.Column="2"
+                  StrokeThickness="1"
+                  Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                  BackgroundColor="Transparent"
+                  Padding="12,8"
+                  Opacity="0.4"
+                  VerticalOptions="Center">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Label Text="EXPORT"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+          </Border>
+
+        </Grid>
+
+        <!-- CSV Export row -->
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="12"
+              Margin="0,0,0,8">
+
+          <Image Grid.Column="0"
+                 WidthRequest="20"
+                 HeightRequest="20"
+                 VerticalOptions="Start"
+                 Margin="0,2,0,0">
+            <Image.Source>
+              <AppThemeBinding Light="csv_light.svg" Dark="csv_dark.svg" />
+            </Image.Source>
+          </Image>
+
+          <VerticalStackLayout Grid.Column="1" Spacing="2">
+            <Label Text="Export All Projects (CSV)"
+                   FontFamily="MontserratMedium"
+                   FontSize="15"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+            <Label Text="Columns: Name, Rows, Total Rows, Notes, Created"
+                   FontFamily="MontserratRegular"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                   Opacity="0.6" />
+            <Label Text="Coming in Phase 2"
+                   FontFamily="MontserratRegular"
+                   FontSize="12"
+                   TextColor="{StaticResource BrandGold}"
+                   Opacity="0.7" />
+          </VerticalStackLayout>
+
+          <!-- Disabled export button -->
+          <Border Grid.Column="2"
+                  StrokeThickness="1"
+                  Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                  BackgroundColor="Transparent"
+                  Padding="12,8"
+                  Opacity="0.4"
+                  VerticalOptions="Center">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Label Text="EXPORT"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+          </Border>
+
+        </Grid>
+
+
+      </VerticalStackLayout>
+    </ScrollView>
+
+  </Grid>
+
 </ContentPage>

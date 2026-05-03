@@ -51,6 +51,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public ICommand SetAutoThemeCommand { get; }
     public ICommand SetDarkThemeCommand { get; }
     public ICommand ToggleHapticFeedbackCommand { get; }
+    public ICommand ResetOnboardingCommand { get; }
 
     /// <summary>
     /// Set by SettingsPage to apply the theme to the running app.
@@ -58,9 +59,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     /// </summary>
     public Action<string>? ApplyTheme { get; set; }
 
-    public SettingsViewModel(
-        IAppSettingsRepository settingsRepository,
-        IHapticsService hapticsService)
+    public SettingsViewModel(IAppSettingsRepository settingsRepository, IHapticsService hapticsService)
     {
         _settingsRepository = settingsRepository ?? throw new ArgumentNullException(nameof(settingsRepository));
         _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
@@ -69,6 +68,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         SetAutoThemeCommand = new RelayCommand(() => _ = SetThemeAsync("Auto"));
         SetDarkThemeCommand = new RelayCommand(() => _ = SetThemeAsync("Dark"));
         ToggleHapticFeedbackCommand = new RelayCommand(() => _ = ToggleHapticsAsync());
+        ResetOnboardingCommand = new RelayCommand(() => _ = ResetOnboardingAsync());
 
         System.Diagnostics.Debug.WriteLine("✅ SettingsViewModel created");
     }
@@ -132,6 +132,17 @@ public class SettingsViewModel : INotifyPropertyChanged
 
         OnPropertyChanged(nameof(HapticFeedbackEnabled));
         System.Diagnostics.Debug.WriteLine($"📳 Haptic feedback: {newValue}");
+    }
+
+    // ─── Onboarding ──────────────────────────────────────────────
+    private async Task ResetOnboardingAsync()
+    {
+        if (_settings == null) return;
+
+        _settings.ResetFirstRun();
+        await SaveAsync().ConfigureAwait(false);
+
+        System.Diagnostics.Debug.WriteLine("🔄 Onboarding reset — will show on next launch");
     }
 
     // ─── Persist ─────────────────────────────────────────────────

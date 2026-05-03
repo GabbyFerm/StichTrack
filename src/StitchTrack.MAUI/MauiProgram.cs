@@ -70,6 +70,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ProjectCounterPage>();
         builder.Services.AddTransient<SessionsPage>();
         builder.Services.AddTransient<SettingsPage>();
+        builder.Services.AddTransient<ExportPage>();
 
         // POPUPS (Community Toolkit)
         builder.Services.AddTransient<OnboardingPopup>();
@@ -83,24 +84,33 @@ public static class MauiProgram
         var app = builder.Build();
 
         // Remove Android Material underline from all Entry and Editor controls
-        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(  // ← add this block
             "NoUnderline", (handler, view) =>
             {
 #if ANDROID
-                handler.PlatformView.BackgroundTintList =
-                    Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+        handler.PlatformView.BackgroundTintList =
+            Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
 #endif
             });
 
+        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping(  // ← already there
+            "NoUnderline", (handler, view) =>
+            {
+#if ANDROID
+        handler.PlatformView.BackgroundTintList =
+            Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
+            });
+
+        // Remove Android Material underline from all Entry and Editor controls
         Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping(
-            "NoUnderline", (handler, view) =>
-            {
+    "NoUnderline", (handler, view) =>
+    {
 #if ANDROID
-                handler.PlatformView.BackgroundTintList =
-                    Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+        handler.PlatformView.BackgroundTintList =
+            Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
 #endif
-            });
-
+    });
         Task.Run(async () =>
         {
             try

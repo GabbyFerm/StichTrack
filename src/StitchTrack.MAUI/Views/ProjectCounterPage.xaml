@@ -165,9 +165,9 @@
 
               <!-- Progress fill bar -->
               <ProgressBar Progress="{Binding ProgressValue}"
-                     ProgressColor="{StaticResource BrandGold}"
-                     BackgroundColor="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
-                     HeightRequest="8" />
+                           ProgressColor="{StaticResource BrandGold}"
+                           BackgroundColor="{AppThemeBinding Light=#E6E1D0, Dark=#374151}"
+                           HeightRequest="4" />
 
             </VerticalStackLayout>
 
@@ -245,7 +245,7 @@
                          HeightRequest="16"
                          VerticalOptions="Center">
                     <Image.Source>
-                      <AppThemeBinding Light="undo_light.svg" Dark="undo_dark.svg" />
+                      <AppThemeBinding Light="undo_dark.svg" Dark="undo_light.svg" />
                     </Image.Source>
                   </Image>
                   <Label Text="Undo"
@@ -274,7 +274,7 @@
                          HeightRequest="16"
                          VerticalOptions="Center">
                     <Image.Source>
-                      <AppThemeBinding Light="reset_light.svg" Dark="reset_dark.svg" />
+                      <AppThemeBinding Light="reset_dark.svg" Dark="reset_light.svg" />
                     </Image.Source>
                   </Image>
                   <Label Text="Reset"
