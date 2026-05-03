@@ -315,14 +315,13 @@
 
                 <!-- More Options Button -->
                 <Image Grid.Column="2"
-                       Source="more. svg"
                        WidthRequest="24"
                        HeightRequest="24"
                        VerticalOptions="Start">
-                  <Image.Behaviors>
-                    <toolkit:IconTintColorBehavior TintColor="{AppThemeBinding Light={StaticResource LightIconColor}, Dark={StaticResource DarkIconColor}}" />
-                    </Image.Behaviors>
-                    <Image.GestureRecognizers>
+                  <Image.Source>
+                    <AppThemeBinding Light="more_light.svg" Dark="more_dark.svg" />
+                  </Image.Source>
+                  <Image.GestureRecognizers>
                     <TapGestureRecognizer
                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProjectsViewModel}}, Path=ShowProjectMenuCommand}"
                         CommandParameter="{Binding .}" />

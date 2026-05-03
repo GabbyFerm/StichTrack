@@ -33,6 +33,15 @@ public class AppSettings
         FirstRunCompletedAt = DateTime.UtcNow;
     }
 
+    /// <summary>
+    /// Resets first run flag so onboarding shows again on next app launch.
+    /// </summary>
+    public void ResetFirstRun()
+    {
+        IsFirstRun = true;
+        FirstRunCompletedAt = null;
+    }
+
     public void EnableSync(string provider)
     {
         if (string.IsNullOrWhiteSpace(provider))
