@@ -88,8 +88,8 @@ public static class MauiProgram
             "NoUnderline", (handler, view) =>
             {
 #if ANDROID
-        handler.PlatformView.BackgroundTintList =
-            Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+                handler.PlatformView.BackgroundTintList =
+                    Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
 #endif
             });
 
@@ -97,8 +97,8 @@ public static class MauiProgram
             "NoUnderline", (handler, view) =>
             {
 #if ANDROID
-        handler.PlatformView.BackgroundTintList =
-            Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+                handler.PlatformView.BackgroundTintList =
+                    Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
 #endif
             });
 
