@@ -19,7 +19,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "9.0.x"
 
       # Build only the non-MAUI projects for now
       - name: Restore dependencies
@@ -28,7 +28,7 @@ jobs:
           dotnet restore src/StitchTrack.Application/StitchTrack.Application.csproj
           dotnet restore src/StitchTrack.Infrastructure/StitchTrack.Infrastructure.csproj
           dotnet restore tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj
-          dotnet restore tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj
+          dotnet restore tests/StitchTrack.Integration.Tests/StitchTrack.Integration.Tests.csproj
 
       - name: Build projects
         run: |
@@ -39,4 +39,4 @@ jobs:
       - name: Run tests
         run: |
           dotnet test tests/StitchTrack.Domain.Tests/StitchTrack.Domain.Tests.csproj -c Release --no-restore --verbosity normal
-          dotnet test tests/StitchTrack.IntegrationTests/StitchTrack.IntegrationTests.csproj -c Release --no-restore --verbosity normal
+          dotnet test tests/StitchTrack.Integration.Tests/StitchTrack.Integration.Tests.csproj -c Release --no-restore --verbosity normal
