@@ -42,7 +42,7 @@ public partial class OnboardingPopup : Popup
     private async void OnEnableSyncClicked(object sender, EventArgs e)
     {
         // Phase 3 feature - show info message
-        await Microsoft.Maui.Controls.Application.Current!.MainPage!.DisplayAlert(
+        await Microsoft.Maui.Controls.Application.Current!.Windows[0].Page!.DisplayAlert(
             "Coming Soon",
             "Cloud backup & sync will be available in Phase 3! For now, your projects are safely stored locally on your device.",
             "OK");

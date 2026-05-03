@@ -11,9 +11,13 @@ public partial class App : Microsoft.Maui.Controls.Application
         ArgumentNullException.ThrowIfNull(hapticsService);
 
         InitializeComponent();
-        MainPage = new AppShell();
 
         _ = ApplyStoredSettingsAsync(settingsRepository, hapticsService);
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        return new Window(new AppShell());
     }
 
     /// <summary>

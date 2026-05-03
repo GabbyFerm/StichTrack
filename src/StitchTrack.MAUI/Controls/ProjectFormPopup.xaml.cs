@@ -122,7 +122,7 @@ public partial class ProjectFormPopup : Popup
     {
         try
         {
-            var action = await Microsoft.Maui.Controls.Application.Current!.MainPage!
+            var action = await Microsoft.Maui.Controls.Application.Current!.Windows[0].Page!
                 .DisplayActionSheet("Add Photo", "Cancel", null, "Take Photo", "Choose from Library");
 
             if (action == null || action == "Cancel") return;
@@ -232,7 +232,7 @@ public partial class ProjectFormPopup : Popup
 
     private static async Task ShowAlertAsync(string title, string message)
     {
-        await Microsoft.Maui.Controls.Application.Current!.MainPage!
+        await Microsoft.Maui.Controls.Application.Current!.Windows[0].Page!
             .DisplayAlert(title, message, "OK");
     }
 

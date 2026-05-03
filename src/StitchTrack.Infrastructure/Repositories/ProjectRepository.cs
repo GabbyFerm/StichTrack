@@ -88,23 +88,21 @@ public class ProjectRepository : IProjectRepository
             .ConfigureAwait(false);
     }
 
-    public async Task UpdateAsync(Project project)
+    public Task UpdateAsync(Project project)
     {
         ArgumentNullException.ThrowIfNull(project);
 
-        // If the project was loaded via GetByIdAsync in this same DbContext instance,
-        // EF Core is already tracking it and knows what changed.
-        // Calling Update() would override child entity states (e.g. Added → Modified)
-        // causing INSERT to become UPDATE on rows that don't exist yet.
-        var entry = _context.Entry(project);
-        if (entry.State == EntityState.Detached)
-        {
-            // Only attach and mark modified if not already tracked
-            _context.Projects.Update(project);
-        }
+        var existing = _context.ChangeTracker
+            .Entries<Project>()
+            .FirstOrDefault(e => e.Entity.Id == project.Id);
 
-        System.Diagnostics.Debug.WriteLine($"🔄 Project updated: {project.Name}");
-        await Task.CompletedTask.ConfigureAwait(false);
+        if (existing != null)
+            existing.State = EntityState.Detached;
+
+        // Attach and mark only the root entity as modified
+        // leaving child collections untouched
+        _context.Entry(project).State = EntityState.Modified;
+        return Task.CompletedTask;
     }
 
     public async Task UpdateCountAsync(Guid projectId, int newCount, DateTime updatedAt)
@@ -124,12 +122,15 @@ public class ProjectRepository : IProjectRepository
     /// </summary>
     public async Task ArchiveAsync(Guid id)
     {
-        var project = await GetByIdAsync(id).ConfigureAwait(false);
-        if (project != null)
-        {
-            project.ArchiveProject();
-            System.Diagnostics.Debug.WriteLine($"📦 Project soft-deleted (archived): {project.Name}");
-        }
+        // ExecuteUpdateAsync bypasses change tracker — safe with AsNoTracking queries
+        await _context.Projects
+            .Where(p => p.Id == id)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(p => p.IsArchived, true)
+                .SetProperty(p => p.UpdatedAt, DateTime.UtcNow))
+            .ConfigureAwait(false);
+
+        System.Diagnostics.Debug.WriteLine($"📦 Project archived: {id}");
     }
 
     /// <summary>

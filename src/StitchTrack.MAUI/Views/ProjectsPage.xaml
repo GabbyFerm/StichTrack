@@ -227,7 +227,8 @@
               <Grid ColumnDefinitions="80,*,Auto" ColumnSpacing="12">
 
                 <Grid.GestureRecognizers>
-                  <TapGestureRecognizer 
+                  <TapGestureRecognizer
+                    x:DataType="{x:Null}"
                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProjectsViewModel}}, Path=NavigateToProjectCommand}"
                     CommandParameter="{Binding Id}" />
                   </Grid.GestureRecognizers>
@@ -323,6 +324,7 @@
                   </Image.Source>
                   <Image.GestureRecognizers>
                     <TapGestureRecognizer
+                        x:DataType="{x:Null}"
                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProjectsViewModel}}, Path=ShowProjectMenuCommand}"
                         CommandParameter="{Binding .}" />
                   </Image.GestureRecognizers>

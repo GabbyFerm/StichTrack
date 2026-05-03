@@ -11,11 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.Infrastructure"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.MAUI", "src\StitchTrack.MAUI\StitchTrack.MAUI.csproj", "{51A90FB4-E9D6-4DA5-AD54-41425BCBF199}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.Domain.Tests", "tests\StitchTrack.Domain.Tests\StitchTrack.Domain.Tests.csproj", "{9B96DF15-6CB3-4FB1-9D3B-767576A94002}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.Application.Tests", "tests\StitchTrack.Application.Tests\StitchTrack.Application.Tests.csproj", "{86F429C9-7BC3-0E1D-DF22-AE7FA6379DD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.IntegrationTests", "tests\StitchTrack.IntegrationTests\StitchTrack.IntegrationTests.csproj", "{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.Domain.Tests", "tests\StitchTrack.Domain.Tests\StitchTrack.Domain.Tests.csproj", "{859AD485-DC13-8D8E-464E-B304E6352C8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.Application.Tests", "tests\StitchTrack.Application.Tests\StitchTrack.Application.Tests.csproj", "{22F9376B-BB74-4B83-85E4-950048C68B4D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchTrack.IntegrationTests", "tests\StitchTrack.Integration.Tests\StitchTrack.IntegrationTests.csproj", "{F465CC36-89D5-299F-304D-738B673B484C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,18 +41,18 @@ Global
 		{51A90FB4-E9D6-4DA5-AD54-41425BCBF199}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51A90FB4-E9D6-4DA5-AD54-41425BCBF199}.Release|Any CPU.Build.0 = Release|Any CPU
 		{51A90FB4-E9D6-4DA5-AD54-41425BCBF199}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{9B96DF15-6CB3-4FB1-9D3B-767576A94002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B96DF15-6CB3-4FB1-9D3B-767576A94002}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B96DF15-6CB3-4FB1-9D3B-767576A94002}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B96DF15-6CB3-4FB1-9D3B-767576A94002}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C05FCF7-E718-4A96-9F8A-CB3D8783EAF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{22F9376B-BB74-4B83-85E4-950048C68B4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{22F9376B-BB74-4B83-85E4-950048C68B4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{22F9376B-BB74-4B83-85E4-950048C68B4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{22F9376B-BB74-4B83-85E4-950048C68B4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86F429C9-7BC3-0E1D-DF22-AE7FA6379DD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86F429C9-7BC3-0E1D-DF22-AE7FA6379DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86F429C9-7BC3-0E1D-DF22-AE7FA6379DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86F429C9-7BC3-0E1D-DF22-AE7FA6379DD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{859AD485-DC13-8D8E-464E-B304E6352C8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{859AD485-DC13-8D8E-464E-B304E6352C8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{859AD485-DC13-8D8E-464E-B304E6352C8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{859AD485-DC13-8D8E-464E-B304E6352C8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F465CC36-89D5-299F-304D-738B673B484C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F465CC36-89D5-299F-304D-738B673B484C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F465CC36-89D5-299F-304D-738B673B484C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F465CC36-89D5-299F-304D-738B673B484C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

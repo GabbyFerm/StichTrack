@@ -8,6 +8,22 @@ namespace StitchTrack.MAUI.Services;
 /// </summary>
 public class MauiDialogService : IDialogService
 {
+    /// <summary>
+    /// Safe single-window page lookup.
+    /// Returns null during early startup or if no window is available.
+    /// </summary>
+    private static Page? GetCurrentPage()
+    {
+        var app = Microsoft.Maui.Controls.Application.Current;
+        if (app == null) return null;
+
+        // CA1826 suppressed: FirstOrDefault() is intentional here —
+        // Windows[0] throws if the collection is empty during early startup
+#pragma warning disable CA1826
+        return app.Windows.FirstOrDefault()?.Page;
+#pragma warning restore CA1826
+    }
+
     public async Task<string?> ShowPromptAsync(
         string title,
         string message,
@@ -19,14 +35,14 @@ public class MauiDialogService : IDialogService
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(message);
 
-        // Ensure we're on the main thread
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        var page = GetCurrentPage();
+        if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show prompt: MainPage is null");
+            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show prompt: no page available");
             return null;
         }
 
-        return await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayPromptAsync(
+        return await page.DisplayPromptAsync(
             title: title,
             message: message,
             accept: accept,
@@ -42,17 +58,14 @@ public class MauiDialogService : IDialogService
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(message);
 
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        var page = GetCurrentPage();
+        if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show alert: MainPage is null");
+            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show alert: no page available");
             return;
         }
 
-        await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayAlert(
-            title,
-            message,
-            cancel
-        ).ConfigureAwait(false);
+        await page.DisplayAlert(title, message, cancel).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -68,16 +81,15 @@ public class MauiDialogService : IDialogService
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(message);
 
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        var page = GetCurrentPage();
+        if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show confirm: MainPage is null");
+            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show confirm: no page available");
             return false;
         }
 
         return await MainThread.InvokeOnMainThreadAsync(async () =>
-            await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayAlert(
-                title, message, accept, cancel
-            )
+            await page.DisplayAlert(title, message, accept, cancel)
         );
     }
 
@@ -85,13 +97,13 @@ public class MauiDialogService : IDialogService
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        var page = GetCurrentPage();
+        if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show toast: MainPage is null");
+            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show toast: no page available");
             return;
         }
 
-        // CommunityToolkit Toast — auto-dismisses, no button needed
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
             var toast = CommunityToolkit.Maui.Alerts.Toast.Make(
@@ -115,9 +127,10 @@ public class MauiDialogService : IDialogService
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(cancel);
 
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        var page = GetCurrentPage();
+        if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show action sheet: MainPage is null");
+            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show action sheet: no page available");
             return null;
         }
 
@@ -125,9 +138,7 @@ public class MauiDialogService : IDialogService
 
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
-            result = await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayActionSheet(
-                title, cancel, destruction, buttons
-            );
+            result = await page.DisplayActionSheet(title, cancel, destruction, buttons);
         });
 
         return result == cancel ? null : result;

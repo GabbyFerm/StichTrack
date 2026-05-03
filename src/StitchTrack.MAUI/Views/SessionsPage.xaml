@@ -72,7 +72,7 @@
             </Label.GestureRecognizers>
           </Label>
 
-          <Label Grid.Column="1" Text="This Week" FontFamily="MontserratMedium" FontSize="14"
+          <Label Grid.Column="1" Text="Week" FontFamily="MontserratMedium" FontSize="14"
            HorizontalOptions="Center"
            TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
             <Label.Triggers>
@@ -86,7 +86,7 @@
             </Label.GestureRecognizers>
           </Label>
 
-          <Label Grid.Column="2" Text="This Month" FontFamily="MontserratMedium" FontSize="14"
+          <Label Grid.Column="2" Text="Month" FontFamily="MontserratMedium" FontSize="14"
            HorizontalOptions="Center"
            TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
             <Label.Triggers>

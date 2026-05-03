@@ -49,7 +49,7 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
             -d '{"content":"✅ **StitchTrack DEV** deployed successfully\nBranch: `${{ github.event.workflow_run.head_branch }}`\nCommit: `${{ github.event.workflow_run.head_sha }}`"}' \
-            ${{ vars.DISCORD_WEBHOOK_DEV }}
+            "${{ vars.DISCORD_WEBHOOK_DEV }}"
 
   deploy-prod:
     name: Deploy to Production
@@ -94,7 +94,7 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
             -d '{"content":"🚀 **StitchTrack PRODUCTION** deployed!\nVersion: `${{ github.event.workflow_run.head_sha }}`\n@everyone"}' \
-            ${{ vars.DISCORD_WEBHOOK_PROD }}
+            "${{ vars.DISCORD_WEBHOOK_DEV }}"
 
   notify-failure:
     name: Notify Build Failure
@@ -107,4 +107,4 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
             -d '{"content":"❌ **StitchTrack CI** failed\nBranch: `${{ github.event.workflow_run.head_branch }}`\nCheck: ${{ github.event.workflow_run.html_url }}"}' \
-            ${{ vars.DISCORD_WEBHOOK_DEV }}
+            "${{ vars.DISCORD_WEBHOOK_DEV }}"
