@@ -5,7 +5,7 @@ using StitchTrack.Domain.Entities;
 namespace StitchTrack.Domain.Tests.Entities;
 
 [TestFixture]
-internal class UserTests
+internal sealed class UserTests
 {
     [Test]
     public void CreateUser_WithValidDetails_ShouldInitializeCorrectly()

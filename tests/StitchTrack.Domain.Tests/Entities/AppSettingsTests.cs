@@ -5,7 +5,7 @@ using StitchTrack.Domain.Entities;
 namespace StitchTrack.Domain.Tests.Entities;
 
 [TestFixture]
-internal class AppSettingsTests
+internal sealed class AppSettingsTests
 {
     [Test]
     public void CreateDefault_ShouldHaveCorrectInitialState()

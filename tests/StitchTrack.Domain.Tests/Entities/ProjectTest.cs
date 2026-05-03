@@ -5,7 +5,7 @@ using StitchTrack.Domain.Entities;
 namespace StitchTrack.Domain.Tests.Entities;
 
 [TestFixture]
-internal class ProjectTests
+internal sealed class ProjectTests
 {
     [Test]
     public void Create_ShouldGenerateNewGuid_ForNewProject()

@@ -5,7 +5,7 @@ using StitchTrack.Domain.Entities;
 namespace StitchTrack.Domain.Tests.Entities;
 
 [TestFixture]
-internal class SessionTests
+internal sealed class SessionTests
 {
     [Test]
     public void StartSession_ShouldInitializeActiveSession()
