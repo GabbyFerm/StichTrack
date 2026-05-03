@@ -92,8 +92,6 @@ public class ProjectRepository : IProjectRepository
     {
         ArgumentNullException.ThrowIfNull(project);
 
-        // Detach any stale tracked instance with the same Id
-        // to avoid EF change tracking conflicts on repeated edits
         var existing = _context.ChangeTracker
             .Entries<Project>()
             .FirstOrDefault(e => e.Entity.Id == project.Id);
@@ -101,7 +99,9 @@ public class ProjectRepository : IProjectRepository
         if (existing != null)
             existing.State = EntityState.Detached;
 
-        _context.Projects.Update(project);
+        // Attach and mark only the root entity as modified
+        // leaving child collections untouched
+        _context.Entry(project).State = EntityState.Modified;
         return Task.CompletedTask;
     }
 
