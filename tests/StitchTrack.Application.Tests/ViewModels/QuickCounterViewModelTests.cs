@@ -9,7 +9,7 @@ using StitchTrack.Domain.Interfaces;
 namespace StitchTrack.Application.Tests.ViewModels;
 
 [TestFixture]
-internal class QuickCounterViewModelTests
+internal sealed class QuickCounterViewModelTests
 {
     private QuickCounterViewModel _viewModel;
     private Mock<IProjectRepository> _mockProjectRepo;

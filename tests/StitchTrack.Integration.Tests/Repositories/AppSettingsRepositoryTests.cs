@@ -7,7 +7,7 @@ using StitchTrack.Infrastructure.Repositories;
 namespace StitchTrack.IntegrationTests.Repositories;
 
 [TestFixture]
-internal class AppSettingsRepositoryTests
+internal sealed class AppSettingsRepositoryTests
 {
     private AppDbContext _context = null!;
     private AppSettingsRepository _repository = null!;
