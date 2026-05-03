@@ -17,6 +17,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     private readonly IAppSettingsRepository _settingsRepository;
     private readonly IHapticsService _hapticsService;
     private AppSettings? _settings;
+    private readonly SynchronizationContext? _syncContext;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -61,6 +62,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     public SettingsViewModel(IAppSettingsRepository settingsRepository, IHapticsService hapticsService)
     {
+        _syncContext = SynchronizationContext.Current;
         _settingsRepository = settingsRepository ?? throw new ArgumentNullException(nameof(settingsRepository));
         _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
 
@@ -84,7 +86,9 @@ public class SettingsViewModel : INotifyPropertyChanged
             // Sync haptics service with persisted setting
             _hapticsService.IsEnabled = _settings.HapticFeedbackEnabled;
 
-            OnPropertyChanged(string.Empty);
+            // Notify on UI thread so Switch binding updates correctly
+            UpdateOnUiThread(() => OnPropertyChanged(string.Empty));
+
             System.Diagnostics.Debug.WriteLine($"✅ Settings loaded — theme: {_settings.Theme}, haptics: {_settings.HapticFeedbackEnabled}");
         }
 #pragma warning disable CA1031
@@ -109,10 +113,14 @@ public class SettingsViewModel : INotifyPropertyChanged
 
         await SaveAsync().ConfigureAwait(false);
 
-        OnPropertyChanged(nameof(IsLightTheme));
-        OnPropertyChanged(nameof(IsAutoTheme));
-        OnPropertyChanged(nameof(IsDarkTheme));
-        OnPropertyChanged(nameof(ThemeDisplayText));
+        // Notify on UI thread so Switch binding updates correctly
+        UpdateOnUiThread(() =>
+        {
+            OnPropertyChanged(nameof(IsLightTheme));
+            OnPropertyChanged(nameof(IsAutoTheme));
+            OnPropertyChanged(nameof(IsDarkTheme));
+            OnPropertyChanged(nameof(ThemeDisplayText));
+        });
 
         System.Diagnostics.Debug.WriteLine($"🎨 Theme set to: {theme}");
     }
@@ -130,7 +138,9 @@ public class SettingsViewModel : INotifyPropertyChanged
 
         await SaveAsync().ConfigureAwait(false);
 
-        OnPropertyChanged(nameof(HapticFeedbackEnabled));
+        // Notify on UI thread so Switch binding updates correctly
+        UpdateOnUiThread(() => OnPropertyChanged(string.Empty));
+
         System.Diagnostics.Debug.WriteLine($"📳 Haptic feedback: {newValue}");
     }
 
@@ -165,4 +175,12 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    private void UpdateOnUiThread(Action action)
+    {
+        if (_syncContext != null)
+            _syncContext.Post(_ => action(), null);
+        else
+            action();
+    }
 }

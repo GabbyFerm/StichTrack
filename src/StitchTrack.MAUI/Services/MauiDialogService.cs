@@ -20,13 +20,13 @@ public class MauiDialogService : IDialogService
         ArgumentNullException.ThrowIfNull(message);
 
         // Ensure we're on the main thread
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        if (Microsoft.Maui.Controls.Application.Current?.Windows[0].Page == null)
         {
             System.Diagnostics.Debug.WriteLine("⚠️ Cannot show prompt: MainPage is null");
             return null;
         }
 
-        return await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayPromptAsync(
+        return await Microsoft.Maui.Controls.Application.Current.Windows[0].Page!.DisplayPromptAsync(
             title: title,
             message: message,
             accept: accept,
@@ -42,13 +42,13 @@ public class MauiDialogService : IDialogService
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(message);
 
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        if (Microsoft.Maui.Controls.Application.Current?.Windows[0].Page == null)
         {
             System.Diagnostics.Debug.WriteLine("⚠️ Cannot show alert: MainPage is null");
             return;
         }
 
-        await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayAlert(
+        await Microsoft.Maui.Controls.Application.Current.Windows[0].Page!.DisplayAlert(
             title,
             message,
             cancel
@@ -68,14 +68,14 @@ public class MauiDialogService : IDialogService
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(message);
 
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        if (Microsoft.Maui.Controls.Application.Current?.Windows[0].Page == null)
         {
             System.Diagnostics.Debug.WriteLine("⚠️ Cannot show confirm: MainPage is null");
             return false;
         }
 
         return await MainThread.InvokeOnMainThreadAsync(async () =>
-            await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayAlert(
+            await Microsoft.Maui.Controls.Application.Current.Windows[0].Page!.DisplayAlert(
                 title, message, accept, cancel
             )
         );
@@ -85,7 +85,7 @@ public class MauiDialogService : IDialogService
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        if (Microsoft.Maui.Controls.Application.Current?.Windows[0].Page == null)
         {
             System.Diagnostics.Debug.WriteLine("⚠️ Cannot show toast: MainPage is null");
             return;
@@ -115,7 +115,7 @@ public class MauiDialogService : IDialogService
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(cancel);
 
-        if (Microsoft.Maui.Controls.Application.Current?.MainPage == null)
+        if (Microsoft.Maui.Controls.Application.Current?.Windows[0].Page == null)
         {
             System.Diagnostics.Debug.WriteLine("⚠️ Cannot show action sheet: MainPage is null");
             return null;
@@ -125,7 +125,7 @@ public class MauiDialogService : IDialogService
 
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
-            result = await Microsoft.Maui.Controls.Application.Current.MainPage.DisplayActionSheet(
+            result = await Microsoft.Maui.Controls.Application.Current.Windows[0].Page!.DisplayActionSheet(
                 title, cancel, destruction, buttons
             );
         });

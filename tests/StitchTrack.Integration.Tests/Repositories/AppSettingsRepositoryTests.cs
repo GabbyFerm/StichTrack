@@ -1,15 +1,16 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 using StitchTrack.Infrastructure.Data;
 using StitchTrack.Infrastructure.Repositories;
 
 namespace StitchTrack.IntegrationTests.Repositories;
 
 [TestFixture]
-public class AppSettingsRepositoryTests
+internal class AppSettingsRepositoryTests
 {
-    private AppDbContext _context;
-    private AppSettingsRepository _repository;
+    private AppDbContext _context = null!;
+    private AppSettingsRepository _repository = null!;
 
     [SetUp]
     public void Setup()
@@ -144,13 +145,13 @@ public class AppSettingsRepositoryTests
     }
 
     [Test]
-    public void SaveAppSettingsAsync_WhenSettingsIsNull_ShouldThrowException()
+    public async Task SaveAppSettingsAsync_WhenSettingsIsNull_ShouldThrowException()
     {
         // Act
         Func<Task> act = async () => await _repository.SaveAppSettingsAsync(null!).ConfigureAwait(false);
 
         // Assert
-        act.Should().ThrowAsync<ArgumentNullException>();
+        await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
     }
 
     [Test]

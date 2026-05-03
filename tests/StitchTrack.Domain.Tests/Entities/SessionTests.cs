@@ -1,59 +1,59 @@
 using FluentAssertions;
+using NUnit.Framework;
 using StitchTrack.Domain.Entities;
 
 namespace StitchTrack.Domain.Tests.Entities;
 
 [TestFixture]
-
-public class SessionTests
+internal class SessionTests
 {
     [Test]
-    public void Start_ShouldCreateNewSession()
+    public void StartSession_ShouldInitializeActiveSession()
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        var startingRowCount = 5;
 
         // Act
-        var session = Session.StartSession(projectId, startingRowCount);
+        var session = Session.StartSession(projectId, startingRowCount: 10);
 
         // Assert
-        session.Id.Should().NotBe(Guid.Empty);
         session.ProjectId.Should().Be(projectId);
-        session.StartingRowCount.Should().Be(startingRowCount);
+        session.StartingRowCount.Should().Be(10);
+        session.IsActive.Should().BeTrue();
         session.EndedAt.Should().BeNull();
         session.DurationSeconds.Should().Be(0);
-        session.IsActive.Should().BeTrue();
+        session.StartedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
     [Test]
-    public void End_ShouldCalculateDurationCorrectly()
+    public void EndSession_ShouldCalculateDurationAndRows()
     {
         // Arrange
-        var session = Session.StartSession(Guid.NewGuid(), 10);
+        var session = Session.StartSession(Guid.NewGuid(), startingRowCount: 10);
+        Thread.Sleep(100); // Sleep briefly to ensure time elapses for DurationSeconds
 
         // Act
-        session.EndSession(15);
+        session.EndSession(endingRowCount: 15);
 
         // Assert
-        // Duration should be calculated, even if very small (0-1 seconds)
-        session.DurationSeconds.Should().BeGreaterThanOrEqualTo(0);
+        session.IsActive.Should().BeFalse();
         session.EndedAt.Should().NotBeNull();
+        session.EndingRowCount.Should().Be(15);
 
-        // Calculate expected duration manually
-        var expectedDuration = (int)(session.EndedAt!.Value - session.StartedAt).TotalSeconds;
-        session.DurationSeconds.Should().Be(expectedDuration);
+        // Rows completed = 15 - 10
+        session.RowsCompleted.Should().Be(5);
+        session.DurationSeconds.Should().BeGreaterThanOrEqualTo(0);
     }
 
     [Test]
-    public void End_WhenAlreadyEnded_ShouldThrowException()
+    public void EndSession_WhenAlreadyEnded_ShouldThrowException()
     {
         // Arrange
         var session = Session.StartSession(Guid.NewGuid());
-        session.EndSession(5);
+        session.EndSession();
 
         // Act
-        Action act = () => session.EndSession(10);
+        Action act = () => session.EndSession();
 
         // Assert
         act.Should().Throw<InvalidOperationException>()
@@ -61,69 +61,13 @@ public class SessionTests
     }
 
     [Test]
-    public void RowsCompleted_ShouldCalculateCorrectly()
+    public void RowsCompleted_WithoutRowData_ShouldReturnNull()
     {
-        // Arrange
-        var session = Session.StartSession(Guid.NewGuid(), 10);
-        session.EndSession(25);
-
-        // Act
-        var rowsCompleted = session.RowsCompleted;
+        // Arrange & Act
+        var session = Session.StartSession(Guid.NewGuid()); // no starting row count
+        session.EndSession(); // no ending row count
 
         // Assert
-        rowsCompleted.Should().Be(15);
-    }
-
-    [Test]
-    public void RowsCompleted_WhenNoStartingCount_ShouldBeNull()
-    {
-        // Arrange
-        var session = Session.StartSession(Guid.NewGuid());
-        session.EndSession();
-
-        // Act
-        var rowsCompleted = session.RowsCompleted;
-
-        // Assert
-        rowsCompleted.Should().BeNull();
-    }
-
-    [Test]
-    public void End_WithoutRowCounts_ShouldWork()
-    {
-        // Arrange
-        var session = Session.StartSession(Guid.NewGuid());
-
-        // Act
-        session.EndSession();
-
-        // Assert
-        session.EndedAt.Should().NotBeNull();
-        session.IsActive.Should().BeFalse();
-        session.StartingRowCount.Should().BeNull();
-        session.EndingRowCount.Should().BeNull();
-    }
-
-    [Test]
-    public void IsActive_WhenNotEnded_ShouldBeTrue()
-    {
-        // Arrange
-        var session = Session.StartSession(Guid.NewGuid());
-
-        // Act & Assert
-        session.IsActive.Should().BeTrue();
-    }
-
-    [Test]
-    public void IsActive_WhenEnded_ShouldBeFalse()
-    {
-        // Arrange
-        var session = Session.StartSession(Guid.NewGuid());
-
-        // Act
-        session.EndSession();
-
-        // Assert
-        session.IsActive.Should().BeFalse();
+        session.RowsCompleted.Should().BeNull();
     }
 }

@@ -1,10 +1,11 @@
 using FluentAssertions;
+using NUnit.Framework;
 using StitchTrack.Domain.Entities;
 
 namespace StitchTrack.Domain.Tests.Entities;
 
 [TestFixture]
-public class ProjectTests
+internal class ProjectTests
 {
     [Test]
     public void Create_ShouldGenerateNewGuid_ForNewProject()
