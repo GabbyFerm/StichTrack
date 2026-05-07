@@ -16,33 +16,12 @@
     <!-- TOP BAR:   Logo + Sync Icon                    -->
     <!-- ============================================ -->
     <Grid Grid.Row="0"
-          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-          Padding="30,30"
-          ColumnDefinitions="*,Auto"
-          ColumnSpacing="15">
-
-      <!-- Logo -->
-      <Image Grid.Column="0"
-             Source="logo.svg"
-             HeightRequest="35"
-             HorizontalOptions="Start"
-             Aspect="AspectFit" />
-
-      <!-- Sync Icon -->
-      <Image Grid.Column="1"
-             Source="refresh.svg"
-             HeightRequest="24"
-             WidthRequest="24"
-             HorizontalOptions="End"
-             VerticalOptions="Center">
-        <Image.Behaviors>
-          <toolkit:IconTintColorBehavior TintColor="White" />
-        </Image.Behaviors>
-        <Image.GestureRecognizers>
-          <TapGestureRecognizer Command="{Binding SyncCommand}" />
-        </Image.GestureRecognizers>
-      </Image>
-
+      BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+      Padding="30,30">
+      <Image Source="logo.svg"
+         HeightRequest="35"
+         HorizontalOptions="Start"
+         Aspect="AspectFit" />
     </Grid>
 
     <!-- ============================================ -->

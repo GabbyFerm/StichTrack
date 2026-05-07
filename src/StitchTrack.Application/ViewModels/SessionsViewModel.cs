@@ -214,9 +214,13 @@ public class SessionsViewModel : INotifyPropertyChanged
                 : startLocal.ToString("dd MMM, HH:mm",
                     System.Globalization.CultureInfo.InvariantCulture);
 
-            var rowsText = session.RowsCompleted.HasValue
-                ? $"Rows: {session.StartingRowCount} → {session.EndingRowCount} (+{session.RowsCompleted} rows)"
-                : string.Empty;
+            var rowsText = string.Empty;
+            if (session.RowsCompleted.HasValue)
+            {
+                var diff = session.EndingRowCount - session.StartingRowCount;
+                var sign = diff >= 0 ? "+" : "";  // negative already includes -
+                rowsText = $"Rows: {session.StartingRowCount} → {session.EndingRowCount} ({sign}{diff} rows)";
+            }
 
             RecentSessions.Add(new SessionDisplayItem
             {

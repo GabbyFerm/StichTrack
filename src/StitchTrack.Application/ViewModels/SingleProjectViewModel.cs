@@ -78,7 +78,7 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     // ─── Notes ────────────────────────────────────────────────────
 
     public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
-    public bool NotesCanExpand => HasNotes && (Notes?.Length ?? 0) > 150;
+    public bool NotesCanExpand => HasNotes && (Notes?.Split('\n').Length ?? 0) > 3;
     public int NotesMaxLines => _notesExpanded ? int.MaxValue : 3;
     public string NotesToggleText => _notesExpanded ? "See less ▲" : "See all notes ▼";
 
@@ -89,7 +89,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
     // ─── Commands ────────────────────────────────────────────────
 
-    public ICommand SyncCommand { get; }
     public ICommand ContinueCountingCommand { get; }
     public ICommand ViewPatternCommand { get; }
     public ICommand ToggleNotesCommand { get; }
@@ -108,7 +107,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
-        SyncCommand = new RelayCommand(OnSync);
         ContinueCountingCommand = new RelayCommand(OnContinueCounting);
         ViewPatternCommand = new RelayCommand(OnViewPattern);
         ToggleNotesCommand = new RelayCommand(OnToggleNotes);
@@ -136,6 +134,9 @@ public class SingleProjectViewModel : INotifyPropertyChanged
                 await _dialogService.ShowAlertAsync("Error", "Project not found").ConfigureAwait(false);
                 return;
             }
+
+            // Reset expand state on each load so notes display correctly after edit
+            _notesExpanded = false;
 
             OnPropertyChanged(string.Empty);
             System.Diagnostics.Debug.WriteLine($"✅ Project loaded: {_project.Name}");
@@ -185,8 +186,14 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             {
                 var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);
                 var fileSize = new FileInfo(result.PatternFilePath).Length;
+                var extension = Path.GetExtension(result.PatternFilePath);
+                var contentType = extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                                  extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                                  extension.Equals(".png", StringComparison.OrdinalIgnoreCase)
+                    ? "image/jpeg"
+                    : "application/pdf";
                 var pattern = PatternFile.CreatePatternFile(
-                    _project.Id, fileName, result.PatternFilePath, fileSize, "application/pdf");
+                    _project.Id, fileName, result.PatternFilePath, fileSize, contentType);
 
                 await _patternFileRepository.AddAsync(pattern).ConfigureAwait(false);
                 await _patternFileRepository.SaveChangesAsync().ConfigureAwait(false);
@@ -311,8 +318,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     }
 
     // ─── Other handlers ──────────────────────────────────────────
-
-    private void OnSync() => System.Diagnostics.Debug.WriteLine("🔄 Sync tapped - TODO Phase 3");
 
     private async void OnContinueCounting()
     {
