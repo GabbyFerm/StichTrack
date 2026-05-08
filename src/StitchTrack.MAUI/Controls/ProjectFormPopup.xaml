@@ -251,15 +251,19 @@
                   <RoundRectangle CornerRadius="8" />
                 </Border.StrokeShape>
 
-                <Editor x:Name="NotesEditor"
-                        Placeholder="Optional notes about this project..."
-                        FontFamily="MontserratRegular"
-                        FontSize="14"
-                        HeightRequest="100"
-                        Margin="12,8"
-                        AutoSize="Disabled"
-                        TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
-                        PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+                <ScrollView HeightRequest="160"
+                            Orientation="Vertical">
+                  <Editor x:Name="NotesEditor"
+                          Placeholder="Optional notes about this project..."
+                          FontFamily="MontserratRegular"
+                          FontSize="14"
+                          Margin="12,8"
+                          AutoSize="TextChanges"
+                          VerticalTextAlignment="Start"
+                          TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+                          PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+                </ScrollView>
+
               </Border>
 
             </VerticalStackLayout>

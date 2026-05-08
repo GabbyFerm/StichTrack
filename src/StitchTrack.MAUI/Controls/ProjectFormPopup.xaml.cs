@@ -180,27 +180,29 @@ public partial class ProjectFormPopup : Popup
     {
         try
         {
-            var options = new PickOptions
+            // Let user choose how to add the pattern
+            var choice = await ShowActionSheetAsync(
+                "Add Pattern",
+                "Cancel",
+                null,
+                "Take Photo",
+                "Choose Photo from Library",
+                "Choose PDF");
+
+            if (choice == null || choice == "Cancel") return;
+
+            switch (choice)
             {
-                PickerTitle = "Select PDF Pattern",
-                FileTypes = PdfFileType
-            };
-
-            var result = await FilePicker.Default.PickAsync(options);
-            if (result == null) return;
-
-            // Copy to app's local storage
-            _selectedPatternFilePath = await CopyFileToLocalStorageAsync(result.FullPath, "Patterns");
-
-            PatternLabel.Text = "📄 Pattern Added ✓";
-            PatternFileNameLabel.Text = result.FileName;
-            PatternFileNameLabel.IsVisible = true;
-
-            System.Diagnostics.Debug.WriteLine($"📄 Pattern saved: {_selectedPatternFilePath}");
-        }
-        catch (PermissionException)
-        {
-            await ShowAlertAsync("Permission Needed", "Please allow file access in Settings.");
+                case "Take Photo":
+                    await PickPatternPhotoAsync(useCamera: true);
+                    break;
+                case "Choose Photo from Library":
+                    await PickPatternPhotoAsync(useCamera: false);
+                    break;
+                case "Choose PDF":
+                    await PickPatternPdfAsync();
+                    break;
+            }
         }
 #pragma warning disable CA1031
         catch (Exception ex)
@@ -208,6 +210,58 @@ public partial class ProjectFormPopup : Popup
         {
             System.Diagnostics.Debug.WriteLine($"❌ Pattern upload error: {ex.Message}");
         }
+    }
+
+    private async Task PickPatternPhotoAsync(bool useCamera)
+    {
+        FileResult? result;
+        if (useCamera)
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                await ShowAlertAsync("Camera Not Available", "This device does not support taking photos.");
+                return;
+            }
+            var cameraStatus = await Microsoft.Maui.ApplicationModel.Permissions.RequestAsync<Microsoft.Maui.ApplicationModel.Permissions.Camera>();
+            if (cameraStatus != Microsoft.Maui.ApplicationModel.PermissionStatus.Granted)
+            {
+                await ShowAlertAsync("Camera Permission Needed", "Please allow camera access to take a pattern photo.");
+                return;
+            }
+            result = await MediaPicker.Default.CapturePhotoAsync();
+        }
+        else
+        {
+            result = await MediaPicker.Default.PickPhotoAsync();
+        }
+
+        if (result == null) return;
+
+        _selectedPatternFilePath = await CopyFileToLocalStorageAsync(result.FullPath, "Patterns");
+        PatternLabel.Text = "🖼️ Pattern Added ✓";
+        PatternFileNameLabel.Text = result.FileName;
+        PatternFileNameLabel.IsVisible = true;
+
+        System.Diagnostics.Debug.WriteLine($"🖼️ Pattern photo saved: {_selectedPatternFilePath}");
+    }
+
+    private async Task PickPatternPdfAsync()
+    {
+        var options = new PickOptions
+        {
+            PickerTitle = "Select PDF Pattern",
+            FileTypes = PdfFileType
+        };
+
+        var result = await FilePicker.Default.PickAsync(options);
+        if (result == null) return;
+
+        _selectedPatternFilePath = await CopyFileToLocalStorageAsync(result.FullPath, "Patterns");
+        PatternLabel.Text = "📄 Pattern Added ✓";
+        PatternFileNameLabel.Text = result.FileName;
+        PatternFileNameLabel.IsVisible = true;
+
+        System.Diagnostics.Debug.WriteLine($"📄 Pattern PDF saved: {_selectedPatternFilePath}");
     }
 
     /// <summary>
@@ -271,4 +325,16 @@ public partial class ProjectFormPopup : Popup
 
     private async void OnCancelClicked(object sender, EventArgs e)
         => await CloseAsync(null);
+
+    private static async Task<string?> ShowActionSheetAsync(
+    string title, string cancel, string? destruction, params string[] buttons)
+    {
+#pragma warning disable CA1826
+        var page = Microsoft.Maui.Controls.Application.Current?.Windows.FirstOrDefault()?.Page;
+#pragma warning restore CA1826
+        if (page == null) return null;
+
+        return await page.DisplayActionSheet(title, cancel, destruction, buttons)
+            .ConfigureAwait(true);
+    }
 }
