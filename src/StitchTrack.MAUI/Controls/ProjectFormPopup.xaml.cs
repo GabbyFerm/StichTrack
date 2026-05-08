@@ -214,9 +214,26 @@ public partial class ProjectFormPopup : Popup
 
     private async Task PickPatternPhotoAsync(bool useCamera)
     {
-        FileResult? result = useCamera
-            ? await MediaPicker.Default.CapturePhotoAsync()
-            : await MediaPicker.Default.PickPhotoAsync();
+        FileResult? result;
+        if (useCamera)
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                await ShowAlertAsync("Camera Not Available", "This device does not support taking photos.");
+                return;
+            }
+            var cameraStatus = await Microsoft.Maui.ApplicationModel.Permissions.RequestAsync<Microsoft.Maui.ApplicationModel.Permissions.Camera>();
+            if (cameraStatus != Microsoft.Maui.ApplicationModel.PermissionStatus.Granted)
+            {
+                await ShowAlertAsync("Camera Permission Needed", "Please allow camera access to take a pattern photo.");
+                return;
+            }
+            result = await MediaPicker.Default.CapturePhotoAsync();
+        }
+        else
+        {
+            result = await MediaPicker.Default.PickPhotoAsync();
+        }
 
         if (result == null) return;
 

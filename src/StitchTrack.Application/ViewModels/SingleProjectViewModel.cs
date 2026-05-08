@@ -187,11 +187,14 @@ public class SingleProjectViewModel : INotifyPropertyChanged
                 var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);
                 var fileSize = new FileInfo(result.PatternFilePath).Length;
                 var extension = Path.GetExtension(result.PatternFilePath);
-                var contentType = extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                                  extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-                                  extension.Equals(".png", StringComparison.OrdinalIgnoreCase)
-                    ? "image/jpeg"
-                    : "application/pdf";
+                var contentType = extension.ToUpperInvariant() switch
+                {
+                    ".jpg" => "image/jpeg",
+                    ".jpeg" => "image/jpeg",
+                    ".png" => "image/png",
+                    ".pdf" => "application/pdf",
+                    _ => "application/octet-stream"
+                };
                 var pattern = PatternFile.CreatePatternFile(
                     _project.Id, fileName, result.PatternFilePath, fileSize, contentType);
 

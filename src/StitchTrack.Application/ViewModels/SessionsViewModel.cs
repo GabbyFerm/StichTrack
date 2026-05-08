@@ -217,7 +217,7 @@ public class SessionsViewModel : INotifyPropertyChanged
             var rowsText = string.Empty;
             if (session.RowsCompleted.HasValue)
             {
-                var diff = session.EndingRowCount - session.StartingRowCount;
+                var diff = session.RowsCompleted.Value;
                 var sign = diff >= 0 ? "+" : "";  // negative already includes -
                 rowsText = $"Rows: {session.StartingRowCount} → {session.EndingRowCount} ({sign}{diff} rows)";
             }
