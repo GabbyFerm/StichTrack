@@ -341,13 +341,13 @@
 
           <!-- Save Progress — stays on page -->
           <Button Grid.Column="0"
-                  Text="SAVE PROGRESS"
+                  Text="SAVE CHECKPOING"
                   Style="{StaticResource SecondaryButton}"
                   Command="{Binding SaveProgressCommand}" />
 
           <!-- End Session — saves + navigates back -->
           <Button Grid.Column="1"
-                  Text="END SESSION"
+                  Text="FINISH &amp; SAVE SESSION"
                   Style="{StaticResource PrimaryButton}"
                   Command="{Binding EndSessionCommand}" />
 

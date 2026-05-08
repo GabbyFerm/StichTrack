@@ -63,6 +63,29 @@ public partial class ProjectCounterPage : ContentPage
         _sessionTimer = null;
     }
 
+    protected override bool OnBackButtonPressed()
+    {
+        if (_viewModel.IsSessionRunning)
+        {
+            // Ask user what to do before allowing navigation
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                var result = await DisplayAlert(
+                    "Active Session",
+                    "You have an active session. Do you want to save your progress before leaving?",
+                    "Save & Leave",
+                    "Leave Without Saving");
+
+                if (result)
+                    await _viewModel.SaveProgressAsync();
+
+                await Shell.Current.GoToAsync("..");
+            });
+            return true; // Intercept back navigation
+        }
+        return base.OnBackButtonPressed();
+    }
+
     /// <summary>
     /// Watches IsSessionRunning on the ViewModel and starts/stops the timer accordingly.
     /// Keeps timer lifecycle in the Page where it belongs.

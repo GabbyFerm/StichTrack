@@ -25,6 +25,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     private readonly ISessionRepository _sessionRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
+    private readonly IHapticsService _hapticsService = null!;
 
     private Project? _project;
     private Session? _currentSession;
@@ -112,8 +113,10 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         IProjectRepository projectRepository,
         ISessionRepository sessionRepository,
         IDialogService dialogService,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        IHapticsService hapticsService)
     {
+        hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _sessionRepository = sessionRepository ?? throw new ArgumentNullException(nameof(sessionRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
@@ -166,17 +169,16 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     private void OnIncrement()
     {
         if (_project == null) return;
-
-        // Entity method handles history recording
         _project.IncrementCount();
+        _hapticsService.Click();
         NotifyCounterChanged();
     }
 
     private void OnDecrement()
     {
         if (_project == null) return;
-
         _project.DecrementCount();
+        _hapticsService.Click();
         NotifyCounterChanged();
     }
 
@@ -255,7 +257,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     /// Saves the current count to the database.
     /// Stays on the page — session keeps running.
     /// </summary>
-    private async Task SaveProgressAsync()
+    public async Task SaveProgressAsync()
     {
         if (_project == null) return;
 
