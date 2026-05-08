@@ -367,44 +367,36 @@ internal sealed class QuickCounterViewModelTests
     [Test]
     public void HapticFeedback_ShouldBeTriggeredOnIncrement()
     {
-        // Arrange
-        var hapticTriggered = false;
-        _viewModel.TriggerHapticFeedback = () => hapticTriggered = true;
-
         // Act
         _viewModel.IncrementCommand.Execute(null);
 
         // Assert
-        hapticTriggered.Should().BeTrue("haptic should trigger on increment");
+        _mockHapticsService.Verify(x => x.Click(), Times.Once);
     }
 
     [Test]
     public void HapticFeedback_ShouldBeTriggeredOnDecrement()
     {
         // Arrange
-        var hapticTriggered = false;
-        _viewModel.TriggerHapticFeedback = () => hapticTriggered = true;
-        _viewModel.IncrementCommand.Execute(null); // Need to increment first
+        _viewModel.IncrementCommand.Execute(null);
 
         // Act
         _viewModel.DecrementCommand.Execute(null);
 
-        // Assert
-        hapticTriggered.Should().BeTrue("haptic should trigger on decrement");
+        // Assert — once for increment, once for decrement
+        _mockHapticsService.Verify(x => x.Click(), Times.Exactly(2));
     }
 
     [Test]
     public void HapticFeedback_ShouldBeTriggeredOnReset()
     {
         // Arrange
-        var hapticTriggered = false;
-        _viewModel.TriggerHapticFeedback = () => hapticTriggered = true;
-        _viewModel.IncrementCommand.Execute(null); // Increment first
+        _viewModel.IncrementCommand.Execute(null);
 
         // Act
         _viewModel.ResetCommand.Execute(null);
 
-        // Assert
-        hapticTriggered.Should().BeTrue("haptic should trigger on reset");
+        // Assert — once for increment, once for reset
+        _mockHapticsService.Verify(x => x.Click(), Times.Exactly(2));
     }
 }
