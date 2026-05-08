@@ -17,8 +17,7 @@ public static class ProjectColors
         "#F97316", // Orange
         "#EF4444", // Red
         "#EC4899", // Pink
-        "#14B8A6", // Teal
-        "#F59E0B"  // Amber
+        "#14B8A6" // Teal
     };
 
     /// <summary>

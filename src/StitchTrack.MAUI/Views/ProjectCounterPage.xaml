@@ -333,25 +333,12 @@
         </Border>
 
         <!-- ============================================ -->
-        <!-- BOTTOM BUTTONS: Save Progress | End Session  -->
+        <!-- BOTTOM BUTTON FULL WIDTH: Save Progress -->
         <!-- ============================================ -->
-        <Grid ColumnDefinitions="*,*"
-              ColumnSpacing="12"
-              Margin="0,24,0,32">
-
-          <!-- Save Progress — stays on page -->
-          <Button Grid.Column="0"
-                  Text="SAVE CHECKPOING"
-                  Style="{StaticResource SecondaryButton}"
-                  Command="{Binding SaveProgressCommand}" />
-
-          <!-- End Session — saves + navigates back -->
-          <Button Grid.Column="1"
-                  Text="FINISH &amp; SAVE SESSION"
-                  Style="{StaticResource PrimaryButton}"
-                  Command="{Binding EndSessionCommand}" />
-
-        </Grid>
+        <!-- Full width single button -->
+        <Button Text="SAVE &amp; GO BACK"
+                Style="{StaticResource PrimaryButton}"
+                Command="{Binding EndSessionCommand}" />
 
       </VerticalStackLayout>
 

@@ -116,11 +116,11 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         INavigationService navigationService,
         IHapticsService hapticsService)
     {
-        hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _sessionRepository = sessionRepository ?? throw new ArgumentNullException(nameof(sessionRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+        _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
 
         IncrementCommand = new RelayCommand(OnIncrement);
         DecrementCommand = new RelayCommand(OnDecrement);
@@ -298,7 +298,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
                 DateTime.UtcNow
             ).ConfigureAwait(false);
 
-            // Save the session if one was started
+            // Save the session record if one was started
             if (_currentSession != null)
             {
                 _currentSession.EndSession(_project.CurrentCount);
@@ -306,11 +306,15 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
                 await _sessionRepository.SaveChangesAsync().ConfigureAwait(false);
 
                 System.Diagnostics.Debug.WriteLine($"✅ Session ended: {_currentSession.DurationSeconds}s, rows {_currentSession.StartingRowCount}→{_currentSession.EndingRowCount}");
+
+                await _dialogService.ShowToastAsync($"Session saved — row {_project.CurrentCount}").ConfigureAwait(false);
+            }
+            else
+            {
+                await _dialogService.ShowToastAsync($"Progress saved — row {_project.CurrentCount}").ConfigureAwait(false);
             }
 
             IsSessionRunning = false;
-
-            await _dialogService.ShowToastAsync($"Session saved — row {_project.CurrentCount}").ConfigureAwait(false);
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031

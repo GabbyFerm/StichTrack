@@ -21,6 +21,8 @@ public partial class ProjectCounterPage : ContentPage
     private System.Timers.Timer? _sessionTimer;
     private TimeSpan _sessionDuration;
 
+    private bool _isHandlingBackPress;
+
     public ProjectCounterPage(ProjectCounterViewModel viewModel)
     {
         InitializeComponent();
@@ -65,23 +67,30 @@ public partial class ProjectCounterPage : ContentPage
 
     protected override bool OnBackButtonPressed()
     {
-        if (_viewModel.IsSessionRunning)
+        if (_viewModel.IsSessionRunning && !_isHandlingBackPress)
         {
-            // Ask user what to do before allowing navigation
-            MainThread.BeginInvokeOnMainThread(async () =>
+            _isHandlingBackPress = true;
+            _ = MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                var result = await DisplayAlert(
-                    "Active Session",
-                    "You have an active session. Do you want to save your progress before leaving?",
-                    "Save & Leave",
-                    "Leave Without Saving");
+                try
+                {
+                    var result = await DisplayAlert(
+                        "Active Session",
+                        "You have an active session. Save your progress before leaving?",
+                        "Save & Leave",
+                        "Leave Without Saving");
 
-                if (result)
-                    await _viewModel.SaveProgressAsync();
+                    if (result)
+                        await _viewModel.SaveProgressAsync();
 
-                await Shell.Current.GoToAsync("..");
+                    await Shell.Current.GoToAsync("..");
+                }
+                finally
+                {
+                    _isHandlingBackPress = false;
+                }
             });
-            return true; // Intercept back navigation
+            return true;
         }
         return base.OnBackButtonPressed();
     }
