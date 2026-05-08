@@ -54,12 +54,4 @@ public partial class QuickCounterPage : ContentPage
             System.Diagnostics.Debug.WriteLine($"❌ Popup cancelled: {ex.Message}");
         }
     }
-
-    /// <summary>
-    /// Sync icon tapped — Phase 3 placeholder.
-    /// </summary>
-    private async void OnSyncTapped(object sender, TappedEventArgs e)
-    {
-        await DisplayAlert("Sync", "Cloud sync coming in Phase 3!", "OK");
-    }
 }

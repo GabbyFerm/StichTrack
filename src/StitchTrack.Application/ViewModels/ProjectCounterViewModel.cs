@@ -90,7 +90,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
 
     // ─── Notes expand/collapse ───────────────────────────────────
 
-    public bool NotesCanExpand => HasNotes && (Notes?.Length ?? 0) > 150;
+    public bool NotesCanExpand => HasNotes && (Notes?.Split('\n').Length ?? 0) > 3;
     public int NotesMaxLines => _notesExpanded ? int.MaxValue : 3;
     public string NotesToggleText => _notesExpanded ? "See less ▲" : "See all notes ▼";
 
