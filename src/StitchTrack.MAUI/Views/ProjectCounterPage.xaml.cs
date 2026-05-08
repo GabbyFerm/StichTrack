@@ -21,6 +21,8 @@ public partial class ProjectCounterPage : ContentPage
     private System.Timers.Timer? _sessionTimer;
     private TimeSpan _sessionDuration;
 
+    private bool _isHandlingBackPress;
+
     public ProjectCounterPage(ProjectCounterViewModel viewModel)
     {
         InitializeComponent();
@@ -61,6 +63,36 @@ public partial class ProjectCounterPage : ContentPage
         StopTimer();
         _sessionTimer?.Dispose();
         _sessionTimer = null;
+    }
+
+    protected override bool OnBackButtonPressed()
+    {
+        if (_viewModel.IsSessionRunning && !_isHandlingBackPress)
+        {
+            _isHandlingBackPress = true;
+            _ = MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                try
+                {
+                    var result = await DisplayAlert(
+                        "Active Session",
+                        "You have an active session. Save your progress before leaving?",
+                        "Save & Leave",
+                        "Leave Without Saving");
+
+                    if (result)
+                        await _viewModel.SaveProgressAsync();
+
+                    await Shell.Current.GoToAsync("..");
+                }
+                finally
+                {
+                    _isHandlingBackPress = false;
+                }
+            });
+            return true;
+        }
+        return base.OnBackButtonPressed();
     }
 
     /// <summary>

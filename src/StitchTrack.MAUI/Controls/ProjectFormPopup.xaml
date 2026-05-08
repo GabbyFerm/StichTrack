@@ -86,6 +86,7 @@
                 </Border.StrokeShape>
 
                 <Entry x:Name="NameEntry"
+                       Keyboard="Text"
                        Placeholder="My Knitting Project"
                        FontFamily="MontserratRegular"
                        FontSize="14"
@@ -200,7 +201,7 @@
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
               <HorizontalStackLayout x:Name="ColorPickerContainer"
-                                     Spacing="12" />
+                                      Spacing="9" />
 
             </VerticalStackLayout>
 
@@ -252,6 +253,7 @@
                 <ScrollView HeightRequest="160"
                             Orientation="Vertical">
                   <Editor x:Name="NotesEditor"
+                          Keyboard="Text"
                           Placeholder="Optional notes about this project..."
                           FontFamily="MontserratRegular"
                           FontSize="14"

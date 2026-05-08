@@ -25,6 +25,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     private readonly ISessionRepository _sessionRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
+    private readonly IHapticsService _hapticsService = null!;
 
     private Project? _project;
     private Session? _currentSession;
@@ -112,12 +113,14 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         IProjectRepository projectRepository,
         ISessionRepository sessionRepository,
         IDialogService dialogService,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        IHapticsService hapticsService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _sessionRepository = sessionRepository ?? throw new ArgumentNullException(nameof(sessionRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+        _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
 
         IncrementCommand = new RelayCommand(OnIncrement);
         DecrementCommand = new RelayCommand(OnDecrement);
@@ -166,17 +169,16 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     private void OnIncrement()
     {
         if (_project == null) return;
-
-        // Entity method handles history recording
         _project.IncrementCount();
+        _hapticsService.Click();
         NotifyCounterChanged();
     }
 
     private void OnDecrement()
     {
         if (_project == null) return;
-
         _project.DecrementCount();
+        _hapticsService.Click();
         NotifyCounterChanged();
     }
 
@@ -255,7 +257,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     /// Saves the current count to the database.
     /// Stays on the page — session keeps running.
     /// </summary>
-    private async Task SaveProgressAsync()
+    public async Task SaveProgressAsync()
     {
         if (_project == null) return;
 
@@ -296,7 +298,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
                 DateTime.UtcNow
             ).ConfigureAwait(false);
 
-            // Save the session if one was started
+            // Save the session record if one was started
             if (_currentSession != null)
             {
                 _currentSession.EndSession(_project.CurrentCount);
@@ -304,11 +306,15 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
                 await _sessionRepository.SaveChangesAsync().ConfigureAwait(false);
 
                 System.Diagnostics.Debug.WriteLine($"✅ Session ended: {_currentSession.DurationSeconds}s, rows {_currentSession.StartingRowCount}→{_currentSession.EndingRowCount}");
+
+                await _dialogService.ShowToastAsync($"Session saved — row {_project.CurrentCount}").ConfigureAwait(false);
+            }
+            else
+            {
+                await _dialogService.ShowToastAsync($"Progress saved — row {_project.CurrentCount}").ConfigureAwait(false);
             }
 
             IsSessionRunning = false;
-
-            await _dialogService.ShowToastAsync($"Session saved — row {_project.CurrentCount}").ConfigureAwait(false);
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031

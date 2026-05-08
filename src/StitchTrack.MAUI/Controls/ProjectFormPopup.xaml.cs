@@ -76,8 +76,8 @@ public partial class ProjectFormPopup : Popup
         {
             var ring = new Border
             {
-                WidthRequest = 36,
-                HeightRequest = 36,
+                WidthRequest = 32,
+                HeightRequest = 32,
                 StrokeThickness = _selectedColorHex == hex ? 2 : 0,
                 Stroke = Color.FromArgb("#F59E0B"),
                 BackgroundColor = Colors.Transparent,
@@ -86,8 +86,8 @@ public partial class ProjectFormPopup : Popup
 
             var dot = new Border
             {
-                WidthRequest = 28,
-                HeightRequest = 28,
+                WidthRequest = 24,
+                HeightRequest = 24,
                 StrokeThickness = 0,
                 BackgroundColor = Color.FromArgb(hex),
                 HorizontalOptions = LayoutOptions.Center,
