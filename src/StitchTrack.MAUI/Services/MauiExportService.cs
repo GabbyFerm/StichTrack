@@ -30,7 +30,7 @@ public class MauiExportService : IExportService
 
     // ─── JSON Export ─────────────────────────────────────────────
 
-    public async Task ExportJsonAsync(bool includeArchived = false)
+    public async Task<int> ExportJsonAsync(bool includeArchived = false)
     {
         var projects = await _projectRepository
             .GetAllForExportAsync(includeArchived)
@@ -73,13 +73,14 @@ public class MauiExportService : IExportService
         var fileName = $"stitchtrack-export-{DateTime.Now:yyyy-MM-dd}.json";
 
         await WriteAndShareAsync(fileName, json, "application/json").ConfigureAwait(false);
-
         System.Diagnostics.Debug.WriteLine($"✅ JSON export complete: {fileName} ({projectList.Count} projects)");
+
+        return projectList.Count;
     }
 
     // ─── CSV Export ──────────────────────────────────────────────
 
-    public async Task ExportCsvAsync(bool includeArchived = false)
+    public async Task<int> ExportCsvAsync(bool includeArchived = false)
     {
         var projects = await _projectRepository
             .GetAllForExportAsync(includeArchived)
@@ -108,8 +109,9 @@ public class MauiExportService : IExportService
         var fileName = $"stitchtrack-export-{DateTime.Now:yyyy-MM-dd}.csv";
 
         await WriteAndShareAsync(fileName, csv.ToString(), "text/csv").ConfigureAwait(false);
-
         System.Diagnostics.Debug.WriteLine($"✅ CSV export complete: {fileName} ({projectList.Count} projects)");
+
+        return projectList.Count;
     }
 
     // ─── Helpers ─────────────────────────────────────────────────

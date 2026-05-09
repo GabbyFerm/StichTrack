@@ -10,11 +10,11 @@ public interface IExportService
     /// Exports all projects to a JSON file and opens the system share sheet.
     /// </summary>
     /// <param name="includeArchived">Whether to include archived projects in the export.</param>
-    Task ExportJsonAsync(bool includeArchived = false);
+    Task<int> ExportJsonAsync(bool includeArchived = false);
 
     /// <summary>
     /// Exports all projects to a CSV file and opens the system share sheet.
     /// </summary>
     /// <param name="includeArchived">Whether to include archived projects in the export.</param>
-    Task ExportCsvAsync(bool includeArchived = false);
+    Task<int> ExportCsvAsync(bool includeArchived = false);
 }

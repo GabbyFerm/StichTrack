@@ -76,11 +76,12 @@ public class ExportViewModel : INotifyPropertyChanged
     private async Task ExportJsonAsync()
     {
         if (_isExporting) return;
-
         try
         {
             IsExporting = true;
-            await _exportService.ExportJsonAsync(_includeArchived).ConfigureAwait(false);
+            var count = await _exportService.ExportJsonAsync(_includeArchived).ConfigureAwait(false);
+            if (count == 0)
+                await _dialogService.ShowToastAsync("No projects to export").ConfigureAwait(false);
         }
 #pragma warning disable CA1031
         catch (Exception ex)
@@ -101,11 +102,12 @@ public class ExportViewModel : INotifyPropertyChanged
     private async Task ExportCsvAsync()
     {
         if (_isExporting) return;
-
         try
         {
             IsExporting = true;
-            await _exportService.ExportCsvAsync(_includeArchived).ConfigureAwait(false);
+            var count = await _exportService.ExportCsvAsync(_includeArchived).ConfigureAwait(false);
+            if (count == 0)
+                await _dialogService.ShowToastAsync("No projects to export").ConfigureAwait(false);
         }
 #pragma warning disable CA1031
         catch (Exception ex)
