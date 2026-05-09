@@ -178,9 +178,7 @@
 
         </Border>
 
-        <!-- ============================================ -->
         <!-- SAVE TO PROJECT — full width, below card     -->
-        <!-- ============================================ -->
         <Border BackgroundColor="{StaticResource BrandGold}"
                 HeightRequest="52"
                 StrokeThickness="0"
@@ -210,6 +208,16 @@
                    VerticalOptions="Center" />
           </HorizontalStackLayout>
         </Border>
+
+        <!-- Explanatory text below Save to Project -->
+        <Label Text="Quick Counter is a one-off digital counter — like a manual click counter. Save to Project creates a new project with your current count."
+               FontFamily="MontserratRegular"
+               FontSize="12"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+               HorizontalOptions="Center"
+               HorizontalTextAlignment="Center"
+               Opacity="0.7"
+               Margin="0,4,0,0" />
 
       </VerticalStackLayout>
     </ScrollView>

@@ -92,7 +92,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     // ─── Notes expand/collapse ───────────────────────────────────
 
     public bool NotesCanExpand => HasNotes && (Notes?.Split('\n').Length ?? 0) > 3;
-    public int NotesMaxLines => _notesExpanded ? int.MaxValue : 3;
+    public int NotesMaxLines => _notesExpanded ? int.MaxValue : 6;
     public string NotesToggleText => _notesExpanded ? "See less ▲" : "See all notes ▼";
 
     // ─── Commands ────────────────────────────────────────────────
@@ -278,6 +278,32 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         {
             System.Diagnostics.Debug.WriteLine($"❌ Error saving progress: {ex.Message}");
             await _dialogService.ShowAlertAsync("Save Failed", "Could not save progress.").ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Silently saves the current count when the page disappears.
+    /// Covers swipe back and other navigation gestures that bypass OnBackButtonPressed.
+    /// </summary>
+    public async Task AutoSaveAsync()
+    {
+        if (_project == null) return;
+
+        try
+        {
+            await _projectRepository.UpdateCountAsync(
+                _project.Id,
+                _project.CurrentCount,
+                DateTime.UtcNow
+            ).ConfigureAwait(false);
+
+            System.Diagnostics.Debug.WriteLine($"💾 Auto-saved count: {_project.CurrentCount}");
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Auto-save failed: {ex.Message}");
         }
     }
 

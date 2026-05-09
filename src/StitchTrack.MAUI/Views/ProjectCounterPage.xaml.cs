@@ -63,6 +63,9 @@ public partial class ProjectCounterPage : ContentPage
         StopTimer();
         _sessionTimer?.Dispose();
         _sessionTimer = null;
+
+        // Auto-save count silently when leaving — covers swipe back gesture
+        _ = _viewModel.AutoSaveAsync();
     }
 
     protected override bool OnBackButtonPressed()
