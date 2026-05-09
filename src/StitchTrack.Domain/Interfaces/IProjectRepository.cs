@@ -35,6 +35,11 @@ public interface IProjectRepository
     Task<IEnumerable<Project>> GetArchivedProjectsAsync(Guid? userId = null);
 
     /// <summary>
+    /// Gets all projects with sessions included, for export.
+    /// </summary>
+    Task<IEnumerable<Project>> GetAllForExportAsync(bool includeArchived = false);
+
+    /// <summary>
     /// Updates an existing project.
     /// </summary>
     Task UpdateAsync(Project project);
