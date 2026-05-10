@@ -206,10 +206,10 @@
                FontFamily="MontserratRegular"
                FontSize="12"
                TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
-               HorizontalOptions="Center"
-               HorizontalTextAlignment="Center"
-               Opacity="0.7"
-               Margin="0,4,0,0" />
+               HorizontalOptions="Start"
+               HorizontalTextAlignment="Start"
+               Opacity="0.8"
+               Margin="10,4,10,0" />
 
       </VerticalStackLayout>
     </ScrollView>
