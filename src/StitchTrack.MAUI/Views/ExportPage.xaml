@@ -83,7 +83,7 @@
           <Image Grid.Column="0" WidthRequest="20" HeightRequest="20"
                  VerticalOptions="Start" Margin="0,2,0,0">
             <Image.Source>
-              <AppThemeBinding Light="file_on_light.svg" Dark="file_on_dark.svg" />
+              <AppThemeBinding Light="json_light.svg" Dark="json_dark.svg" />
             </Image.Source>
           </Image>
 
@@ -125,7 +125,7 @@
           <Image Grid.Column="0" WidthRequest="20" HeightRequest="20"
                  VerticalOptions="Start" Margin="0,2,0,0">
             <Image.Source>
-              <AppThemeBinding Light="file_on_light.svg" Dark="file_on_dark.svg" />
+              <AppThemeBinding Light="csv_light.svg" Dark="csv_dark.svg" />
             </Image.Source>
           </Image>
 

@@ -239,7 +239,7 @@
                          HeightRequest="16"
                          VerticalOptions="Center">
                     <Image.Source>
-                      <AppThemeBinding Light="undo_dark.svg" Dark="undo_light.svg" />
+                      <AppThemeBinding Light="undo_light.svg" Dark="undo_dark.svg" />
                     </Image.Source>
                   </Image>
                   <Label Text="Undo"
@@ -268,7 +268,7 @@
                          HeightRequest="16"
                          VerticalOptions="Center">
                     <Image.Source>
-                      <AppThemeBinding Light="reset_dark.svg" Dark="reset_light.svg" />
+                      <AppThemeBinding Light="reset_light.svg" Dark="reset_dark.svg" />
                     </Image.Source>
                   </Image>
                   <Label Text="Reset"
@@ -298,10 +298,18 @@
 
           <VerticalStackLayout Spacing="8">
 
-            <Label Text="📝 Notes"
-                   FontFamily="MontserratSemiBold"
-                   FontSize="14"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+            <HorizontalStackLayout Spacing="8">
+              <Image WidthRequest="16" HeightRequest="16" VerticalOptions="Center">
+                <Image.Source>
+                  <AppThemeBinding Light="notes_light.svg" Dark="notes_dark.svg" />
+                </Image.Source>
+              </Image>
+              <Label Text="Notes"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     VerticalOptions="Center"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+            </HorizontalStackLayout>
 
             <Label Text="{Binding Notes}"
                    FontFamily="MontserratRegular"

@@ -10,9 +10,7 @@
 
   <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0">
 
-    <!-- ============================================ -->
-    <!-- TOP BAR: Logo + Sync Icon                    -->
-    <!-- ============================================ -->
+    <!-- TOP BAR: Logo -->
     <Grid Grid.Row="0"
       BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
       Padding="30,30">
@@ -22,9 +20,7 @@
          Aspect="AspectFit" />
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- PAGE TITLE                                   -->
-    <!-- ============================================ -->
+    <!-- PAGE TITLE -->
     <Grid Grid.Row="1"
           BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
           HeightRequest="60"
@@ -33,15 +29,11 @@
              Style="{StaticResource HeaderTitle}" />
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- MAIN CONTENT                                 -->
-    <!-- ============================================ -->
+    <!-- MAIN CONTENT -->
     <ScrollView Grid.Row="2">
       <VerticalStackLayout Spacing="0" Padding="16">
 
-        <!-- ============================================ -->
         <!-- COUNTER CARD — number + all counter controls -->
-        <!-- ============================================ -->
         <Border Padding="20"
                 Margin="0,16,0,0"
                 StrokeThickness="0"
@@ -134,7 +126,7 @@
                          HeightRequest="16"
                          VerticalOptions="Center">
                     <Image.Source>
-                      <AppThemeBinding Light="undo_dark.svg" Dark="undo_light.svg" />
+                      <AppThemeBinding Light="undo_light.svg" Dark="undo_dark.svg" />
                     </Image.Source>
                   </Image>
                   <Label Text="Undo"
@@ -161,7 +153,7 @@
                          HeightRequest="16"
                          VerticalOptions="Center">
                     <Image.Source>
-                      <AppThemeBinding Light="reset_dark.svg" Dark="reset_light.svg" />
+                      <AppThemeBinding Light="reset_light.svg" Dark="reset_dark.svg" />
                     </Image.Source>
                   </Image>
                   <Label Text="Reset"
@@ -178,7 +170,7 @@
 
         </Border>
 
-        <!-- SAVE TO PROJECT — full width, below card     -->
+        <!-- SAVE TO PROJECT — full width, below card -->
         <Border BackgroundColor="{StaticResource BrandGold}"
                 HeightRequest="52"
                 StrokeThickness="0"
