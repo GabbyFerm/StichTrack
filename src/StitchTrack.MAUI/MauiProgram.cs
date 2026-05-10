@@ -54,6 +54,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IDialogService, MauiDialogService>();
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<IHapticsService, MauiHapticsService>();
+        builder.Services.AddTransient<IExportService, MauiExportService>();
 
         // VIEWMODELS
         builder.Services.AddTransient<QuickCounterViewModel>();
@@ -62,6 +63,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ProjectCounterViewModel>();
         builder.Services.AddTransient<SessionsViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<ExportViewModel>();
 
         // PAGES
         builder.Services.AddTransient<QuickCounterPage>();

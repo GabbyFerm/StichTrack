@@ -10,9 +10,7 @@
 
   <Grid RowDefinitions="Auto,*">
 
-    <!-- ============================================ -->
-    <!-- TOP BAR: Logo + Sync Icon                    -->
-    <!-- ============================================ -->
+    <!-- TOP BAR: Logo -->
     <Grid Grid.Row="0"
       BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
       Padding="30,30">
@@ -22,16 +20,12 @@
          Aspect="AspectFit" />
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- SCROLLABLE CONTENT                           -->
-    <!-- ============================================ -->
+    <!-- SCROLLABLE CONTENT  -->
     <ScrollView Grid.Row="1">
 
       <VerticalStackLayout Spacing="0">
 
-        <!-- ============================================ -->
-        <!-- PROJECT IMAGE — full width, no card          -->
-        <!-- ============================================ -->
+        <!-- PROJECT IMAGE — full width, no card -->
         <Grid HeightRequest="220">
 
           <Image Source="{Binding ImageUrl}"
@@ -60,9 +54,7 @@
 
         </Grid>
 
-        <!-- ============================================ -->
         <!-- PROJECT HEADER: Name + Color dot + Divider  -->
-        <!-- ============================================ -->
         <VerticalStackLayout Padding="20,16,20,0" Spacing="8">
 
           <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
@@ -96,9 +88,7 @@
 
         </VerticalStackLayout>
 
-        <!-- ============================================ -->
-        <!-- PROGRESS ROW + CONTINUE COUNTING BUTTON     -->
-        <!-- ============================================ -->
+        <!-- PROGRESS ROW + CONTINUE COUNTING BUTTON -->
         <VerticalStackLayout Padding="20,16,20,0" Spacing="16">
 
           <!-- Row progress in a single line -->
@@ -163,9 +153,7 @@
 
         </VerticalStackLayout>
 
-        <!-- ============================================ -->
         <!-- PATTERN SECTION (if exists) — flat, no card -->
-        <!-- ============================================ -->
         <VerticalStackLayout Padding="20,20,20,0"
                              Spacing="8"
                              IsVisible="{Binding HasPattern}">

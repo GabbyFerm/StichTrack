@@ -2,15 +2,15 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:StitchTrack.Application.ViewModels;assembly=StitchTrack.Application"
              x:Class="StitchTrack.MAUI.Views.ExportPage"
+             x:DataType="viewModels:ExportViewModel"
              BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
              Shell.NavBarIsVisible="False">
 
   <Grid RowDefinitions="Auto,Auto,*">
 
-    <!-- ============================================ -->
-    <!-- TOP BAR: Logo                                -->
-    <!-- ============================================ -->
+    <!-- TOP BAR: Logo -->
     <Grid Grid.Row="0"
           BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
           Padding="30,30">
@@ -20,39 +20,57 @@
              Aspect="AspectFit" />
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- HEADER: Icon + Title                         -->
-    <!-- ============================================ -->
+    <!-- HEADER: Icon + Title -->
     <Grid Grid.Row="1"
-      BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-      Padding="20,0,20,20">
-
+          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+          Padding="20,0,20,20">
       <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-        <Image Source="export.svg"
-           WidthRequest="22"
-           HeightRequest="22"
-           VerticalOptions="Center">
-          <Image.Behaviors>
-            <toolkit:IconTintColorBehavior TintColor="White" />
-          </Image.Behaviors>
+        <Image WidthRequest="22" HeightRequest="22" VerticalOptions="Center">
+          <Image.Source>
+            <AppThemeBinding Light="export_on_light.svg" Dark="export_on_dark.svg" />
+          </Image.Source>
         </Image>
         <Label Text="EXPORT"
-           Style="{StaticResource HeaderTitle}"
-           FontSize="20"
-           VerticalOptions="Center" />
+               Style="{StaticResource HeaderTitle}"
+               VerticalOptions="Center" />
       </HorizontalStackLayout>
-
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- CONTENT                                      -->
-    <!-- ============================================ -->
+    <!-- CONTENT -->
     <ScrollView Grid.Row="2">
       <VerticalStackLayout Spacing="0" Padding="20,24,20,32">
 
-        <!-- ============================================ -->
-        <!-- SECTION: Export Data                         -->
-        <!-- ============================================ -->
+        <!-- Export Options -->
+        <Label Text="Export Options"
+               FontFamily="MontserratBold"
+               FontSize="16"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+               Margin="0,0,0,16" />
+
+        <!-- Include archived checkbox -->
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,0,0,24">
+          <CheckBox Grid.Column="0"
+                    IsChecked="{Binding IncludeArchived}"
+                    Color="{StaticResource BrandGold}"
+                    VerticalOptions="Center" />
+          <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+            <Label Text="Include archived projects"
+                   FontFamily="MontserratMedium"
+                   FontSize="15"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+            <Label Text="Archived projects are excluded by default"
+                   FontFamily="MontserratRegular"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                   Opacity="0.6" />
+          </VerticalStackLayout>
+        </Grid>
+
+        <!-- Divider -->
+        <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
+                 Opacity="0.3" Margin="0,0,0,24" />
+
+        <!-- Export Data -->
         <Label Text="Export Data"
                FontFamily="MontserratBold"
                FontSize="16"
@@ -60,15 +78,10 @@
                Margin="0,0,0,16" />
 
         <!-- JSON Export row -->
-        <Grid ColumnDefinitions="Auto,*,Auto"
-              ColumnSpacing="12"
-              Margin="0,0,0,20">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,0,0,20">
 
-          <Image Grid.Column="0"
-                 WidthRequest="20"
-                 HeightRequest="20"
-                 VerticalOptions="Start"
-                 Margin="0,2,0,0">
+          <Image Grid.Column="0" WidthRequest="20" HeightRequest="20"
+                 VerticalOptions="Start" Margin="0,2,0,0">
             <Image.Source>
               <AppThemeBinding Light="json_light.svg" Dark="json_dark.svg" />
             </Image.Source>
@@ -78,48 +91,40 @@
             <Label Text="Export All Projects (JSON)"
                    FontFamily="MontserratMedium"
                    FontSize="15"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
-            <Label Text="Includes projects, sessions and counter history"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+            <Label Text="Includes projects and session history"
                    FontFamily="MontserratRegular"
                    FontSize="12"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                    Opacity="0.6" />
-            <Label Text="Coming in Phase 2"
-                   FontFamily="MontserratRegular"
-                   FontSize="12"
-                   TextColor="{StaticResource BrandGold}"
-                   Opacity="0.7" />
           </VerticalStackLayout>
 
-          <!-- Disabled export button -->
           <Border Grid.Column="2"
                   StrokeThickness="1"
-                  Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                  Stroke="{StaticResource BrandGold}"
                   BackgroundColor="Transparent"
                   Padding="12,8"
-                  Opacity="0.4"
-                  VerticalOptions="Center">
+                  VerticalOptions="Center"
+                  IsEnabled="{Binding IsNotExporting}">
             <Border.StrokeShape>
               <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ExportJsonCommand}" />
+            </Border.GestureRecognizers>
             <Label Text="EXPORT"
                    FontFamily="MontserratSemiBold"
                    FontSize="12"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+                   TextColor="{StaticResource BrandGold}" />
           </Border>
 
         </Grid>
 
         <!-- CSV Export row -->
-        <Grid ColumnDefinitions="Auto,*,Auto"
-              ColumnSpacing="12"
-              Margin="0,0,0,8">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,0,0,8">
 
-          <Image Grid.Column="0"
-                 WidthRequest="20"
-                 HeightRequest="20"
-                 VerticalOptions="Start"
-                 Margin="0,2,0,0">
+          <Image Grid.Column="0" WidthRequest="20" HeightRequest="20"
+                 VerticalOptions="Start" Margin="0,2,0,0">
             <Image.Source>
               <AppThemeBinding Light="csv_light.svg" Dark="csv_dark.svg" />
             </Image.Source>
@@ -129,38 +134,41 @@
             <Label Text="Export All Projects (CSV)"
                    FontFamily="MontserratMedium"
                    FontSize="15"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
-            <Label Text="Columns: Name, Rows, Total Rows, Notes, Created"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+            <Label Text="Columns: Name, CurrentCount, TotalRows, Notes, CreatedAt, IsArchived"
                    FontFamily="MontserratRegular"
                    FontSize="12"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                    Opacity="0.6" />
-            <Label Text="Coming in Phase 2"
-                   FontFamily="MontserratRegular"
-                   FontSize="12"
-                   TextColor="{StaticResource BrandGold}"
-                   Opacity="0.7" />
           </VerticalStackLayout>
 
-          <!-- Disabled export button -->
           <Border Grid.Column="2"
                   StrokeThickness="1"
-                  Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                  Stroke="{StaticResource BrandGold}"
                   BackgroundColor="Transparent"
                   Padding="12,8"
-                  Opacity="0.4"
-                  VerticalOptions="Center">
+                  VerticalOptions="Center"
+                  IsEnabled="{Binding IsNotExporting}">
             <Border.StrokeShape>
               <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ExportCsvCommand}" />
+            </Border.GestureRecognizers>
             <Label Text="EXPORT"
                    FontFamily="MontserratSemiBold"
                    FontSize="12"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+                   TextColor="{StaticResource BrandGold}" />
           </Border>
 
         </Grid>
 
+        <!-- Loading indicator while exporting -->
+        <ActivityIndicator IsRunning="{Binding IsExporting}"
+                           IsVisible="{Binding IsExporting}"
+                           Color="{StaticResource BrandGold}"
+                           HorizontalOptions="Center"
+                           Margin="0,16,0,0" />
 
       </VerticalStackLayout>
     </ScrollView>

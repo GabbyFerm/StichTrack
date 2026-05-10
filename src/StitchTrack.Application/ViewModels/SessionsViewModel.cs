@@ -52,6 +52,9 @@ public class SessionsViewModel : INotifyPropertyChanged
         private set { _isLoading = value; OnPropertyChanged(); }
     }
 
+    public bool HasMoreSessions => _activeFilter == SessionFilter.All
+        && _allSessions.Count > 10;
+
     // True when the filtered list has no sessions
     public bool IsEmpty
     {
@@ -206,7 +209,11 @@ public class SessionsViewModel : INotifyPropertyChanged
     {
         RecentSessions.Clear();
 
-        foreach (var session in sessions)
+        var displaySessions = _activeFilter == SessionFilter.All
+            ? sessions.Take(10)
+            : sessions;
+
+        foreach (var session in displaySessions)
         {
             var startLocal = session.StartedAt.ToLocalTime();
             var dateText = startLocal.Date == DateTime.Today
@@ -225,8 +232,8 @@ public class SessionsViewModel : INotifyPropertyChanged
             RecentSessions.Add(new SessionDisplayItem
             {
                 ProjectName = session.Project?.Name ?? "Unknown project",
-                DateText = dateText,
-                DurationText = $"Duration: {FormatDuration(TimeSpan.FromSeconds(session.DurationSeconds))}",
+                ImagePath = session.Project?.ImagePath,
+                DateText = $"{dateText}  |  Duration: {FormatDuration(TimeSpan.FromSeconds(session.DurationSeconds))}",
                 RowsText = rowsText
             });
         }
@@ -271,6 +278,8 @@ public class SessionsViewModel : INotifyPropertyChanged
 public class SessionDisplayItem
 {
     public string ProjectName { get; init; } = string.Empty;
+    public string? ImagePath { get; init; }
+    public bool HasImage => !string.IsNullOrWhiteSpace(ImagePath);
     public string DateText { get; init; } = string.Empty;
     public string DurationText { get; init; } = string.Empty;
     public string RowsText { get; init; } = string.Empty;
