@@ -88,12 +88,17 @@ public class ProjectRepository : IProjectRepository
             .ConfigureAwait(false);
     }
 
-    public async Task<IEnumerable<Project>> GetAllForExportAsync(bool includeArchived = false)
+    public async Task<List<Project>> GetAllForExportAsync(bool includeArchived = false, Guid? userId = null)
     {
         var query = _context.Projects
             .AsNoTracking()
             .Include(p => p.Sessions)
-            .Where(p => p.UserId == null);
+            .AsQueryable();
+
+        if (userId.HasValue)
+            query = query.Where(p => p.UserId == userId.Value);
+        else
+            query = query.Where(p => p.UserId == null);
 
         if (!includeArchived)
             query = query.Where(p => !p.IsArchived);

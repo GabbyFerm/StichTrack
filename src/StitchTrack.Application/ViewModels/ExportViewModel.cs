@@ -14,6 +14,7 @@ public class ExportViewModel : INotifyPropertyChanged
 {
     private readonly IExportService _exportService;
     private readonly IDialogService _dialogService;
+    private readonly SynchronizationContext? _syncContext;
     private bool _includeArchived;
     private bool _isExporting;
 
@@ -61,6 +62,8 @@ public class ExportViewModel : INotifyPropertyChanged
 
     public ExportViewModel(IExportService exportService, IDialogService dialogService)
     {
+        _syncContext = SynchronizationContext.Current;
+
         _exportService = exportService ?? throw new ArgumentNullException(nameof(exportService));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
@@ -95,7 +98,7 @@ public class ExportViewModel : INotifyPropertyChanged
         }
         finally
         {
-            IsExporting = false;
+            UpdateOnUiThread(() => IsExporting = false);
         }
     }
 
@@ -121,10 +124,18 @@ public class ExportViewModel : INotifyPropertyChanged
         }
         finally
         {
-            IsExporting = false;
+            UpdateOnUiThread(() => IsExporting = false);
         }
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    private void UpdateOnUiThread(Action action)
+    {
+        if (_syncContext != null)
+            _syncContext.Post(_ => action(), null);
+        else
+            action();
+    }
 }

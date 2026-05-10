@@ -1,5 +1,6 @@
 using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.Models;
+using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
 using System.Text;
 using System.Text.Json;
@@ -82,11 +83,9 @@ public class MauiExportService : IExportService
 
     public async Task<int> ExportCsvAsync(bool includeArchived = false)
     {
-        var projects = await _projectRepository
+        var projectList = (await _projectRepository
             .GetAllForExportAsync(includeArchived)
-            .ConfigureAwait(false);
-
-        var projectList = projects.ToList();
+            .ConfigureAwait(false)).ToList();
 
         var csv = new StringBuilder();
 
@@ -146,7 +145,8 @@ public class MauiExportService : IExportService
     {
         if (field.Contains(',', StringComparison.Ordinal) ||
             field.Contains('"', StringComparison.Ordinal) ||
-            field.Contains('\n', StringComparison.Ordinal))
+            field.Contains('\n', StringComparison.Ordinal) ||
+            field.Contains('\r', StringComparison.Ordinal))
             return $"\"{field.Replace("\"", "\"\"", StringComparison.Ordinal)}\"";
 
         return field;

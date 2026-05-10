@@ -104,7 +104,8 @@
                   Stroke="{StaticResource BrandGold}"
                   BackgroundColor="Transparent"
                   Padding="12,8"
-                  VerticalOptions="Center">
+                  VerticalOptions="Center"
+                  IsEnabled="{Binding IsNotExporting}">
             <Border.StrokeShape>
               <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
@@ -134,7 +135,7 @@
                    FontFamily="MontserratMedium"
                    FontSize="15"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
-            <Label Text="Columns: Name, Rows, Total Rows, Notes, Created"
+            <Label Text="Columns: Name, CurrentCount, TotalRows, Notes, CreatedAt, IsArchived"
                    FontFamily="MontserratRegular"
                    FontSize="12"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
@@ -146,7 +147,8 @@
                   Stroke="{StaticResource BrandGold}"
                   BackgroundColor="Transparent"
                   Padding="12,8"
-                  VerticalOptions="Center">
+                  VerticalOptions="Center"
+                  IsEnabled="{Binding IsNotExporting}">
             <Border.StrokeShape>
               <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>

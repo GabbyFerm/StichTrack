@@ -37,7 +37,7 @@ public interface IProjectRepository
     /// <summary>
     /// Gets all projects with sessions included, for export.
     /// </summary>
-    Task<IEnumerable<Project>> GetAllForExportAsync(bool includeArchived = false);
+    Task<List<Project>> GetAllForExportAsync(bool includeArchived = false, Guid? userId = null);
 
     /// <summary>
     /// Updates an existing project.
