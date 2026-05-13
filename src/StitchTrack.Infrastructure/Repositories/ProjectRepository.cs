@@ -30,6 +30,7 @@ public class ProjectRepository : IProjectRepository
     {
         return await _context.Projects
             .AsNoTracking()
+            .Include(p => p.Tags)
             .Include(p => p.CounterHistoryEntries)
             .Include(p => p.Sessions)
             .Include(p => p.PatternFiles)
@@ -49,6 +50,7 @@ public class ProjectRepository : IProjectRepository
     {
         var query = _context.Projects
         .AsNoTracking()
+        .Include(p => p.Tags)
         .Where(p => !p.IsArchived);
 
         if (userId.HasValue)
@@ -71,6 +73,7 @@ public class ProjectRepository : IProjectRepository
     {
         var query = _context.Projects
         .AsNoTracking()
+        .Include(p => p.Tags)
         .Where(p => p.IsArchived);
 
         if (userId.HasValue)
@@ -177,5 +180,23 @@ public class ProjectRepository : IProjectRepository
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
         System.Diagnostics.Debug.WriteLine($"💾 Saved {changes} changes to database");
         return changes;
+    }
+
+    public async Task UpdateTagsAsync(Guid projectId, IReadOnlyList<string> tagNames)
+    {
+        ArgumentNullException.ThrowIfNull(tagNames);
+
+        // Delete all existing tags for this project in one shot — no change tracking needed
+        await _context.ProjectTags
+            .Where(t => t.ProjectId == projectId)
+            .ExecuteDeleteAsync().ConfigureAwait(false);
+
+        // Re-insert with colors assigned by position
+        for (int i = 0; i < tagNames.Count; i++)
+        {
+            var tag = ProjectTag.Create(projectId, tagNames[i], i % TagColors.Palette.Length);
+            _context.ProjectTags.Add(tag);
+        }
+        // SaveChangesAsync is called by the caller
     }
 }

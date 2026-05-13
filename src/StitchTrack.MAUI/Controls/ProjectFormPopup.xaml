@@ -205,6 +205,97 @@
 
             </VerticalStackLayout>
 
+            <!-- Tags section -->
+            <VerticalStackLayout Spacing="8">
+
+              <Label Text="Tags"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+              <!-- Input row: Entry + Add button side by side -->
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+
+                <Border Grid.Column="0"
+                        StrokeThickness="1"
+                        Stroke="{StaticResource BrandGold}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                        Padding="0">
+                  <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                  </Border.StrokeShape>
+                  <Entry x:Name="TagEntry"
+                         Keyboard="Text"
+                         Placeholder="e.g. Knitting, Amigurumi..."
+                         FontFamily="MontserratRegular"
+                         FontSize="14"
+                         MaxLength="40"
+                         Margin="12,0"
+                         ReturnCommand="{x:Null}"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+                         PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
+                         Completed="OnTagEntryCompleted" />
+                </Border>
+
+                <!-- Small Add button — same height as the Entry border -->
+                <Border Grid.Column="1"
+                        StrokeThickness="0"
+                        BackgroundColor="{StaticResource BrandGold}"
+                        WidthRequest="44"
+                        HeightRequest="44">
+                  <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                  </Border.StrokeShape>
+                  <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAddTagTapped" />
+                  </Border.GestureRecognizers>
+                  <Label Text="+"
+                         FontFamily="MontserratBold"
+                         FontSize="22"
+                         TextColor="White"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center" />
+                </Border>
+
+              </Grid>
+
+              <!-- Chips are built in code-behind and added here -->
+              <FlexLayout x:Name="TagChipContainer"
+                          Wrap="Wrap"
+                          Direction="Row"
+                          JustifyContent="Start"
+                          AlignItems="Center"/>
+
+            </VerticalStackLayout>
+
+            <!-- Needle / Hook Size section -->
+            <VerticalStackLayout Spacing="8">
+
+              <Label Text="Needle / Hook Size"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+
+              <Border StrokeThickness="1"
+                      Stroke="{StaticResource BrandGold}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                      Padding="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Entry x:Name="NeedleSizeEntry"
+                       Keyboard="Text"
+                       Placeholder="e.g. 5.0mm, US 8, 4.5mm / G-6"
+                       FontFamily="MontserratRegular"
+                       FontSize="14"
+                       MaxLength="50"
+                       Margin="12,0"
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+              </Border>
+
+            </VerticalStackLayout>
+
             <!-- TOTAL ROWS (optional) -->
             <VerticalStackLayout Spacing="8">
 

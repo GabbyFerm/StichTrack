@@ -227,18 +227,26 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
         try
         {
-            // CreateProject sets the name and color; UpdateProjectDetails adds the rest
             var newProject = Project.CreateProject(result.Name, colorHex: result.ColorHex);
+
+            // Apply all optional detail fields, including the new ones
             newProject.UpdateProjectDetails(
                 colorHex: result.ColorHex,
                 totalRows: result.TotalRows,
-                notes: result.Notes
-            );
+                notes: result.Notes,
+                needleOrHookSize: result.NeedleOrHookSize);
 
             await _projectRepository.AddAsync(newProject).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            // Set project image if one was picked
+            // Sync tags separately — uses ExecuteDeleteAsync + re-insert to avoid
+            // change tracking issues (same strategy used for counter history)
+            if (result.Tags.Count > 0)
+            {
+                await _projectRepository.UpdateTagsAsync(newProject.Id, result.Tags).ConfigureAwait(false);
+                await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+            }
+
             if (!string.IsNullOrWhiteSpace(result.ImagePath))
             {
                 newProject.SetProjectImage(result.ImagePath);
@@ -246,7 +254,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
                 await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            // Save PDF pattern if one was picked
             if (!string.IsNullOrWhiteSpace(result.PatternFilePath))
             {
                 var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);
@@ -259,7 +266,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
             }
 
             System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Name}");
-
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{result.Name}' created!").ConfigureAwait(false);
         }
@@ -278,6 +284,9 @@ public class ProjectsViewModel : INotifyPropertyChanged
     /// <summary>
     /// Opens the form popup pre-filled with the project's current data.
     /// </summary>
+    /// <summary>
+    /// Opens the form popup pre-filled with the project's current data.
+    /// </summary>
     private async Task EditProjectAsync(Project project)
     {
         if (ShowProjectFormAsync == null)
@@ -286,7 +295,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
             return;
         }
 
-        // Pass the existing project so the popup pre-fills the form fields
         var result = await ShowProjectFormAsync(project).ConfigureAwait(false);
 
         if (result == null)
@@ -297,28 +305,30 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
         try
         {
-            // Apply domain methods — the entity controls all state changes
             project.Rename(result.Name);
             project.UpdateProjectDetails(
                 colorHex: result.ColorHex,
                 totalRows: result.TotalRows,
-                notes: result.Notes
-            );
+                notes: result.Notes,
+                needleOrHookSize: result.NeedleOrHookSize);
 
             await _projectRepository.UpdateAsync(project).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
+            // Always sync tags — UpdateTagsAsync handles the case where the list is empty
+            // (it will just delete all existing tags, which is correct)
+            await _projectRepository.UpdateTagsAsync(project.Id, result.Tags).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
             System.Diagnostics.Debug.WriteLine($"✅ Project updated: {project.Name}");
 
-            // Set project image if one was picked
             if (!string.IsNullOrWhiteSpace(result.ImagePath))
             {
-                project.SetProjectImage(result.ImagePath);  // ← project, not newProject
+                project.SetProjectImage(result.ImagePath);
                 await _projectRepository.UpdateAsync(project).ConfigureAwait(false);
                 await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            // Save PDF pattern if one was picked
             if (!string.IsNullOrWhiteSpace(result.PatternFilePath))
             {
                 var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);

@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Reminder> Reminders { get; set; } = null!;
     public DbSet<PatternFile> PatternFiles { get; set; } = null!;
     public DbSet<AppSettings> AppSettings { get; set; } = null!;
+    public DbSet<ProjectTag> ProjectTags { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

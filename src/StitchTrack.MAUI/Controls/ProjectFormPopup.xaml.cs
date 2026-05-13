@@ -16,6 +16,10 @@ public partial class ProjectFormPopup : Popup
     private string? _selectedPatternFilePath;
     private readonly bool _isEditMode;
 
+    // Tracks tag names in the order the user added them
+    private readonly List<string> _selectedTags = new();
+
+
     public ProjectFormPopup(Project? existingProject = null)
     {
         InitializeComponent();
@@ -54,6 +58,15 @@ public partial class ProjectFormPopup : Popup
                 PatternFileNameLabel.IsVisible = true;
                 PatternLabel.Text = "📄 Change Pattern";
             }
+
+            // Pre-fill needle/hook size
+            NeedleSizeEntry.Text = existingProject.NeedleOrHookSize;
+
+            // Pre-fill tags — project must be loaded with .Include(p => p.Tags)
+            foreach (var tag in existingProject.Tags.OrderBy(t => t.ColorIndex))
+                _selectedTags.Add(tag.Name);
+
+            BuildTagChips();
         }
     }
 
@@ -111,6 +124,104 @@ public partial class ProjectFormPopup : Popup
         _selectedColorHex = hex;
         BuildColorPicker();
     }
+
+    /// <summary>
+    /// Called when the user taps the "+" button next to the tag entry.
+    /// </summary>
+    private void OnAddTagTapped(object sender, TappedEventArgs e)
+        => TryAddCurrentTag();
+
+    /// <summary>
+    /// Called when the user presses Return/Enter in the tag entry field.
+    /// </summary>
+    private void OnTagEntryCompleted(object sender, EventArgs e)
+        => TryAddCurrentTag();
+
+    /// <summary>
+    /// Reads the tag entry, validates, adds to the list, and rebuilds chips.
+    /// </summary>
+    private void TryAddCurrentTag()
+    {
+        var name = TagEntry.Text?.Trim();
+
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        // Silently ignore duplicate tag names (case-insensitive)
+        if (_selectedTags.Any(t => t.Equals(name, StringComparison.OrdinalIgnoreCase)))
+        {
+            TagEntry.Text = string.Empty;
+            return;
+        }
+
+        _selectedTags.Add(name);
+        TagEntry.Text = string.Empty;
+        BuildTagChips();
+    }
+
+    /// <summary>
+    /// Rebuilds the chip FlexLayout from _selectedTags.
+    /// Called after every add or remove so the UI stays in sync.
+    /// </summary>
+    private void BuildTagChips()
+    {
+        TagChipContainer.Children.Clear();
+
+        for (int i = 0; i < _selectedTags.Count; i++)
+        {
+            var tagName = _selectedTags[i];
+
+            // Color cycles through TagColors.Palette by position
+            var colorHex = TagColors.GetColor(i);
+
+            // The chip: colored pill with tag name + × button
+            var chip = new Border
+            {
+                StrokeThickness = 0,
+                BackgroundColor = Color.FromArgb(colorHex),
+                Padding = new Thickness(10, 5),
+                Margin = new Thickness(0, 0, 6, 6),
+                StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+                {
+                    CornerRadius = new CornerRadius(12)
+                }
+            };
+
+            var row = new HorizontalStackLayout { Spacing = 6 };
+
+            row.Children.Add(new Label
+            {
+                Text = tagName,
+                FontFamily = "MontserratMedium",
+                FontSize = 12,
+                TextColor = Colors.White,
+                VerticalOptions = LayoutOptions.Center
+            });
+
+            // × button — removes this specific tag
+            var removeLabel = new Label
+            {
+                Text = "×",
+                FontFamily = "MontserratBold",
+                FontSize = 14,
+                TextColor = Colors.White,
+                VerticalOptions = LayoutOptions.Center
+            };
+
+            var capturedName = tagName; // capture for the closure
+            var removeTap = new TapGestureRecognizer();
+            removeTap.Tapped += (_, _) =>
+            {
+                _selectedTags.Remove(capturedName);
+                BuildTagChips(); // rebuild so colors re-index correctly
+            };
+            removeLabel.GestureRecognizers.Add(removeTap);
+            row.Children.Add(removeLabel);
+
+            chip.Content = row;
+            TagChipContainer.Children.Add(chip);
+        }
+    }
+
 
     // ─── File pickers ─────────────────────────────────────────────
 
@@ -315,6 +426,8 @@ public partial class ProjectFormPopup : Popup
             ColorHex: _selectedColorHex,
             TotalRows: totalRows,
             Notes: string.IsNullOrWhiteSpace(NotesEditor.Text) ? null : NotesEditor.Text.Trim(),
+            NeedleOrHookSize: string.IsNullOrWhiteSpace(NeedleSizeEntry.Text) ? null : NeedleSizeEntry.Text.Trim(),
+            Tags: _selectedTags.AsReadOnly(),  // snapshot of the current tag list
             ImagePath: _selectedImagePath,
             PatternFilePath: _selectedPatternFilePath,
             PatternFileName: PatternFileNameLabel.Text

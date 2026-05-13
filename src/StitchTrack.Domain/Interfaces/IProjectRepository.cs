@@ -40,6 +40,13 @@ public interface IProjectRepository
     Task<List<Project>> GetAllForExportAsync(bool includeArchived = false, Guid? userId = null);
 
     /// <summary>
+    /// Replaces all tags for a project with the provided list.
+    /// Assigns colors by position (index % TagColors.Palette.Length).
+    /// Caller must call SaveChangesAsync() afterwards.
+    /// </summary>
+    Task UpdateTagsAsync(Guid projectId, IReadOnlyList<string> tagNames);
+
+    /// <summary>
     /// Updates an existing project.
     /// </summary>
     Task UpdateAsync(Project project);

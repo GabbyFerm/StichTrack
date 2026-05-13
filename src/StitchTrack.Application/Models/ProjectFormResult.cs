@@ -9,6 +9,8 @@ public record ProjectFormResult(
     string? ColorHex,
     int? TotalRows,
     string? Notes,
+    string? NeedleOrHookSize,
+    IReadOnlyList<string> Tags,
     string? ImagePath,
     string? PatternFilePath,
     string? PatternFileName
