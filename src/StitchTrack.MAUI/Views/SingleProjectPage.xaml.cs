@@ -18,8 +18,10 @@ public partial class SingleProjectPage : ContentPage
         _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         BindingContext = _viewModel;
 
-        // Wire popup callback — same pattern as ProjectsPage
         _viewModel.ShowProjectFormAsync = ShowProjectFormPopupAsync;
+
+        // Rebuild dynamic file grids when the project reloads after an edit
+        _viewModel.PropertyChanged += OnViewModelPropertyChanged;
 
         _viewModel.OpenFileAsync = async (filePath) =>
         {
@@ -174,5 +176,20 @@ public partial class SingleProjectPage : ContentPage
         });
 
         return formResult;
+    }
+
+    /// <summary>
+    /// Rebuilds dynamic file grids when the ViewModel signals a full property refresh.
+    /// OnPropertyChanged(string.Empty) fires at the end of LoadProjectAsync —
+    /// this covers the case where edit closes a popup without triggering OnAppearing.
+    /// </summary>
+    private void OnViewModelPropertyChanged(object? sender,
+        System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.PropertyName))
+        {
+            BuildFilesGrid(PatternFilesGrid, _viewModel.PatternFiles);
+            BuildFilesGrid(InspirationPhotosGrid, _viewModel.InspirationPhotos);
+        }
     }
 }
