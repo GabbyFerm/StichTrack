@@ -36,7 +36,7 @@ public class Project
     public ICollection<Session> Sessions { get; private set; } = new List<Session>();
     public ICollection<CounterHistory> CounterHistoryEntries { get; private set; } = new List<CounterHistory>();
     public ICollection<RowNote> RowNotes { get; private set; } = new List<RowNote>();
-    public ICollection<PatternFile> PatternFiles { get; private set; } = new List<PatternFile>();
+    public ICollection<ProjectFile> ProjectFiles { get; private set; } = new List<ProjectFile>();
     public ICollection<Reminder> Reminders { get; private set; } = new List<Reminder>();
 
     // Tags owned by this project — loaded via .Include(p => p.Tags)
@@ -155,7 +155,7 @@ public class Project
         int? totalRows = null,
         int? rowsPerRepeat = null,
         string? notes = null,
-        string? needleOrHookSize = null) 
+        string? needleOrHookSize = null)
     {
         ColorHex = colorHex;
         TotalRows = totalRows;

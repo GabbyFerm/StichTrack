@@ -98,97 +98,144 @@
 
             </VerticalStackLayout>
 
-            <!-- PHOTO + PATTERN UPLOAD — side by side -->
-            <VerticalStackLayout Spacing="8">
+            <!-- ── Cover Photo ─────────────────────────────────────────── -->
+            <VerticalStackLayout Spacing="6">
 
-              <Label Text="Files"
+              <Label Text="Cover Photo"
                      FontFamily="MontserratSemiBold"
                      FontSize="14"
-                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                       Dark={StaticResource DarkTextPrimary}}" />
 
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+              <Label Text="Shown as the project thumbnail"
+                     FontFamily="MontserratRegular"
+                     FontSize="12"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                       Dark={StaticResource DarkTextSecondary}}" />
 
-                <!-- Photo Upload Button -->
-                <Border Grid.Column="0"
-                        StrokeThickness="0"
-                        BackgroundColor="{StaticResource BrandGold}"
-                        Padding="12,10">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="8" />
-                    </Border.StrokeShape>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnPhotoUploadTapped" />
-                    </Border.GestureRecognizers>
+              <Border StrokeThickness="0"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource ButtonSecondary}, Dark={StaticResource ButtonSecondaryDark}}"
+                      Padding="12,10">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Tapped="OnPhotoUploadTapped" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+                  <Image Source="camera.svg"
+                         WidthRequest="16"
+                         HeightRequest="16"
+                         VerticalOptions="Center">
+                    <Image.Behaviors>
+                      <toolkit:IconTintColorBehavior TintColor="White" />
+                    </Image.Behaviors>
+                  </Image>
+                  <Label x:Name="PhotoLabel"
+                         Text="Add Cover Photo"
+                         FontFamily="MontserratMedium"
+                         FontSize="12"
+                         TextColor="White"
+                         VerticalOptions="Center" />
+                </HorizontalStackLayout>
+              </Border>
 
-                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                        <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
-                            <Image Source="camera.svg"
-                                   WidthRequest="16"
-                                   HeightRequest="16"
-                                   VerticalOptions="Center">
-                                <Image.Behaviors>
-                                    <toolkit:IconTintColorBehavior TintColor="White" />
-                                </Image.Behaviors>
-                            </Image>
-                            <Label x:Name="PhotoLabel"
-                                   Text="Add Photo"
-                                   FontFamily="MontserratMedium"
-                                   FontSize="12"
-                                   TextColor="White"
-                                   VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <Label x:Name="PhotoFileNameLabel"
-                               Text=""
-                               FontFamily="MontserratRegular"
-                               FontSize="10"
-                               TextColor="White"
-                               HorizontalOptions="Center"
-                               LineBreakMode="TailTruncation"
-                               IsVisible="False" />
-                    </VerticalStackLayout>
-                </Border>
+              <!-- Shown below the button once a photo is selected -->
+              <Label x:Name="PhotoFileNameLabel"
+                     FontFamily="MontserratRegular"
+                     FontSize="11"
+                     TextColor="{StaticResource BrandGold}"
+                     IsVisible="False" />
 
-                <!-- PDF Pattern Upload Button -->
-                <Border Grid.Column="1"
-                        StrokeThickness="0"
-                        BackgroundColor="{StaticResource BrandGold}"
-                        Padding="12,10">
-                        <Border.StrokeShape>
-                          <RoundRectangle CornerRadius="8" />
-                        </Border.StrokeShape>
-                        <Border.GestureRecognizers>
-                          <TapGestureRecognizer Tapped="OnPatternUploadTapped" />
-                        </Border.GestureRecognizers>
+            </VerticalStackLayout>
 
-                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                          <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
-                            <Image Source="file.svg"
-                                    WidthRequest="16"
-                                    HeightRequest="16"
-                                    VerticalOptions="Center">
-                              <Image.Behaviors>
-                                <toolkit:IconTintColorBehavior TintColor="White" />
-                              </Image.Behaviors>
-                            </Image>
-                            <Label x:Name="PatternLabel"
-                                    Text="Add Pattern"
-                                    FontFamily="MontserratMedium"
-                                    FontSize="12"
-                                    TextColor="White"
-                                    VerticalOptions="Center" />
-                          </HorizontalStackLayout>
-                          <Label x:Name="PatternFileNameLabel"
-                                  Text=""
-                                  FontFamily="MontserratRegular"
-                                  FontSize="10"
-                                  TextColor="White"
-                                  HorizontalOptions="Center"
-                                  LineBreakMode="TailTruncation"
-                                  IsVisible="False" />
-                        </VerticalStackLayout>
-                </Border>
+            <!-- ── Pattern Files ──────────────────────────────────────────────── -->
+            <VerticalStackLayout Spacing="6">
 
-              </Grid>
+              <Label Text="Pattern Files"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                       Dark={StaticResource DarkTextPrimary}}" />
+
+              <Label Text="PDF or photo of your pattern"
+                     FontFamily="MontserratRegular"
+                     FontSize="12"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                       Dark={StaticResource DarkTextSecondary}}" />
+
+              <Border StrokeThickness="0"
+                      BackgroundColor="{AppThemeBinding Light=#424B54, Dark=#5E6B76}"
+                      Padding="12,10">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Tapped="OnAddPatternFileTapped" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+                  <Image Source="file.svg"
+                         WidthRequest="16" HeightRequest="16"
+                         VerticalOptions="Center">
+                    <Image.Behaviors>
+                      <toolkit:IconTintColorBehavior TintColor="White" />
+                    </Image.Behaviors>
+                  </Image>
+                  <Label Text="Add Pattern"
+                         FontFamily="MontserratMedium"
+                         FontSize="12"
+                         TextColor="White"
+                         VerticalOptions="Center" />
+                </HorizontalStackLayout>
+              </Border>
+
+              <!-- 2-column chip grid built in code-behind -->
+              <VerticalStackLayout x:Name="PatternFilesContainer" Spacing="8" />
+
+            </VerticalStackLayout>
+
+            <!-- ── Inspiration Photos ─────────────────────────────────────────── -->
+            <VerticalStackLayout Spacing="6">
+
+              <Label Text="Inspiration Photos"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                       Dark={StaticResource DarkTextPrimary}}" />
+
+              <Label Text="Photos for inspiration or reference"
+                     FontFamily="MontserratRegular"
+                     FontSize="12"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                       Dark={StaticResource DarkTextSecondary}}" />
+
+              <Border StrokeThickness="0"
+                      BackgroundColor="{AppThemeBinding Light=#424B54, Dark=#5E6B76}"
+                      Padding="12,10">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Tapped="OnAddInspirationPhotoTapped" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+                  <Image Source="camera.svg"
+                         WidthRequest="16" HeightRequest="16"
+                         VerticalOptions="Center">
+                    <Image.Behaviors>
+                      <toolkit:IconTintColorBehavior TintColor="White" />
+                    </Image.Behaviors>
+                  </Image>
+                  <Label Text="Add Photo"
+                         FontFamily="MontserratMedium"
+                         FontSize="12"
+                         TextColor="White"
+                         VerticalOptions="Center" />
+                </HorizontalStackLayout>
+              </Border>
+
+              <!-- 2-column chip grid built in code-behind -->
+              <VerticalStackLayout x:Name="InspirationPhotosContainer" Spacing="8" />
 
             </VerticalStackLayout>
 

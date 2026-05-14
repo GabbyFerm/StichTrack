@@ -50,13 +50,18 @@
   <Color x:Key="TextWhite">#ffffff</Color>
 
   <!-- ============================================ -->
-  <!-- BUTTON COLORS (Same in Both Modes)           -->
+  <!-- BUTTON COLORS -->
   <!-- ============================================ -->
+  <!-- BUTTON COLORS -->
   <Color x:Key="ButtonIncrease">#E1AD37</Color>
   <Color x:Key="ButtonDecrease">#424B54</Color>
+  <!-- light mode only -->
+  <Color x:Key="ButtonSecondary">#424B54</Color>
+  <!-- light mode only -->
+  <Color x:Key="ButtonSecondaryDark">#5E6B76</Color>
+  <!-- dark mode for both Decrease and Secondary -->
   <Color x:Key="ButtonCancel">#EB9057</Color>
   <Color x:Key="ButtonPrimary">#E1AD37</Color>
-  <Color x:Key="ButtonSecondary">#424B54</Color>
   <Color x:Key="ButtonTextOnGold">#FFFFFF</Color>
   <Color x:Key="ButtonTextOnDark">#FFFFFF</Color>
 

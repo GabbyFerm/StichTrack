@@ -41,6 +41,9 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(p => p.ImageUrl)
             .HasMaxLength(512);
 
+        builder.Property(p => p.NeedleOrHookSize)
+             .HasMaxLength(100);
+
         // Timestamps
         builder.Property(p => p.CreatedAt)
             .IsRequired();
@@ -83,11 +86,6 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.HasMany(p => p.Reminders)
             .WithOne(r => r.Project)
             .HasForeignKey(r => r.ProjectId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(p => p.PatternFiles)
-            .WithOne(pf => pf.Project)
-            .HasForeignKey(pf => pf.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Indexes for performance

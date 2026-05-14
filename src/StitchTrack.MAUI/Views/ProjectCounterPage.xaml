@@ -60,38 +60,28 @@
         <Border Padding="16,14"
                 Margin="0,8,0,0"
                 StrokeThickness="0"
-                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}">
-
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground},
+                                                  Dark={StaticResource DarkCardBackground}}">
           <Border.StrokeShape>
             <RoundRectangle CornerRadius="12" />
           </Border.StrokeShape>
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
 
-          <Grid ColumnDefinitions="*,Auto"
-                ColumnSpacing="12">
+            <!-- Timer — now aligns vertically with the button naturally -->
+            <Label Grid.Column="0"
+                   Text="{Binding SessionTimerText}"
+                   FontFamily="MontserratBold"
+                   FontSize="22"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                               Dark={StaticResource DarkTextPrimary}}" />
 
-            <!-- Timer display -->
-            <VerticalStackLayout Grid.Column="0"
-                                 Spacing="2"
-                                 VerticalOptions="Center">
-
-              <Label Text="SESSION"
-                     FontFamily="MontserratSemiBold"
-                     FontSize="11"
-                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
-                     Opacity="0.7" />
-
-              <Label Text="{Binding SessionTimerText}"
-                     FontFamily="MontserratBold"
-                     FontSize="22"
-                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
-
-            </VerticalStackLayout>
-
-            <!-- Play/Pause button -->
+            <!-- Play/Pause button — unchanged -->
             <Border Grid.Column="1"
                     Padding="16,10"
                     StrokeThickness="0"
-                    BackgroundColor="{StaticResource ButtonSecondary}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource ButtonSecondary},
+                                                      Dark={StaticResource ButtonSecondaryDark}}"
                     VerticalOptions="Center">
               <Border.StrokeShape>
                 <RoundRectangle CornerRadius="10" />
@@ -99,7 +89,6 @@
               <Border.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding ToggleSessionCommand}" />
               </Border.GestureRecognizers>
-
               <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
                 <Image x:Name="SessionIcon"
                        Source="{Binding SessionButtonIcon}"
@@ -119,11 +108,51 @@
             </Border>
 
           </Grid>
-
         </Border>
 
+        <!-- PATTERN FILES — 2-column grid built in code-behind -->
+        <Grid IsVisible="{Binding HasPattern}"
+              Margin="10,15,0,0"
+              ColumnDefinitions="3,*"
+              ColumnSpacing="10">
+
+          <!-- Gold accent bar -->
+          <BoxView Grid.Column="0"
+                   BackgroundColor="{StaticResource BrandGold}"
+                   VerticalOptions="Fill"
+                   CornerRadius="2" />
+
+          <!-- Icon + "Pattern:" label + dynamic file links from code-behind -->
+          <FlexLayout x:Name="CounterPatternFilesGrid"
+                      Grid.Column="1"
+                      Wrap="Wrap"
+                      Direction="Row"
+                      AlignItems="Center">
+
+            <Image WidthRequest="16"
+                   HeightRequest="16"
+                   VerticalOptions="Center"
+                   Margin="0,0,3,0">
+              <Image.Source>
+                <AppThemeBinding Light="file_light.svg" Dark="file_dark.svg" />
+              </Image.Source>
+            </Image>
+
+            <Label Text="Pattern:"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="13"
+                   Margin="2,0,5,0"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}" />
+
+            <!-- File links added here by code-behind -->
+          </FlexLayout>
+
+        </Grid>
+
         <!-- COUNTER CARD -->
-        <Border Padding="20,12,20,20"
+        <Border Padding="20,6,20,10"
                 Margin="0,16,0,0"
                 StrokeThickness="0"
                 BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}">
@@ -132,48 +161,18 @@
             <RoundRectangle CornerRadius="12" />
           </Border.StrokeShape>
 
-          <VerticalStackLayout Spacing="16">
+          <VerticalStackLayout Spacing="5">
 
-            <!-- Row count display -->
-            <Label Text="{Binding CurrentCount}"
-                   Style="{StaticResource CounterLabel}"
-                   HorizontalOptions="Center" />
-
-            <!-- Progress bar — only shown when TotalRows is set -->
-            <VerticalStackLayout Spacing="6"
-                                 IsVisible="{Binding HasTotalRows}">
-
-              <Grid ColumnDefinitions="*,Auto">
-                <Label Grid.Column="0"
-                       Text="{Binding ProgressText}"
-                       FontFamily="MontserratMedium"
-                       FontSize="13"
-                       TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
-
-                <Label Grid.Column="1"
-                       Text="{Binding ProgressPercentage}"
-                       FontFamily="MontserratSemiBold"
-                       FontSize="13"
-                       TextColor="{StaticResource BrandGold}" />
-              </Grid>
-
-              <!-- Progress fill bar -->
-              <ProgressBar Progress="{Binding ProgressValue}"
-                           ProgressColor="{StaticResource BrandGold}"
-                           BackgroundColor="{AppThemeBinding Light=#E6E1D0, Dark=#374151}"
-                           HeightRequest="4" />
-
-            </VerticalStackLayout>
-
-            <!-- +/- buttons -->
-            <Grid ColumnDefinitions="*,*"
-                  ColumnSpacing="12"
-                  Margin="0,8,0,0">
+            <!-- [−]  count  [+]  all in one row -->
+            <Grid ColumnDefinitions="Auto,*,Auto"
+                  ColumnSpacing="16">
 
               <!-- Decrease -->
               <Border Grid.Column="0"
-                      BackgroundColor="{StaticResource ButtonDecrease}"
-                      HeightRequest="60"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource ButtonDecrease}, 
+                                          Dark={StaticResource ButtonSecondaryDark}}"
+                      WidthRequest="72"
+                      HeightRequest="72"
                       StrokeThickness="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -192,10 +191,18 @@
                 </Image>
               </Border>
 
+              <!-- Current count — centered between the buttons -->
+              <Label Grid.Column="1"
+                     Text="{Binding CurrentCount}"
+                     Style="{StaticResource CounterLabel}"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Center" />
+
               <!-- Increase -->
-              <Border Grid.Column="1"
+              <Border Grid.Column="2"
                       BackgroundColor="{StaticResource ButtonIncrease}"
-                      HeightRequest="60"
+                      WidthRequest="72"
+                      HeightRequest="72"
                       StrokeThickness="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -216,57 +223,69 @@
 
             </Grid>
 
+            <!-- Progress bar — unchanged, only shown when TotalRows is set -->
+            <VerticalStackLayout Spacing="6"
+                         IsVisible="{Binding HasTotalRows}">
 
-            <!-- Undo & Reset -->
+              <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0"
+                       Text="{Binding ProgressText}"
+                       FontFamily="MontserratMedium"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+
+                <Label Grid.Column="1"
+                       Text="{Binding ProgressPercentage}"
+                       FontFamily="MontserratSemiBold"
+                       FontSize="13"
+                       TextColor="{StaticResource BrandGold}" />
+              </Grid>
+
+              <ProgressBar Progress="{Binding ProgressValue}"
+                           ProgressColor="{StaticResource BrandGold}"
+                           BackgroundColor="{AppThemeBinding Light=#E6E1D0, Dark=#374151}"
+                           HeightRequest="4" />
+
+            </VerticalStackLayout>
+
+            <!-- Undo & Reset — unchanged -->
             <Grid ColumnDefinitions="*,*"
-                  ColumnSpacing="15"
-                  Margin="0,0,0,0">
+                  ColumnSpacing="15">
 
-              <!-- Undo Button -->
               <Border Grid.Column="0"
-                      BackgroundColor="Transparent"
-                      HorizontalOptions="Center">
+                BackgroundColor="Transparent"
+                HorizontalOptions="Center">
                 <Border.GestureRecognizers>
                   <TapGestureRecognizer Command="{Binding UndoCommand}" />
                 </Border.GestureRecognizers>
-
                 <HorizontalStackLayout Spacing="6"
                                        HorizontalOptions="Center"
                                        VerticalOptions="Center"
                                        Padding="10,8">
-                  <Image Grid.Column="0"
-                         WidthRequest="16"
-                         HeightRequest="16"
-                         VerticalOptions="Center">
+                  <Image WidthRequest="16" HeightRequest="16" VerticalOptions="Center">
                     <Image.Source>
                       <AppThemeBinding Light="undo_light.svg" Dark="undo_dark.svg" />
                     </Image.Source>
                   </Image>
                   <Label Text="Undo"
-                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
-                         FontFamily="MontserratBold"
-                         FontSize="12"
-                         VerticalOptions="Center" />
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
+                       FontFamily="MontserratBold"
+                       FontSize="12"
+                       VerticalOptions="Center" />
                 </HorizontalStackLayout>
               </Border>
 
-
-              <!-- Reset Button -->
               <Border Grid.Column="1"
                       BackgroundColor="Transparent"
                       HorizontalOptions="Center">
                 <Border.GestureRecognizers>
                   <TapGestureRecognizer Command="{Binding ResetCommand}" />
                 </Border.GestureRecognizers>
-
                 <HorizontalStackLayout Spacing="6"
                                        HorizontalOptions="Center"
                                        VerticalOptions="Center"
                                        Padding="10,8">
-                  <Image Grid.Column="0"
-                         WidthRequest="16"
-                         HeightRequest="16"
-                         VerticalOptions="Center">
+                  <Image WidthRequest="16" HeightRequest="16" VerticalOptions="Center">
                     <Image.Source>
                       <AppThemeBinding Light="reset_light.svg" Dark="reset_dark.svg" />
                     </Image.Source>
@@ -280,6 +299,116 @@
               </Border>
 
             </Grid>
+
+          </VerticalStackLayout>
+
+        </Border>
+
+        <Border Padding="16"
+        Margin="0,16,0,0"
+        StrokeThickness="0"
+        BackgroundColor="{AppThemeBinding Light={StaticResource LightCardBackground},
+                                          Dark={StaticResource DarkCardBackground}}">
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+          </Border.StrokeShape>
+
+          <VerticalStackLayout Spacing="12">
+
+            <!-- Section header -->
+            <HorizontalStackLayout Spacing="8">
+              <Image WidthRequest="16"
+                   HeightRequest="16"
+                   VerticalOptions="Center">
+                <Image.Source>
+                  <AppThemeBinding Light="notes_light.svg" Dark="notes_dark.svg" />
+                </Image.Source>
+              </Image>
+              <Label Text="Row Notes"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                               Dark={StaticResource DarkTextPrimary}}" />
+            </HorizontalStackLayout>
+
+            <!-- Quick-add: [row number] [note text] [+] -->
+            <Grid ColumnDefinitions="70,*,44"
+              ColumnSpacing="8">
+
+              <!-- Row number — small numeric entry, pre-filled with current count -->
+              <Border Grid.Column="0"
+                    StrokeThickness="1"
+                    Stroke="{StaticResource BrandGold}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground},
+                                                     Dark=#1F2937}"
+                    Padding="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Entry x:Name="RowNoteRowEntry"
+                       Keyboard="Numeric"
+                       Placeholder="Row"
+                       FontFamily="MontserratRegular"
+                       FontSize="13"
+                       MaxLength="5"
+                       HorizontalTextAlignment="Center"
+                       Margin="4,0"
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                                   Dark={StaticResource DarkTextPrimary}}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                                          Dark={StaticResource DarkTextSecondary}}" />
+              </Border>
+
+              <!-- Note text -->
+              <Border Grid.Column="1"
+                      StrokeThickness="1"
+                      Stroke="{StaticResource BrandGold}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground},
+                                                       Dark=#1F2937}"
+                      Padding="0">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Entry x:Name="RowNoteTextEntry"
+                       Placeholder="e.g. decrease here"
+                       FontFamily="MontserratRegular"
+                       FontSize="13"
+                       MaxLength="80"
+                       Margin="10,0"
+                       Completed="OnAddRowNoteTapped"
+                       TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                                   Dark={StaticResource DarkTextPrimary}}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                                          Dark={StaticResource DarkTextSecondary}}" />
+              </Border>
+
+              <!-- Add button -->
+              <Border Grid.Column="2"
+                      StrokeThickness="0"
+                      BackgroundColor="{StaticResource BrandGold}"
+                      WidthRequest="44"
+                      HeightRequest="44">
+                <Border.StrokeShape>
+                  <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                  <TapGestureRecognizer Tapped="OnAddRowNoteTapped" />
+                </Border.GestureRecognizers>
+                <Label Text="+"
+                       FontFamily="MontserratBold"
+                       FontSize="22"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+              </Border>
+
+            </Grid>
+
+            <!-- 2-column grid — built in code-behind, only shown when notes exist -->
+            <VerticalStackLayout x:Name="RowNotesContainer"
+                                 Spacing="8"
+                                 IsVisible="{Binding HasRowNotes}" />
 
           </VerticalStackLayout>
 

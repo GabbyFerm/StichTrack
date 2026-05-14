@@ -13,7 +13,7 @@ public partial class ProjectFormPopup : Popup
 {
     private string _selectedColorHex;
     private string? _selectedImagePath;
-    private string? _selectedPatternFilePath;
+    private readonly List<PendingProjectFile> _pendingFiles = new();
     private readonly bool _isEditMode;
 
     // Tracks tag names in the order the user added them
@@ -41,23 +41,26 @@ public partial class ProjectFormPopup : Popup
                 System.Globalization.CultureInfo.InvariantCulture);
             NotesEditor.Text = existingProject.Notes;
 
-            // Show existing image name if set
             if (!string.IsNullOrWhiteSpace(existingProject.ImagePath))
             {
-                PhotoFileNameLabel.Text = Path.GetFileName(existingProject.ImagePath);
+                PhotoFileNameLabel.Text = "Cover photo set ✓";
                 PhotoFileNameLabel.IsVisible = true;
-                PhotoLabel.Text = "📷 Change Photo";
+                PhotoLabel.Text = "Change Cover Photo";
             }
 
-            // Show existing pattern name if any
-            var existingPattern = existingProject.PatternFiles.FirstOrDefault();
-            if (existingPattern != null && !string.IsNullOrWhiteSpace(existingPattern.FilePath))
+            foreach (var file in existingProject.ProjectFiles.OrderByDescending(f => f.UploadedAt))
             {
-                _selectedPatternFilePath = existingPattern.FilePath;
-                PatternFileNameLabel.Text = existingPattern.FileName;
-                PatternFileNameLabel.IsVisible = true;
-                PatternLabel.Text = "📄 Change Pattern";
+                _pendingFiles.Add(new PendingProjectFile(
+                    ExistingId: file.Id,
+                    FileName: file.FileName,
+                    FilePath: file.FilePath,
+                    FileSizeBytes: 0,
+                    ContentType: file.ContentType ?? string.Empty,
+                    FileType: file.FileType));
             }
+
+            BuildFileChips(PatternFilesContainer, ProjectFileType.Pattern);
+            BuildFileChips(InspirationPhotosContainer, ProjectFileType.InspirationPhoto);
 
             // Pre-fill needle/hook size
             NeedleSizeEntry.Text = existingProject.NeedleOrHookSize;
@@ -65,9 +68,9 @@ public partial class ProjectFormPopup : Popup
             // Pre-fill tags — project must be loaded with .Include(p => p.Tags)
             foreach (var tag in existingProject.Tags.OrderBy(t => t.ColorIndex))
                 _selectedTags.Add(tag.Name);
-
-            BuildTagChips();
         }
+
+        BuildTagChips();
     }
 
     // Static to avoid allocating new arrays on every file picker call
@@ -268,11 +271,11 @@ public partial class ProjectFormPopup : Popup
 
             _selectedImagePath = await CopyFileToLocalStorageAsync(photo.FullPath, "Images");
 
-            PhotoLabel.Text = "📷 Photo Added ✓";
+            PhotoLabel.Text = "Photo Added ✓";
             PhotoFileNameLabel.Text = photo.FileName;
             PhotoFileNameLabel.IsVisible = true;
 
-            System.Diagnostics.Debug.WriteLine($"📷 Photo saved: {_selectedImagePath}");
+            System.Diagnostics.Debug.WriteLine($"Photo saved: {_selectedImagePath}");
         }
 #pragma warning disable CA1031
         catch (Exception ex)
@@ -284,36 +287,30 @@ public partial class ProjectFormPopup : Popup
     }
 
     /// <summary>
-    /// Opens the file picker filtered to PDF files.
-    /// Copies the chosen PDF to the app's local storage folder.
+    /// Opens camera/library/PDF picker for a new pattern file.
     /// </summary>
-    private async void OnPatternUploadTapped(object sender, TappedEventArgs e)
+    private async void OnAddPatternFileTapped(object sender, TappedEventArgs e)
     {
         try
         {
-            // Let user choose how to add the pattern
             var choice = await ShowActionSheetAsync(
-                "Add Pattern",
-                "Cancel",
-                null,
-                "Take Photo",
-                "Choose Photo from Library",
-                "Choose PDF");
+                "Add Pattern", "Cancel", null,
+                "Take Photo", "Choose Photo from Library", "Choose PDF");
 
             if (choice == null || choice == "Cancel") return;
 
-            switch (choice)
+            PendingProjectFile? pending = choice switch
             {
-                case "Take Photo":
-                    await PickPatternPhotoAsync(useCamera: true);
-                    break;
-                case "Choose Photo from Library":
-                    await PickPatternPhotoAsync(useCamera: false);
-                    break;
-                case "Choose PDF":
-                    await PickPatternPdfAsync();
-                    break;
-            }
+                "Take Photo" => await PickFileAsPhotoAsync(useCamera: true, ProjectFileType.Pattern),
+                "Choose Photo from Library" => await PickFileAsPhotoAsync(useCamera: false, ProjectFileType.Pattern),
+                "Choose PDF" => await PickFileAsPdfAsync(ProjectFileType.Pattern),
+                _ => null
+            };
+
+            if (pending == null) return;
+
+            _pendingFiles.Add(pending);
+            BuildFileChips(PatternFilesContainer, ProjectFileType.Pattern);
         }
 #pragma warning disable CA1031
         catch (Exception ex)
@@ -323,21 +320,52 @@ public partial class ProjectFormPopup : Popup
         }
     }
 
-    private async Task PickPatternPhotoAsync(bool useCamera)
+    /// <summary>
+    /// Opens camera/library picker for a new inspiration photo.
+    /// </summary>
+    private async void OnAddInspirationPhotoTapped(object sender, TappedEventArgs e)
+    {
+        try
+        {
+            var choice = await ShowActionSheetAsync(
+                "Add Inspiration Photo", "Cancel", null,
+                "Take Photo", "Choose from Library");
+
+            if (choice == null || choice == "Cancel") return;
+
+            var pending = await PickFileAsPhotoAsync(
+                useCamera: choice == "Take Photo",
+                ProjectFileType.InspirationPhoto);
+
+            if (pending == null) return;
+
+            _pendingFiles.Add(pending);
+            BuildFileChips(InspirationPhotosContainer, ProjectFileType.InspirationPhoto);
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Inspiration photo error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Picks a photo (camera or library) and returns a PendingProjectFile.
+    /// </summary>
+    private static async Task<PendingProjectFile?> PickFileAsPhotoAsync(bool useCamera, ProjectFileType fileType)
     {
         FileResult? result;
+
         if (useCamera)
         {
-            if (!MediaPicker.Default.IsCaptureSupported)
+            if (!MediaPicker.Default.IsCaptureSupported) return null;
+
+            var status = await Permissions.RequestAsync<Permissions.Camera>();
+            if (status != PermissionStatus.Granted)
             {
-                await ShowAlertAsync("Camera Not Available", "This device does not support taking photos.");
-                return;
-            }
-            var cameraStatus = await Microsoft.Maui.ApplicationModel.Permissions.RequestAsync<Microsoft.Maui.ApplicationModel.Permissions.Camera>();
-            if (cameraStatus != Microsoft.Maui.ApplicationModel.PermissionStatus.Granted)
-            {
-                await ShowAlertAsync("Camera Permission Needed", "Please allow camera access to take a pattern photo.");
-                return;
+                await ShowAlertAsync("Camera Permission Needed", "Please allow camera access.");
+                return null;
             }
             result = await MediaPicker.Default.CapturePhotoAsync();
         }
@@ -346,17 +374,28 @@ public partial class ProjectFormPopup : Popup
             result = await MediaPicker.Default.PickPhotoAsync();
         }
 
-        if (result == null) return;
+        if (result == null) return null;
 
-        _selectedPatternFilePath = await CopyFileToLocalStorageAsync(result.FullPath, "Patterns");
-        PatternLabel.Text = "🖼️ Pattern Added ✓";
-        PatternFileNameLabel.Text = result.FileName;
-        PatternFileNameLabel.IsVisible = true;
+        var subfolder = fileType == ProjectFileType.Pattern ? "Patterns" : "Inspiration";
+        var destPath = await CopyFileToLocalStorageAsync(result.FullPath, subfolder);
+        var fileSize = new FileInfo(result.FullPath).Length;
 
-        System.Diagnostics.Debug.WriteLine($"🖼️ Pattern photo saved: {_selectedPatternFilePath}");
+        var extension = Path.GetExtension(result.FileName).ToUpperInvariant();
+        var contentType = extension is ".JPG" or ".JPEG" ? "image/jpeg" : "image/png";
+
+        return new PendingProjectFile(
+            ExistingId: null,
+            FileName: result.FileName,
+            FilePath: destPath,
+            FileSizeBytes: fileSize,
+            ContentType: contentType,
+            FileType: fileType);
     }
 
-    private async Task PickPatternPdfAsync()
+    /// <summary>
+    /// Opens a PDF file picker and returns a PendingProjectFile.
+    /// </summary>
+    private static async Task<PendingProjectFile?> PickFileAsPdfAsync(ProjectFileType fileType)
     {
         var options = new PickOptions
         {
@@ -365,14 +404,138 @@ public partial class ProjectFormPopup : Popup
         };
 
         var result = await FilePicker.Default.PickAsync(options);
-        if (result == null) return;
+        if (result == null) return null;
 
-        _selectedPatternFilePath = await CopyFileToLocalStorageAsync(result.FullPath, "Patterns");
-        PatternLabel.Text = "📄 Pattern Added ✓";
-        PatternFileNameLabel.Text = result.FileName;
-        PatternFileNameLabel.IsVisible = true;
+        var destPath = await CopyFileToLocalStorageAsync(result.FullPath, "Patterns");
+        var fileSize = new FileInfo(result.FullPath).Length;
 
-        System.Diagnostics.Debug.WriteLine($"📄 Pattern PDF saved: {_selectedPatternFilePath}");
+        return new PendingProjectFile(
+            ExistingId: null,
+            FileName: result.FileName,
+            FilePath: destPath,
+            FileSizeBytes: fileSize,
+            ContentType: "application/pdf",
+            FileType: fileType);
+    }
+
+    /// <summary>
+    /// Rebuilds the 2-column file chip grid for a specific file type.
+    /// Called after every add or remove.
+    /// </summary>
+    private void BuildFileChips(VerticalStackLayout container, ProjectFileType fileType)
+    {
+        container.Children.Clear();
+
+        var files = _pendingFiles.Where(f => f.FileType == fileType).ToList();
+        if (files.Count == 0) return;
+
+        // Pair files into rows of 2 — same pattern as BuildRowNotesGrid
+        for (int i = 0; i < files.Count; i += 2)
+        {
+            var row = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitionCollection
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Star }
+            },
+                ColumnSpacing = 8
+            };
+
+            row.Add(CreateFileChip(files[i], fileType, container), column: 0, row: 0);
+
+            if (i + 1 < files.Count)
+                row.Add(CreateFileChip(files[i + 1], fileType, container), column: 1, row: 0);
+            else
+                row.Add(new BoxView { IsVisible = false }, column: 1, row: 0);
+
+            container.Children.Add(row);
+        }
+    }
+
+    /// <summary>
+    /// Creates a file chip showing the filename and a × remove button.
+    /// </summary>
+    private Border CreateFileChip(
+        PendingProjectFile file,
+        ProjectFileType fileType,
+        VerticalStackLayout parentContainer)
+    {
+        var chip = new Border
+        {
+            StrokeThickness = 0,
+            BackgroundColor = Color.FromArgb(
+                Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark
+                    ? "#374151" : "#E8E2D0"),
+            Padding = new Thickness(10, 8),
+            StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+            {
+                CornerRadius = new CornerRadius(8)
+            }
+        };
+
+        var textColor = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark
+            ? Colors.White
+            : Color.FromArgb("#2C3338");
+
+        var isPdf = file.ContentType == "application/pdf";
+
+        var row = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitionCollection
+        {
+            new ColumnDefinition { Width = GridLength.Auto }, // icon
+            new ColumnDefinition { Width = GridLength.Star }, // name
+            new ColumnDefinition { Width = GridLength.Auto }  // ×
+        },
+            ColumnSpacing = 6
+        };
+
+        // File type icon — always uses light variant (acceptable at 14px in a themed chip)
+        var icon = new Image
+        {
+            WidthRequest = 14,
+            HeightRequest = 14,
+            VerticalOptions = LayoutOptions.Center,
+            Source = isPdf
+        ? "file_light.svg"   
+        : "photo_light.svg"
+        };
+        row.Add(icon, column: 0, row: 0);
+
+        row.Add(new Label
+        {
+            Text = file.FileName,
+            FontFamily = "MontserratRegular",
+            FontSize = 11,
+            TextColor = textColor,
+            VerticalOptions = LayoutOptions.Center,
+            LineBreakMode = LineBreakMode.TailTruncation
+        }, column: 1, row: 0);
+
+        var removeLabel = new Label
+        {
+            Text = "×",
+            FontFamily = "MontserratBold",
+            FontSize = 16,
+            TextColor = textColor,
+            Opacity = 0.5,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.End
+        };
+
+        var capturedFile = file;
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += (_, _) =>
+        {
+            _pendingFiles.Remove(capturedFile);
+            BuildFileChips(parentContainer, fileType);
+        };
+        removeLabel.GestureRecognizers.Add(tap);
+        row.Add(removeLabel, column: 2, row: 0);
+
+        chip.Content = row;
+        return chip;
     }
 
     /// <summary>
@@ -429,8 +592,7 @@ public partial class ProjectFormPopup : Popup
             NeedleOrHookSize: string.IsNullOrWhiteSpace(NeedleSizeEntry.Text) ? null : NeedleSizeEntry.Text.Trim(),
             Tags: _selectedTags.AsReadOnly(),  // snapshot of the current tag list
             ImagePath: _selectedImagePath,
-            PatternFilePath: _selectedPatternFilePath,
-            PatternFileName: PatternFileNameLabel.Text
+            ProjectFiles: _pendingFiles.AsReadOnly()
         );
 
         await CloseAsync(result);

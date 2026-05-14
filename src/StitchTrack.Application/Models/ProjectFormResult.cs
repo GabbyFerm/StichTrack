@@ -12,6 +12,6 @@ public record ProjectFormResult(
     string? NeedleOrHookSize,
     IReadOnlyList<string> Tags,
     string? ImagePath,
-    string? PatternFilePath,
-    string? PatternFileName
+    // Replaces PatternFilePath + PatternFileName — supports multiple files of any type
+    IReadOnlyList<PendingProjectFile> ProjectFiles
 );

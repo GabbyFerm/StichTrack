@@ -46,9 +46,10 @@ public static class MauiProgram
 
         // REPOSITORIES
         builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-        builder.Services.AddScoped<IPatternFileRepository, PatternFileRepository>();
+        builder.Services.AddScoped<IProjectFileRepository, ProjectFileRepository>();
         builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
         builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+        builder.Services.AddScoped<IRowNoteRepository, RowNoteRepository>();
 
         // SERVICES
         builder.Services.AddSingleton<IDialogService, MauiDialogService>();

@@ -23,6 +23,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
     private readonly ISessionRepository _sessionRepository;
+    private readonly IRowNoteRepository _rowNoteRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly IHapticsService _hapticsService = null!;
@@ -32,8 +33,10 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     private bool _isSessionRunning;
     private TimeSpan _sessionDuration;
     private bool _notesExpanded;
+    private List<RowNote> _rowNotes = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event EventHandler? RowNotesChanged;
 
     // Project ID set from Shell navigation query parameter
     public Guid ProjectId { get; set; }
@@ -47,6 +50,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     public string? Notes => _project?.Notes;
     public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
     public bool HasTotalRows => TotalRows.HasValue && TotalRows > 0;
+    public bool HasRowNotes => _rowNotes.Count > 0;
 
     // ─── Progress ────────────────────────────────────────────────
 
@@ -89,6 +93,28 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     public string SessionButtonText => IsSessionRunning ? "PAUSE" : "START SESSION";
     public string SessionButtonIcon => IsSessionRunning ? "pause.svg" : "play.svg";
 
+    // ─── Pattern ─────────────────────────────────────────────────
+    public bool HasPattern =>
+    (_project?.ProjectFiles.Any(f => f.FileType == ProjectFileType.Pattern) ?? false);
+
+    public string PatternFileName =>
+        _project?.ProjectFiles
+            .FirstOrDefault(f => f.FileType == ProjectFileType.Pattern)?.FileName
+            ?? string.Empty;
+
+    private string? PatternFilePath =>
+        _project?.ProjectFiles
+            .FirstOrDefault(f => f.FileType == ProjectFileType.Pattern)?.FilePath;
+
+    public IReadOnlyList<ProjectFile> PatternFiles =>
+        _project?.ProjectFiles
+            .Where(f => f.FileType == ProjectFileType.Pattern)
+            .OrderByDescending(f => f.UploadedAt)
+            .ToList() ?? [];
+
+    // Set by the Page — same pattern as SingleProjectViewModel
+    public Func<string, Task>? OpenFileAsync { get; set; }
+
     // ─── Notes expand/collapse ───────────────────────────────────
 
     public bool NotesCanExpand => HasNotes && (Notes?.Split('\n').Length ?? 0) > 6;
@@ -105,18 +131,21 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     public ICommand EndSessionCommand { get; }
     public ICommand ToggleNotesCommand { get; }
     public ICommand UndoCommand { get; }
+    public ICommand ViewPatternCommand { get; }
 
     // Set by the Page to handle navigation back
     public Func<Task>? OnNavigateBack { get; set; }
 
     public ProjectCounterViewModel(
         IProjectRepository projectRepository,
+        IRowNoteRepository rowNoteRepository,
         ISessionRepository sessionRepository,
         IDialogService dialogService,
         INavigationService navigationService,
         IHapticsService hapticsService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
+        _rowNoteRepository = rowNoteRepository ?? throw new ArgumentNullException(nameof(rowNoteRepository));
         _sessionRepository = sessionRepository ?? throw new ArgumentNullException(nameof(sessionRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
@@ -130,6 +159,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         EndSessionCommand = new RelayCommand(OnEndSession);
         ToggleNotesCommand = new RelayCommand(OnToggleNotes);
         UndoCommand = new RelayCommand(OnUndo);
+        ViewPatternCommand = new RelayCommand(OnViewPattern);
 
         System.Diagnostics.Debug.WriteLine("✅ ProjectCounterViewModel created");
     }
@@ -153,6 +183,16 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             }
 
             OnPropertyChanged(string.Empty);
+            _rowNotes = (await _rowNoteRepository
+                .GetByProjectIdAsync(ProjectId)
+                .ConfigureAwait(false)).ToList();
+
+            OnPropertyChanged(nameof(HasRowNotes));
+            RowNotesChanged?.Invoke(this, EventArgs.Empty);
+
+            OnPropertyChanged(nameof(HasPattern));
+            OnPropertyChanged(nameof(PatternFileName));
+
             System.Diagnostics.Debug.WriteLine($"✅ Project loaded for counter: {_project.Name} (row {_project.CurrentCount})");
         }
 #pragma warning disable CA1031
@@ -370,7 +410,54 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             NotifyCounterChanged();
     }
 
+    /// <summary>
+    /// Saves a new row note and notifies the Page to rebuild the grid.
+    /// Called directly from the Page code-behind on the add button tap.
+    /// </summary>
+    public async Task AddRowNoteAsync(int rowNumber, string noteText)
+    {
+        if (_project == null) return;
+
+        var note = RowNote.CreateRowNote(_project.Id, rowNumber, noteText);
+
+        await _rowNoteRepository.AddAsync(note).ConfigureAwait(false);
+        await _rowNoteRepository.SaveChangesAsync().ConfigureAwait(false);
+
+        // Re-sort in memory so the grid displays in row number order
+        _rowNotes.Add(note);
+        _rowNotes = _rowNotes.OrderBy(rn => rn.RowNumber).ToList();
+
+        OnPropertyChanged(nameof(HasRowNotes));
+        RowNotesChanged?.Invoke(this, EventArgs.Empty);
+
+        System.Diagnostics.Debug.WriteLine($"✅ Row note added: row {rowNumber} — {noteText}");
+    }
+
+    /// <summary>
+    /// Deletes a row note by ID and notifies the Page to rebuild the grid.
+    /// ExecuteDeleteAsync in the repository handles the SQL directly — no SaveChanges needed.
+    /// </summary>
+    public async Task DeleteRowNoteAsync(Guid noteId)
+    {
+        await _rowNoteRepository.DeleteAsync(noteId).ConfigureAwait(false);
+
+        _rowNotes.RemoveAll(rn => rn.Id == noteId);
+
+        OnPropertyChanged(nameof(HasRowNotes));
+        RowNotesChanged?.Invoke(this, EventArgs.Empty);
+
+        System.Diagnostics.Debug.WriteLine($"🗑️ Row note deleted: {noteId}");
+    }
+
+    public System.Collections.ObjectModel.ReadOnlyCollection<RowNote> RowNotes
+    => _rowNotes.AsReadOnly();
+
     // ─── Helpers ─────────────────────────────────────────────────
+    private async void OnViewPattern()
+    {
+        if (string.IsNullOrWhiteSpace(PatternFilePath) || OpenFileAsync == null) return;
+        await OpenFileAsync(PatternFilePath).ConfigureAwait(false);
+    }
 
     private static string FormatDuration(TimeSpan duration)
     {
