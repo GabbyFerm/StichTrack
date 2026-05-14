@@ -30,6 +30,7 @@ public class ProjectRepository : IProjectRepository
     {
         return await _context.Projects
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(p => p.Tags)
             .Include(p => p.CounterHistoryEntries)
             .Include(p => p.Sessions)
