@@ -121,4 +121,135 @@ internal sealed class ProjectTests
         // Assert
         project.UpdatedAt.Should().BeAfter(originalTimestamp);
     }
+
+    // ─── UpdateProjectDetails ────────────────────────────────────────────
+
+    [Test]
+    public void UpdateProjectDetails_ShouldSetNeedleOrHookSize()
+    {
+        // Arrange
+        var project = Project.CreateProject("Socks");
+
+        // Act
+        project.UpdateProjectDetails(needleOrHookSize: "5.0mm");
+
+        // Assert
+        project.NeedleOrHookSize.Should().Be("5.0mm");
+    }
+
+    [Test]
+    public void UpdateProjectDetails_ShouldClearNeedleOrHookSize_WhenNull()
+    {
+        // Arrange
+        var project = Project.CreateProject("Socks");
+        project.UpdateProjectDetails(needleOrHookSize: "5.0mm");
+
+        // Act
+        project.UpdateProjectDetails(needleOrHookSize: null);
+
+        // Assert
+        project.NeedleOrHookSize.Should().BeNull();
+    }
+
+    [Test]
+    public void UpdateProjectDetails_ShouldUpdateTimestamp()
+    {
+        // Arrange
+        var project = Project.CreateProject("Socks");
+        var original = project.UpdatedAt;
+        Thread.Sleep(10);
+
+        // Act
+        project.UpdateProjectDetails(notes: "Some notes");
+
+        // Assert
+        project.UpdatedAt.Should().BeAfter(original);
+    }
+
+    [Test]
+    public void AddTag_ShouldAddTagToCollection()
+    {
+        // Arrange
+        var project = Project.CreateProject("Hat");
+
+        // Act
+        project.AddTag("Knitting", colorIndex: 0);
+
+        // Assert
+        project.Tags.Should().HaveCount(1);
+        project.Tags.First().Name.Should().Be("Knitting");
+    }
+
+    [Test]
+    public void AddTag_ShouldIgnoreDuplicate_CaseInsensitive()
+    {
+        // Arrange
+        var project = Project.CreateProject("Hat");
+        project.AddTag("Knitting", colorIndex: 0);
+
+        // Act — same name, different casing
+        project.AddTag("knitting", colorIndex: 1);
+
+        // Assert — still only one tag
+        project.Tags.Should().HaveCount(1);
+    }
+
+    [Test]
+    public void AddTag_ShouldSupportMultipleDifferentTags()
+    {
+        // Arrange
+        var project = Project.CreateProject("Blanket");
+
+        // Act
+        project.AddTag("Knitting", colorIndex: 0);
+        project.AddTag("Amigurumi", colorIndex: 1);
+        project.AddTag("Clothing", colorIndex: 2);
+
+        // Assert
+        project.Tags.Should().HaveCount(3);
+    }
+
+    [Test]
+    public void RemoveTag_ShouldRemoveTagFromCollection()
+    {
+        // Arrange
+        var project = Project.CreateProject("Hat");
+        project.AddTag("Knitting", colorIndex: 0);
+
+        // Act
+        project.RemoveTag("Knitting");
+
+        // Assert
+        project.Tags.Should().BeEmpty();
+    }
+
+    [Test]
+    public void RemoveTag_ShouldBeNoOp_WhenTagNotFound()
+    {
+        // Arrange
+        var project = Project.CreateProject("Hat");
+        project.AddTag("Knitting", colorIndex: 0);
+
+        // Act — removing a tag that doesn't exist should not throw
+        Action act = () => project.RemoveTag("Crochet");
+
+        // Assert
+        act.Should().NotThrow();
+        project.Tags.Should().HaveCount(1); // original tag still there
+    }
+
+    [Test]
+    public void ClearTags_ShouldRemoveAllTags()
+    {
+        // Arrange
+        var project = Project.CreateProject("Blanket");
+        project.AddTag("Knitting", colorIndex: 0);
+        project.AddTag("Amigurumi", colorIndex: 1);
+
+        // Act
+        project.ClearTags();
+
+        // Assert
+        project.Tags.Should().BeEmpty();
+    }
 }

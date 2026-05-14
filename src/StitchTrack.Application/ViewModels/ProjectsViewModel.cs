@@ -280,9 +280,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
     /// <summary>
     /// Opens the form popup pre-filled with the project's current data.
     /// </summary>
-    /// <summary>
-    /// Opens the form popup pre-filled with the project's current data.
-    /// </summary>
     private async Task EditProjectAsync(Project project)
     {
         if (ShowProjectFormAsync == null)

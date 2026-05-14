@@ -98,6 +98,7 @@ public class ProjectRepository : IProjectRepository
         var query = _context.Projects
             .AsNoTracking()
             .Include(p => p.Sessions)
+            .Include(p => p.Tags)
             .AsQueryable();
 
         if (userId.HasValue)
@@ -188,10 +189,14 @@ public class ProjectRepository : IProjectRepository
     {
         ArgumentNullException.ThrowIfNull(tagNames);
 
-        // Delete all existing tags for this project in one shot — no change tracking needed
-        await _context.ProjectTags
+        // Fetch existing tags and use the change tracker to remove them, 
+        // ensuring atomic updates when SaveChangesAsync is called
+        var existingTags = await _context.ProjectTags
             .Where(t => t.ProjectId == projectId)
-            .ExecuteDeleteAsync().ConfigureAwait(false);
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        _context.ProjectTags.RemoveRange(existingTags);
 
         // Re-insert with colors assigned by position
         for (int i = 0; i < tagNames.Count; i++)

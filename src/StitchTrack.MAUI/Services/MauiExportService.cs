@@ -52,6 +52,8 @@ public class MauiExportService : IExportService
                 CurrentCount = p.CurrentCount,
                 TotalRows = p.TotalRows,
                 RowsPerRepeat = p.RowsPerRepeat,
+                NeedleOrHookSize = p.NeedleOrHookSize,
+                Tags = p.Tags.OrderBy(t => t.ColorIndex).Select(t => t.Name).ToList(),
                 Notes = p.Notes,
                 ColorHex = p.ColorHex,
                 IsArchived = p.IsArchived,
@@ -90,7 +92,7 @@ public class MauiExportService : IExportService
         var csv = new StringBuilder();
 
         // Header row
-        csv.AppendLine("Name,CurrentCount,TotalRows,Notes,CreatedAt,IsArchived");
+        csv.AppendLine("Name,CurrentCount,TotalRows,NeedleOrHookSize,Tags,Notes,CreatedAt,IsArchived");
 
         // Data rows — escape fields that may contain commas or quotes
         foreach (var project in projectList)
@@ -99,6 +101,8 @@ public class MauiExportService : IExportService
                 EscapeCsvField(project.Name),
                 project.CurrentCount,
                 project.TotalRows?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty,
+                EscapeCsvField(project.NeedleOrHookSize ?? string.Empty),
+                EscapeCsvField(string.Join(";", project.Tags.OrderBy(t => t.ColorIndex).Select(t => t.Name))),
                 EscapeCsvField(project.Notes ?? string.Empty),
                 project.CreatedAt.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
                 project.IsArchived.ToString(System.Globalization.CultureInfo.InvariantCulture)
