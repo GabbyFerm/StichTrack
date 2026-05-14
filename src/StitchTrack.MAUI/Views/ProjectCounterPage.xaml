@@ -110,7 +110,7 @@
           </Grid>
         </Border>
 
-        <!-- PROJECT FILES (PATTERN) — 2-column grid of file chips built in code-behind -->
+        <!-- PROJECT FILES (PATTERN) — accent bar plus content area with inline file links built in code-behind -->
         <Grid IsVisible="{Binding HasPattern}"
               Margin="10,15,0,0"
               ColumnDefinitions="3,*"

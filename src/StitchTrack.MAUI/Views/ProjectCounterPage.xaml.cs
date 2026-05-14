@@ -173,7 +173,7 @@ public partial class ProjectCounterPage : ContentPage
 
     /// <summary>
     /// Timer callback fires every second on a background thread.
-    /// Increments _sessionDuration and updates ViewModel on the main thread.
+    /// Increments _sessionDuration on that timer thread, then dispatches the ViewModel update to the main thread.
     /// ViewModel formats the display string and notifies the UI via binding.
     /// </summary>
     private void OnTimerTick(object? sender, System.Timers.ElapsedEventArgs e)
