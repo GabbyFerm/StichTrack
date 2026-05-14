@@ -25,6 +25,7 @@ public class AppSettingsRepository : IAppSettingsRepository
     {
         // Try to get existing settings
         var settings = await _context.AppSettings
+            .OrderBy(a => a.Id)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 
