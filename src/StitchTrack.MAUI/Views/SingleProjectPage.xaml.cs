@@ -76,8 +76,8 @@ public partial class SingleProjectPage : ContentPage
     {
         base.OnAppearing();
         await _viewModel.LoadProjectAsync();
-        BuildFilesGrid(PatternFilesGrid, _viewModel.PatternFiles);
-        BuildFilesGrid(InspirationPhotosGrid, _viewModel.InspirationPhotos);
+        // Grid rebuild is handled by OnViewModelPropertyChanged
+        // when LoadProjectAsync fires OnPropertyChanged(string.Empty)
     }
 
     /// <summary>
@@ -184,12 +184,15 @@ public partial class SingleProjectPage : ContentPage
     /// this covers the case where edit closes a popup without triggering OnAppearing.
     /// </summary>
     private void OnViewModelPropertyChanged(object? sender,
-        System.ComponentModel.PropertyChangedEventArgs e)
+    System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (string.IsNullOrEmpty(e.PropertyName))
         {
-            BuildFilesGrid(PatternFilesGrid, _viewModel.PatternFiles);
-            BuildFilesGrid(InspirationPhotosGrid, _viewModel.InspirationPhotos);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                BuildFilesGrid(PatternFilesGrid, _viewModel.PatternFiles);
+                BuildFilesGrid(InspirationPhotosGrid, _viewModel.InspirationPhotos);
+            });
         }
     }
 }
