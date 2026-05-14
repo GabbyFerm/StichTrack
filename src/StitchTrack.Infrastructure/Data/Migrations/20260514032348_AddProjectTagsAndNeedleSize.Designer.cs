@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StitchTrack.Infrastructure.Data;
 
@@ -10,9 +11,11 @@ using StitchTrack.Infrastructure.Data;
 namespace StitchTrack.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260514032348_AddProjectTagsAndNeedleSize")]
+    partial class AddProjectTagsAndNeedleSize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -91,6 +94,45 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                     b.ToTable("CounterHistory", (string)null);
                 });
 
+            modelBuilder.Entity("StitchTrack.Domain.Entities.PatternFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FilePath")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("FileSizeBytes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FileUrl")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("PatternFiles", (string)null);
+                });
+
             modelBuilder.Entity("StitchTrack.Domain.Entities.Project", b =>
                 {
                     b.Property<Guid>("Id")
@@ -133,7 +175,6 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NeedleOrHookSize")
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Notes")
@@ -166,48 +207,6 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Projects", (string)null);
-                });
-
-            modelBuilder.Entity("StitchTrack.Domain.Entities.ProjectFile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ContentType")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FilePath")
-                        .HasMaxLength(512)
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("FileSizeBytes")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("FileType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FileUrl")
-                        .HasMaxLength(512)
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId", "FileType");
-
-                    b.ToTable("ProjectFiles", (string)null);
                 });
 
             modelBuilder.Entity("StitchTrack.Domain.Entities.ProjectTag", b =>
@@ -363,6 +362,17 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("StitchTrack.Domain.Entities.PatternFile", b =>
+                {
+                    b.HasOne("StitchTrack.Domain.Entities.Project", "Project")
+                        .WithMany("PatternFiles")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("StitchTrack.Domain.Entities.Project", b =>
                 {
                     b.HasOne("StitchTrack.Domain.Entities.User", "User")
@@ -371,17 +381,6 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("StitchTrack.Domain.Entities.ProjectFile", b =>
-                {
-                    b.HasOne("StitchTrack.Domain.Entities.Project", "Project")
-                        .WithMany("ProjectFiles")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("StitchTrack.Domain.Entities.ProjectTag", b =>
@@ -430,7 +429,7 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                 {
                     b.Navigation("CounterHistoryEntries");
 
-                    b.Navigation("ProjectFiles");
+                    b.Navigation("PatternFiles");
 
                     b.Navigation("Reminders");
 

@@ -63,7 +63,8 @@
 
               <!-- Decrease -->
               <Border Grid.Column="0"
-                      BackgroundColor="{StaticResource ButtonDecrease}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource ButtonDecrease}, 
+                                          Dark={StaticResource ButtonSecondaryDark}}"
                       HeightRequest="60"
                       StrokeThickness="0">
                 <Border.StrokeShape>

@@ -25,6 +25,8 @@ public class ProjectExportDto
     public int? RowsPerRepeat { get; init; }
     public string? Notes { get; init; }
     public string? ColorHex { get; init; }
+    public string? NeedleOrHookSize { get; init; }
+    public IReadOnlyList<string> Tags { get; init; } = [];
     public bool IsArchived { get; init; }
     public string CreatedAt { get; init; } = string.Empty;
     public string UpdatedAt { get; init; } = string.Empty;

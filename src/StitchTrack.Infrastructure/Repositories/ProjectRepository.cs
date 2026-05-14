@@ -30,9 +30,10 @@ public class ProjectRepository : IProjectRepository
     {
         return await _context.Projects
             .AsNoTracking()
+            .Include(p => p.Tags)
             .Include(p => p.CounterHistoryEntries)
             .Include(p => p.Sessions)
-            .Include(p => p.PatternFiles)
+            .Include(p => p.ProjectFiles)
             .FirstOrDefaultAsync(p => p.Id == id)
             .ConfigureAwait(false);
     }
@@ -40,7 +41,9 @@ public class ProjectRepository : IProjectRepository
     public async Task<Project?> GetByIdWithoutHistoryAsync(Guid id)
     {
         return await _context.Projects
+            .AsNoTracking()
             .Include(p => p.Sessions)
+            .Include(p => p.ProjectFiles)
             .FirstOrDefaultAsync(p => p.Id == id)
             .ConfigureAwait(false);
     }
@@ -49,6 +52,7 @@ public class ProjectRepository : IProjectRepository
     {
         var query = _context.Projects
         .AsNoTracking()
+        .Include(p => p.Tags)
         .Where(p => !p.IsArchived);
 
         if (userId.HasValue)
@@ -71,6 +75,7 @@ public class ProjectRepository : IProjectRepository
     {
         var query = _context.Projects
         .AsNoTracking()
+        .Include(p => p.Tags)
         .Where(p => p.IsArchived);
 
         if (userId.HasValue)
@@ -93,6 +98,7 @@ public class ProjectRepository : IProjectRepository
         var query = _context.Projects
             .AsNoTracking()
             .Include(p => p.Sessions)
+            .Include(p => p.Tags)
             .AsQueryable();
 
         if (userId.HasValue)
@@ -177,5 +183,27 @@ public class ProjectRepository : IProjectRepository
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
         System.Diagnostics.Debug.WriteLine($"💾 Saved {changes} changes to database");
         return changes;
+    }
+
+    public async Task UpdateTagsAsync(Guid projectId, IReadOnlyList<string> tagNames)
+    {
+        ArgumentNullException.ThrowIfNull(tagNames);
+
+        // Fetch existing tags and use the change tracker to remove them, 
+        // ensuring atomic updates when SaveChangesAsync is called
+        var existingTags = await _context.ProjectTags
+            .Where(t => t.ProjectId == projectId)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        _context.ProjectTags.RemoveRange(existingTags);
+
+        // Re-insert with colors assigned by position
+        for (int i = 0; i < tagNames.Count; i++)
+        {
+            var tag = ProjectTag.Create(projectId, tagNames[i], i % TagColors.Palette.Length);
+            _context.ProjectTags.Add(tag);
+        }
+        // SaveChangesAsync is called by the caller
     }
 }

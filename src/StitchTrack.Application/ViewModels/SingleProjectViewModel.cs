@@ -12,7 +12,7 @@ namespace StitchTrack.Application.ViewModels;
 public class SingleProjectViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
-    private readonly IPatternFileRepository _patternFileRepository;
+    private readonly IProjectFileRepository _projectFileRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private Project? _project;
@@ -55,20 +55,24 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
     // ─── Pattern ──────────────────────────────────────────────────
 
-    public bool HasPattern => (_project?.PatternFiles.Count ?? 0) > 0;
+    public bool HasPatternFiles =>
+        (_project?.ProjectFiles.Any(f => f.FileType == ProjectFileType.Pattern) ?? false);
 
-    // Shows the file name of the first pattern — tappable link in the UI
-    public string PatternFileName
-    {
-        get
-        {
-            var pattern = _project?.PatternFiles.FirstOrDefault();
-            return pattern != null ? pattern.FileName : string.Empty;
-        }
-    }
+    public bool HasInspirationPhotos =>
+    (_project?.ProjectFiles.Any(f => f.FileType == ProjectFileType.InspirationPhoto) ?? false);
 
-    // Full local path used by ViewPatternCommand to open the file
-    private string? PatternFilePath => _project?.PatternFiles.FirstOrDefault()?.FilePath;
+    public IReadOnlyList<ProjectFile> PatternFiles =>
+    _project?.ProjectFiles
+        .Where(f => f.FileType == ProjectFileType.Pattern)
+        .OrderByDescending(f => f.UploadedAt)
+        .ToList() ?? [];
+
+    public IReadOnlyList<ProjectFile> InspirationPhotos =>
+    _project?.ProjectFiles
+        .Where(f => f.FileType == ProjectFileType.InspirationPhoto)
+        .OrderByDescending(f => f.UploadedAt)
+        .ToList() ?? [];
+
 
     /// <summary>
     /// Set by SingleProjectPage to open a file in the native viewer.
@@ -82,15 +86,66 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     public int NotesMaxLines => _notesExpanded ? int.MaxValue : 3;
     public string NotesToggleText => _notesExpanded ? "See less ▲" : "See all notes ▼";
 
+    // ─── Tags & size ──────────────────────────────────────────────
+
+    public IReadOnlyList<ProjectTag> Tags =>
+        _project?.Tags.OrderBy(t => t.ColorIndex).ToList() ?? [];
+
+    public bool HasTags => (_project?.Tags.Count ?? 0) > 0;
+
+    public string? NeedleOrHookSize => _project?.NeedleOrHookSize;
+    public bool HasNeedleOrHookSize => !string.IsNullOrWhiteSpace(_project?.NeedleOrHookSize);
+
     /// <summary>
     /// Set by SingleProjectPage to open the create/edit form popup.
     /// </summary>
     public Func<Project?, Task<ProjectFormResult?>>? ShowProjectFormAsync { get; set; }
 
+    // ─── Session summary ──────────────────────────────────────────
+
+    public bool HasSessions => (_project?.Sessions.Count ?? 0) > 0;
+
+    // "Today", "Yesterday", or "14 May"
+    public string LastSessionText
+    {
+        get
+        {
+            var last = _project?.Sessions
+                .OrderByDescending(s => s.StartedAt)
+                .FirstOrDefault();
+
+            if (last == null) return string.Empty;
+
+            var local = last.StartedAt.ToLocalTime();
+
+            if (local.Date == DateTime.Today) return "Today";
+            if (local.Date == DateTime.Today.AddDays(-1)) return "Yesterday";
+
+            return local.ToString("dd MMM", System.Globalization.CultureInfo.InvariantCulture);
+        }
+    }
+
+    // "3h 20m", "45m", etc.
+    public string TotalTimeText
+    {
+        get
+        {
+            if (_project == null || _project.Sessions.Count == 0) return string.Empty;
+
+            var total = TimeSpan.FromSeconds(_project.Sessions.Sum(s => s.DurationSeconds));
+
+            if (total.TotalHours >= 1)
+                return $"{(int)total.TotalHours}h {total.Minutes}m";
+            if (total.TotalMinutes >= 1)
+                return $"{(int)total.TotalMinutes}m";
+
+            return $"{(int)total.TotalSeconds}s";
+        }
+    }
+
     // ─── Commands ────────────────────────────────────────────────
 
     public ICommand ContinueCountingCommand { get; }
-    public ICommand ViewPatternCommand { get; }
     public ICommand ToggleNotesCommand { get; }
     public ICommand EditProjectCommand { get; }
     public ICommand ArchiveProjectCommand { get; }
@@ -98,17 +153,16 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
     public SingleProjectViewModel(
         IProjectRepository projectRepository,
-        IPatternFileRepository patternFileRepository,
+        IProjectFileRepository projectFileRepository,
         IDialogService dialogService,
         INavigationService navigationService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
-        _patternFileRepository = patternFileRepository ?? throw new ArgumentNullException(nameof(patternFileRepository));
+        _projectFileRepository = projectFileRepository ?? throw new ArgumentNullException(nameof(projectFileRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
         ContinueCountingCommand = new RelayCommand(OnContinueCounting);
-        ViewPatternCommand = new RelayCommand(OnViewPattern);
         ToggleNotesCommand = new RelayCommand(OnToggleNotes);
         EditProjectCommand = new RelayCommand(OnEditProject);
         ArchiveProjectCommand = new RelayCommand(OnArchiveProject);
@@ -125,7 +179,7 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         {
             System.Diagnostics.Debug.WriteLine($"📂 Loading project: {ProjectId}");
 
-            // GetByIdAsync includes PatternFiles so HasPattern and PatternFileName work
+            // GetByIdAsync includes ProjectFiles so HasPattern and PatternFileName work
             _project = await _projectRepository.GetByIdAsync(ProjectId).ConfigureAwait(false);
 
             if (_project == null)
@@ -171,7 +225,8 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             _project.UpdateProjectDetails(
                 colorHex: result.ColorHex,
                 totalRows: result.TotalRows,
-                notes: result.Notes
+                notes: result.Notes,
+                needleOrHookSize: result.NeedleOrHookSize
             );
 
             // Save image if a new one was picked
@@ -181,26 +236,14 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await _projectRepository.UpdateAsync(_project).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            // Save pattern file if a new one was picked
-            if (!string.IsNullOrWhiteSpace(result.PatternFilePath))
-            {
-                var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);
-                var fileSize = new FileInfo(result.PatternFilePath).Length;
-                var extension = Path.GetExtension(result.PatternFilePath);
-                var contentType = extension.ToUpperInvariant() switch
-                {
-                    ".jpg" => "image/jpeg",
-                    ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".pdf" => "application/pdf",
-                    _ => "application/octet-stream"
-                };
-                var pattern = PatternFile.CreatePatternFile(
-                    _project.Id, fileName, result.PatternFilePath, fileSize, contentType);
+            // Sync tags — delete all existing and re-insert (avoids change tracking issues)
+            await _projectRepository.UpdateTagsAsync(_project.Id, result.Tags).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-                await _patternFileRepository.AddAsync(pattern).ConfigureAwait(false);
-                await _patternFileRepository.SaveChangesAsync().ConfigureAwait(false);
-            }
+            // Save pattern file if a new one was picked
+            await SyncProjectFilesAsync(_project.Id, result.ProjectFiles, _projectFileRepository)
+                    .ConfigureAwait(false);
+
 
             // Reload to get fresh data including any new pattern file
             await LoadProjectAsync().ConfigureAwait(false);
@@ -303,22 +346,12 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
     // ─── Pattern viewer ──────────────────────────────────────────
 
-    private async void OnViewPattern()
+    public async Task OpenProjectFileAsync(string? filePath)
     {
-        if (string.IsNullOrWhiteSpace(PatternFilePath))
-        {
-            System.Diagnostics.Debug.WriteLine("⚠️ No pattern file path");
-            return;
-        }
-
-        if (OpenFileAsync == null)
-        {
-            System.Diagnostics.Debug.WriteLine("⚠️ OpenFileAsync callback not set");
-            return;
-        }
-
-        await OpenFileAsync(PatternFilePath).ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(filePath) || OpenFileAsync == null) return;
+        await OpenFileAsync(filePath).ConfigureAwait(false);
     }
+
 
     // ─── Other handlers ──────────────────────────────────────────
 
@@ -345,4 +378,56 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
+    /// <summary>
+    /// Syncs the project file list from the form result against the database.
+    /// Deletes removed files, inserts new ones.
+    /// </summary>
+    private static async Task SyncProjectFilesAsync(
+        Guid projectId,
+        IReadOnlyList<PendingProjectFile> pendingFiles,
+        IProjectFileRepository projectFileRepository)
+    {
+        // Load what's currently in the DB for this project
+        var existingFiles = (await projectFileRepository
+            .GetByProjectIdAsync(projectId)
+            .ConfigureAwait(false)).ToList();
+
+        // IDs that the user kept in the form
+        var keptIds = pendingFiles
+            .Where(f => f.ExistingId.HasValue)
+            .Select(f => f.ExistingId!.Value)
+            .ToHashSet();
+
+        // Delete files that were removed in the form
+        foreach (var removed in existingFiles.Where(f => !keptIds.Contains(f.Id)))
+        {
+            await projectFileRepository.DeleteAsync(removed.Id).ConfigureAwait(false);
+
+            // Also remove the physical file if it exists locally
+            if (!string.IsNullOrWhiteSpace(removed.FilePath) && File.Exists(removed.FilePath))
+                File.Delete(removed.FilePath);
+
+            System.Diagnostics.Debug.WriteLine($"🗑️ Removed file: {removed.FileName}");
+        }
+
+        // Add new files (those without an existing DB ID)
+        foreach (var newFile in pendingFiles.Where(f => f.ExistingId == null))
+        {
+            var file = ProjectFile.Create(
+                projectId,
+                newFile.FileName,
+                newFile.FilePath,
+                newFile.FileSizeBytes,
+                newFile.FileType,
+                newFile.ContentType);
+
+            await projectFileRepository.AddAsync(file).ConfigureAwait(false);
+            System.Diagnostics.Debug.WriteLine($"📎 Added file: {newFile.FileName} ({newFile.FileType})");
+        }
+
+        if (pendingFiles.Any(f => f.ExistingId == null) || existingFiles.Any(f => !keptIds.Contains(f.Id)))
+            await projectFileRepository.SaveChangesAsync().ConfigureAwait(false);
+    }
+
 }

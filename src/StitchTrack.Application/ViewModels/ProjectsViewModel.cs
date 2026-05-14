@@ -18,7 +18,7 @@ namespace StitchTrack.Application.ViewModels;
 public class ProjectsViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
-    private readonly IPatternFileRepository _patternFileRepository;
+    private readonly IProjectFileRepository _projectFileRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly SynchronizationContext? _syncContext;
@@ -113,12 +113,12 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
     public ProjectsViewModel(
         IProjectRepository projectRepository,
-        IPatternFileRepository patternFileRepository,
+        IProjectFileRepository projectFileRepository,
         IDialogService dialogService,
         INavigationService navigationService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
-        _patternFileRepository = patternFileRepository ?? throw new ArgumentNullException(nameof(patternFileRepository));
+        _projectFileRepository = projectFileRepository ?? throw new ArgumentNullException(nameof(projectFileRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
@@ -227,18 +227,26 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
         try
         {
-            // CreateProject sets the name and color; UpdateProjectDetails adds the rest
             var newProject = Project.CreateProject(result.Name, colorHex: result.ColorHex);
+
+            // Apply all optional detail fields, including the new ones
             newProject.UpdateProjectDetails(
                 colorHex: result.ColorHex,
                 totalRows: result.TotalRows,
-                notes: result.Notes
-            );
+                notes: result.Notes,
+                needleOrHookSize: result.NeedleOrHookSize);
 
             await _projectRepository.AddAsync(newProject).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            // Set project image if one was picked
+            // Sync tags separately — uses ExecuteDeleteAsync + re-insert to avoid
+            // change tracking issues (same strategy used for counter history)
+            if (result.Tags.Count > 0)
+            {
+                await _projectRepository.UpdateTagsAsync(newProject.Id, result.Tags).ConfigureAwait(false);
+                await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+            }
+
             if (!string.IsNullOrWhiteSpace(result.ImagePath))
             {
                 newProject.SetProjectImage(result.ImagePath);
@@ -246,20 +254,14 @@ public class ProjectsViewModel : INotifyPropertyChanged
                 await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            // Save PDF pattern if one was picked
-            if (!string.IsNullOrWhiteSpace(result.PatternFilePath))
+            if (result.ProjectFiles.Count > 0)
             {
-                var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);
-                var fileSize = new FileInfo(result.PatternFilePath).Length;
-                var pattern = PatternFile.CreatePatternFile(
-                    newProject.Id, fileName, result.PatternFilePath, fileSize, "application/pdf");
-
-                await _patternFileRepository.AddAsync(pattern).ConfigureAwait(false);
-                await _patternFileRepository.SaveChangesAsync().ConfigureAwait(false);
+                await SyncProjectFilesAsync(newProject.Id, result.ProjectFiles, _projectFileRepository)
+                    .ConfigureAwait(false);
             }
 
-            System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Name}");
 
+            System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Name}");
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{result.Name}' created!").ConfigureAwait(false);
         }
@@ -286,7 +288,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
             return;
         }
 
-        // Pass the existing project so the popup pre-fills the form fields
         var result = await ShowProjectFormAsync(project).ConfigureAwait(false);
 
         if (result == null)
@@ -297,38 +298,32 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
         try
         {
-            // Apply domain methods — the entity controls all state changes
             project.Rename(result.Name);
             project.UpdateProjectDetails(
                 colorHex: result.ColorHex,
                 totalRows: result.TotalRows,
-                notes: result.Notes
-            );
+                notes: result.Notes,
+                needleOrHookSize: result.NeedleOrHookSize);
 
             await _projectRepository.UpdateAsync(project).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
+            // Always sync tags — UpdateTagsAsync handles the case where the list is empty
+            // (it will just delete all existing tags, which is correct)
+            await _projectRepository.UpdateTagsAsync(project.Id, result.Tags).ConfigureAwait(false);
+            await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
+
             System.Diagnostics.Debug.WriteLine($"✅ Project updated: {project.Name}");
 
-            // Set project image if one was picked
             if (!string.IsNullOrWhiteSpace(result.ImagePath))
             {
-                project.SetProjectImage(result.ImagePath);  // ← project, not newProject
+                project.SetProjectImage(result.ImagePath);
                 await _projectRepository.UpdateAsync(project).ConfigureAwait(false);
                 await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            // Save PDF pattern if one was picked
-            if (!string.IsNullOrWhiteSpace(result.PatternFilePath))
-            {
-                var fileName = result.PatternFileName ?? Path.GetFileName(result.PatternFilePath!);
-                var fileSize = new FileInfo(result.PatternFilePath).Length;
-                var pattern = PatternFile.CreatePatternFile(
-                    project.Id, fileName, result.PatternFilePath, fileSize, "application/pdf");
-
-                await _patternFileRepository.AddAsync(pattern).ConfigureAwait(false);
-                await _patternFileRepository.SaveChangesAsync().ConfigureAwait(false);
-            }
+            await SyncProjectFilesAsync(project.Id, result.ProjectFiles, _projectFileRepository)
+                    .ConfigureAwait(false);
 
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{result.Name}' updated!").ConfigureAwait(false);
@@ -546,4 +541,56 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
+    /// <summary>
+    /// Syncs the project file list from the form result against the database.
+    /// Deletes removed files, inserts new ones.
+    /// </summary>
+    private static async Task SyncProjectFilesAsync(
+        Guid projectId,
+        IReadOnlyList<PendingProjectFile> pendingFiles,
+        IProjectFileRepository projectFileRepository)
+    {
+        // Load what's currently in the DB for this project
+        var existingFiles = (await projectFileRepository
+            .GetByProjectIdAsync(projectId)
+            .ConfigureAwait(false)).ToList();
+
+        // IDs that the user kept in the form
+        var keptIds = pendingFiles
+            .Where(f => f.ExistingId.HasValue)
+            .Select(f => f.ExistingId!.Value)
+            .ToHashSet();
+
+        // Delete files that were removed in the form
+        foreach (var removed in existingFiles.Where(f => !keptIds.Contains(f.Id)))
+        {
+            await projectFileRepository.DeleteAsync(removed.Id).ConfigureAwait(false);
+
+            // Also remove the physical file if it exists locally
+            if (!string.IsNullOrWhiteSpace(removed.FilePath) && File.Exists(removed.FilePath))
+                File.Delete(removed.FilePath);
+
+            System.Diagnostics.Debug.WriteLine($"🗑️ Removed file: {removed.FileName}");
+        }
+
+        // Add new files (those without an existing DB ID)
+        foreach (var newFile in pendingFiles.Where(f => f.ExistingId == null))
+        {
+            var file = ProjectFile.Create(
+                projectId,
+                newFile.FileName,
+                newFile.FilePath,
+                newFile.FileSizeBytes,
+                newFile.FileType,
+                newFile.ContentType);
+
+            await projectFileRepository.AddAsync(file).ConfigureAwait(false);
+            System.Diagnostics.Debug.WriteLine($"📎 Added file: {newFile.FileName} ({newFile.FileType})");
+        }
+
+        if (pendingFiles.Any(f => f.ExistingId == null) || existingFiles.Any(f => !keptIds.Contains(f.Id)))
+            await projectFileRepository.SaveChangesAsync().ConfigureAwait(false);
+    }
+
 }

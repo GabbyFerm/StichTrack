@@ -20,6 +20,7 @@
       <converters:TotalRowsConverter x:Key="TotalRowsConverter" />
       <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
       <converters:ProgressPercentageConverter x:Key="ProgressPercentageConverter" />
+      <converters:TagColorIndexConverter x:Key="TagColorIndexConverter" />
 
       <!-- Add your custom font styles here -->
       <Style TargetType="Label">

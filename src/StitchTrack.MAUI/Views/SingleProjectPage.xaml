@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:StitchTrack.Application.ViewModels;assembly=StitchTrack.Application"
+             xmlns:entities="clr-namespace:StitchTrack.Domain.Entities;assembly=StitchTrack.Domain"
              x:Class="StitchTrack.MAUI.Views.SingleProjectPage"
              x:DataType="viewModels:SingleProjectViewModel"
              BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkPageBackground}}"
@@ -88,36 +89,152 @@
 
         </VerticalStackLayout>
 
+        <!-- TAGS + NEEDLE SIZE — only shown when set -->
+        <VerticalStackLayout Padding="20,12,20,0"
+                     Spacing="6"
+                     IsVisible="{Binding HasTags}">
+
+          <!-- Tag chips — built from the Tags collection -->
+          <FlexLayout BindableLayout.ItemsSource="{Binding Tags}"
+                      Wrap="Wrap"
+                      Direction="Row">
+            <BindableLayout.ItemTemplate>
+              <DataTemplate x:DataType="entities:ProjectTag">
+                <Border StrokeThickness="0"
+                        Padding="10,4"
+                        Margin="0,0,6,6">
+                  <Border.BackgroundColor>
+                    <Binding Path="ColorIndex"
+                            Converter="{StaticResource TagColorIndexConverter}" />
+                  </Border.BackgroundColor>
+                  <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                  </Border.StrokeShape>
+                  <Label Text="{Binding Name}"
+                         FontFamily="MontserratMedium"
+                         FontSize="11"
+                         TextColor="White" />
+                </Border>
+              </DataTemplate>
+            </BindableLayout.ItemTemplate>
+          </FlexLayout>
+
+        </VerticalStackLayout>
+
         <!-- PROGRESS ROW + CONTINUE COUNTING BUTTON -->
         <VerticalStackLayout Padding="20,16,20,0" Spacing="16">
 
-          <!-- Row progress in a single line -->
-          <HorizontalStackLayout Spacing="8">
+          <!-- Combined details row: needle size · row count · progress -->
+          <HorizontalStackLayout Spacing="6">
 
+            <!-- Needle icon — only shown if size is set -->
+            <Image WidthRequest="14"
+                   HeightRequest="14"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding HasNeedleOrHookSize}">
+              <Image.Source>
+                <AppThemeBinding Light="needle_light.svg" Dark="needle_dark.svg" />
+              </Image.Source>
+            </Image>
+
+            <!-- Needle size text -->
+            <Label Text="{Binding NeedleOrHookSize}"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding HasNeedleOrHookSize}"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}" />
+
+            <!-- Separator — only shown if needle size is set -->
+            <Label Text="|"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding HasNeedleOrHookSize}"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}" />
+
+            <!-- Row count — always shown -->
             <Label FontFamily="MontserratMedium"
                    FontSize="14"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}">
               <Label.Text>
                 <MultiBinding StringFormat="Row {0}{1}">
                   <Binding Path="CurrentCount" />
-                  <Binding Path="TotalRows" Converter="{StaticResource TotalRowsConverter}" />
+                  <Binding Path="TotalRows"
+                         Converter="{StaticResource TotalRowsConverter}" />
                 </MultiBinding>
               </Label.Text>
             </Label>
 
-            <Label Text="•"
+            <!-- Separator — only shown if total rows is set -->
+            <Label Text="|"
                    FontFamily="MontserratMedium"
                    FontSize="14"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                    VerticalOptions="Center"
-                   IsVisible="{Binding TotalRows, Converter={StaticResource IsNotNullConverter}}" />
+                   IsVisible="{Binding TotalRows,
+                               Converter={StaticResource IsNotNullConverter}}"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}" />
 
+            <!-- Progress percentage — only shown if total rows is set -->
             <Label Text="{Binding ProgressPercentage}"
                    FontFamily="MontserratSemiBold"
                    FontSize="14"
-                   TextColor="{StaticResource BrandGold}"
                    VerticalOptions="Center"
-                   IsVisible="{Binding TotalRows, Converter={StaticResource IsNotNullConverter}}" />
+                   IsVisible="{Binding TotalRows,
+                               Converter={StaticResource IsNotNullConverter}}"
+                   TextColor="{StaticResource BrandGold}" />
+
+          </HorizontalStackLayout>
+
+          <!-- Session summary — only shown if project has sessions -->
+          <HorizontalStackLayout Spacing="6"
+                                  IsVisible="{Binding HasSessions}">
+
+            <Image WidthRequest="14"
+                   HeightRequest="14"
+                   VerticalOptions="Center">
+              <Image.Source>
+                <AppThemeBinding Light="timer_light.svg" Dark="timer_dark.svg" />
+              </Image.Source>
+            </Image>
+
+            <!-- "Last: Tuesday" -->
+            <Label FontFamily="MontserratMedium"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}">
+              <Label.Text>
+                <MultiBinding StringFormat="Last session: {0}">
+                  <Binding Path="LastSessionText" />
+                </MultiBinding>
+              </Label.Text>
+            </Label>
+
+            <Label Text="|"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}" />
+
+            <!-- "Total: 3h 20m" -->
+            <Label FontFamily="MontserratMedium"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}">
+              <Label.Text>
+                <MultiBinding StringFormat="Total time: {0}">
+                  <Binding Path="TotalTimeText" />
+                </MultiBinding>
+              </Label.Text>
+            </Label>
 
           </HorizontalStackLayout>
 
@@ -153,41 +270,46 @@
 
         </VerticalStackLayout>
 
-        <!-- PATTERN SECTION (if exists) — flat, no card -->
+        <!-- PATTERN FILES -->
         <VerticalStackLayout Padding="20,20,20,0"
-                             Spacing="8"
-                             IsVisible="{Binding HasPattern}">
-
+                     Spacing="8"
+                     IsVisible="{Binding HasPatternFiles}">
           <HorizontalStackLayout Spacing="8">
-            <Image Grid.Column="0"
-                   WidthRequest="16"
-                   HeightRequest="16"
-                   VerticalOptions="Center">
+            <Image WidthRequest="16" HeightRequest="16" VerticalOptions="Center">
               <Image.Source>
                 <AppThemeBinding Light="file_light.svg" Dark="file_dark.svg" />
               </Image.Source>
             </Image>
             <Label Text="Pattern"
-                   FontFamily="MontserratSemiBold"
-                   FontSize="16"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+                   FontFamily="MontserratSemiBold" FontSize="16"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                               Dark={StaticResource DarkTextPrimary}}" />
           </HorizontalStackLayout>
+          <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
+             HorizontalOptions="Fill" Opacity="0.4" />
+          <!-- 2-column grid built in code-behind -->
+          <VerticalStackLayout x:Name="PatternFilesGrid" Spacing="8" />
+        </VerticalStackLayout>
 
-          <!-- Gold divider -->
-          <BoxView HeightRequest="1"
-                   BackgroundColor="{StaticResource BrandGold}"
-                   HorizontalOptions="Fill"
-                   Opacity="0.4" />
-
-          <Label Text="{Binding PatternFileName}"
-                 FontFamily="MontserratMedium"
-                 FontSize="14"
-                 TextColor="{StaticResource BrandGold}">
-            <Label.GestureRecognizers>
-              <TapGestureRecognizer Command="{Binding ViewPatternCommand}" />
-            </Label.GestureRecognizers>
-          </Label>
-
+        <!-- INSPIRATION PHOTOS -->
+        <VerticalStackLayout Padding="20,20,20,0"
+                             Spacing="8"
+                             IsVisible="{Binding HasInspirationPhotos}">
+          <HorizontalStackLayout Spacing="8">
+            <Image WidthRequest="16" HeightRequest="16" VerticalOptions="Center">
+              <Image.Source>
+                <AppThemeBinding Light="photo_light.svg" Dark="photo_dark.svg" />
+              </Image.Source>
+            </Image>
+            <Label Text="Inspiration"
+                   FontFamily="MontserratSemiBold" FontSize="16"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                               Dark={StaticResource DarkTextPrimary}}" />
+          </HorizontalStackLayout>
+          <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
+                  HorizontalOptions="Fill" Opacity="0.4" />
+          <!-- 2-column grid built in code-behind -->
+          <VerticalStackLayout x:Name="InspirationPhotosGrid" Spacing="8" />
         </VerticalStackLayout>
 
         <!-- ============================================ -->
@@ -237,9 +359,7 @@
 
         </VerticalStackLayout>
 
-        <!-- ============================================ -->
         <!-- ACTION BUTTONS: Edit | Archive/Unarchive | Delete -->
-        <!-- ============================================ -->
         <Grid ColumnDefinitions="*,*,*"
               ColumnSpacing="10"
               Margin="20,24,20,32">
@@ -248,7 +368,7 @@
           <Border Grid.Column="0"
                   Padding="12,10"
                   StrokeThickness="0"
-                  BackgroundColor="{AppThemeBinding Light=#424B54, Dark=#424B54}">
+                  BackgroundColor="{AppThemeBinding Light={StaticResource ButtonSecondary}, Dark={StaticResource ButtonSecondaryDark}}">
             <Border.StrokeShape>
               <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
@@ -261,13 +381,13 @@
                      HeightRequest="16"
                      VerticalOptions="Center">
                 <Image.Behaviors>
-                  <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
+                  <toolkit:IconTintColorBehavior TintColor="White" />
                 </Image.Behaviors>
               </Image>
               <Label Text="Edit"
                      FontFamily="MontserratMedium"
                      FontSize="14"
-                     TextColor="{StaticResource BrandGold}"
+                     TextColor="White"
                      VerticalOptions="Center" />
             </HorizontalStackLayout>
           </Border>
@@ -276,7 +396,7 @@
           <Border Grid.Column="1"
                   Padding="12,10"
                   StrokeThickness="0"
-                  BackgroundColor="{AppThemeBinding Light=#424B54, Dark=#424B54}">
+                  BackgroundColor="{AppThemeBinding Light={StaticResource ButtonSecondary}, Dark={StaticResource ButtonSecondaryDark}}">
             <Border.StrokeShape>
               <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
@@ -289,13 +409,13 @@
                      HeightRequest="16"
                      VerticalOptions="Center">
                 <Image.Behaviors>
-                  <toolkit:IconTintColorBehavior TintColor="{StaticResource BrandGold}" />
+                  <toolkit:IconTintColorBehavior TintColor="White" />
                 </Image.Behaviors>
               </Image>
               <Label Text="{Binding ArchiveButtonText}"
                      FontFamily="MontserratMedium"
                      FontSize="14"
-                     TextColor="{StaticResource BrandGold}"
+                     TextColor="White"
                      VerticalOptions="Center" />
             </HorizontalStackLayout>
           </Border>

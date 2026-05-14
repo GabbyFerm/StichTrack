@@ -74,6 +74,80 @@ public partial class SingleProjectPage : ContentPage
     {
         base.OnAppearing();
         await _viewModel.LoadProjectAsync();
+        BuildFilesGrid(PatternFilesGrid, _viewModel.PatternFiles);
+        BuildFilesGrid(InspirationPhotosGrid, _viewModel.InspirationPhotos);
+    }
+
+    private void BuildFilesGrid(VerticalStackLayout container, IReadOnlyList<ProjectFile> files)
+    {
+        container.Children.Clear();
+        if (files.Count == 0) return;
+
+        for (int i = 0; i < files.Count; i += 2)
+        {
+            var row = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitionCollection
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Star }
+            },
+                ColumnSpacing = 8
+            };
+
+            row.Add(CreatePageFileChip(files[i]), column: 0, row: 0);
+
+            if (i + 1 < files.Count)
+                row.Add(CreatePageFileChip(files[i + 1]), column: 1, row: 0);
+            else
+                row.Add(new BoxView { IsVisible = false }, column: 1, row: 0);
+
+            container.Children.Add(row);
+        }
+    }
+
+    private Border CreatePageFileChip(ProjectFile file)
+    {
+        var isDark = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark;
+
+        var chip = new Border
+        {
+            StrokeThickness = 0,
+            BackgroundColor = isDark ? Color.FromArgb("#3D4449") : Color.FromArgb("#EBE3C8"),
+            Padding = new Thickness(10, 8),
+            StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+            {
+                CornerRadius = new CornerRadius(8)
+            }
+        };
+
+        var isPhoto = file.ContentType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) == true;
+
+        var content = new HorizontalStackLayout { Spacing = 6 };
+
+        content.Children.Add(new Label
+        {
+            Text = isPhoto ? "🖼️" : "📄",
+            FontSize = 12,
+            VerticalOptions = LayoutOptions.Center
+        });
+
+        content.Children.Add(new Label
+        {
+            Text = file.FileName,
+            FontFamily = "MontserratMedium",
+            FontSize = 12,
+            TextColor = Color.FromArgb("#E1AD37"), // BrandGold
+            VerticalOptions = LayoutOptions.Center,
+            LineBreakMode = LineBreakMode.TailTruncation
+        });
+
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += async (_, _) => await _viewModel.OpenProjectFileAsync(file.FilePath);
+        chip.GestureRecognizers.Add(tap);
+
+        chip.Content = content;
+        return chip;
     }
 
     /// <summary>
