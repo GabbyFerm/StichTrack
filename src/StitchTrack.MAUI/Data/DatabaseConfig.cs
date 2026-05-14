@@ -14,5 +14,5 @@ public static class DatabaseConfig
 
     // Gets the SQLite connection string with recommended settings
     public static string ConnectionString =>
-        $"Data Source={DatabasePath};Cache=Shared;";
+         $"Data Source={DatabasePath}";
 }
