@@ -19,6 +19,10 @@ public class RowNoteRepository : IRowNoteRepository
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
+    /// <summary>
+    /// Gets all row notes for a project, ordered by row number ascending.
+    /// Used to display in-the-moment reminders (e.g., "decrease here at row 12") in sequence.
+    /// </summary>
     public async Task<IEnumerable<RowNote>> GetByProjectIdAsync(Guid projectId)
     {
         return await _context.RowNotes

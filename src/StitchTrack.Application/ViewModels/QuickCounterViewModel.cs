@@ -41,7 +41,10 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     public ICommand ResetCommand { get; }
     public ICommand SaveToProjectCommand { get; }
 
-    // Callback when project is saved (for navigation)
+    /// <summary>
+    /// Set by QuickCounterPage — callback invoked after the quick counter is successfully saved as a project.
+    /// Used for navigation (e.g., closing the page after save completes).
+    /// </summary>
     public Func<Task>? OnProjectSaved { get; set; }
 
     public QuickCounterViewModel(IProjectRepository projectRepository, IDialogService dialogService, IHapticsService hapticsService)

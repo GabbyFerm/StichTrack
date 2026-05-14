@@ -87,15 +87,15 @@ public class ProjectsViewModel : INotifyPropertyChanged
     public int ArchivedProjectCount => _allProjects.Count(p => p.IsArchived);
 
     /// <summary>
-    /// Set by ProjectsPage to open the form popup.
-    /// Receives the project to edit (null = create mode).
-    /// Returns the filled form result, or null if cancelled.
+    /// Set by ProjectsPage — callback to display the project form popup for create/edit operations.
+    /// Receives the project to edit (null for create mode).
+    /// Returns the form result with updated project data, or null if the user cancelled.
     /// </summary>
     public Func<Project?, Task<ProjectFormResult?>>? ShowProjectFormAsync { get; set; }
 
     /// <summary>
-    /// Set by ProjectsPage to open the project menu popup.
-    /// Returns the action string ("Edit", "Archive", "Unarchive", "Delete"), or null for cancel.
+    /// Set by ProjectsPage — callback to display the project context menu popup.
+    /// Returns the action the user selected ("Edit", "Archive", "Unarchive", "Delete"), or null if cancelled.
     /// </summary>
     public Func<Project, Task<string?>>? ShowProjectMenuPopupAsync { get; set; }
 

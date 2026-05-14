@@ -22,7 +22,7 @@
       <converters:ProgressPercentageConverter x:Key="ProgressPercentageConverter" />
       <converters:TagColorIndexConverter x:Key="TagColorIndexConverter" />
 
-      <!-- Add your custom font styles here -->
+      <!-- Default font family for all controls -->
       <Style TargetType="Label">
         <Setter Property="FontFamily" Value="MontserratRegular" />
       </Style>

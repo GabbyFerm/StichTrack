@@ -24,6 +24,13 @@ public class SessionRepository : ISessionRepository
         System.Diagnostics.Debug.WriteLine($"📝 Session added to context: {session.Id}");
     }
 
+    /// <summary>
+    /// Saves all pending changes to the database.
+    /// Special handling: Cleans up stale CounterHistory entries in the change tracker
+    /// to prevent spurious UPDATE attempts on entities from previous page loads.
+    /// This is necessary because ProjectCounterPage loads CounterHistory via GetByIdAsync
+    /// but doesn't intend to modify it — the detach prevents accidental state tracking issues.
+    /// </summary>
     public async Task<int> SaveChangesAsync()
     {
         // Detach stale CounterHistory entries tracked from previous page loads

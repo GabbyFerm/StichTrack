@@ -6,7 +6,7 @@ namespace StitchTrack.MAUI.Controls;
 /// <summary>
 /// Onboarding popup shown on first app launch.
 /// Uses Community Toolkit Popup for clean UX.
-/// Integrates with AppSettings to track HasSeenOnboarding.
+/// Integrates with AppSettings to Sets IsFirstRun to false.
 /// </summary>
 public partial class OnboardingPopup : Popup
 {
@@ -41,11 +41,16 @@ public partial class OnboardingPopup : Popup
     /// </summary>
     private async void OnEnableSyncClicked(object sender, EventArgs e)
     {
-        // Phase 3 feature - show info message
-        await Microsoft.Maui.Controls.Application.Current!.Windows[0].Page!.DisplayAlert(
+        // Phase 3 feature — inform user it's coming
+        await ShowAlertAsync(
             "Coming Soon",
-            "Cloud backup & sync will be available in Phase 3! For now, your projects are safely stored locally on your device.",
-            "OK");
+            "Cloud backup & sync will be available in a future update. Your projects are safely stored locally on your device.");
+    }
+
+    private static async Task ShowAlertAsync(string title, string message)
+    {
+        await Microsoft.Maui.Controls.Application.Current!.Windows[0].Page!
+            .DisplayAlert(title, message, "OK");
     }
 
     /// <summary>

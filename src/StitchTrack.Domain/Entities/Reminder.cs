@@ -1,5 +1,9 @@
 namespace StitchTrack.Domain.Entities;
 
+/// <summary>
+/// Represents a periodic reminder for a project.
+/// Triggers at configurable intervals when enabled and sufficient time has passed since last trigger.
+/// </summary>
 public class Reminder
 {
     public Guid Id { get; private set; }
@@ -31,6 +35,13 @@ public class Reminder
 
     private Reminder() { }
 
+    /// <summary>
+    /// Creates a new reminder with the specified interval.
+    /// Reminders are enabled by default and have never been triggered.
+    /// </summary>
+    /// <param name="projectId">The project this reminder belongs to</param>
+    /// <param name="intervalMinutes">The interval between triggers in minutes (must be > 0)</param>
+    /// <returns>A new Reminder instance ready for persistence</returns>
     public static Reminder CreateReminder(Guid projectId, int intervalMinutes)
     {
         if (intervalMinutes <= 0)
@@ -48,16 +59,26 @@ public class Reminder
         };
     }
 
+    /// <summary>
+    /// Enables the reminder so it can trigger again.
+    /// </summary>
     public void EnableReminder()
     {
         IsEnabled = true;
     }
 
+    /// <summary>
+    /// Disables the reminder so it will not trigger.
+    /// </summary>
     public void DisableReminder()
     {
         IsEnabled = false;
     }
 
+    /// <summary>
+    /// Updates the interval between reminder triggers.
+    /// </summary>
+    /// <param name="intervalMinutes">The new interval in minutes (must be > 0)</param>
     public void UpdateInterval(int intervalMinutes)
     {
         if (intervalMinutes <= 0)
@@ -68,6 +89,10 @@ public class Reminder
         IntervalMinutes = intervalMinutes;
     }
 
+    /// <summary>
+    /// Records that the reminder has been triggered now.
+    /// Updates LastTriggeredAt to the current time.
+    /// </summary>
     public void MarkTriggered()
     {
         LastTriggeredAt = DateTime.UtcNow;

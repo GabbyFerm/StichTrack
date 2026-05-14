@@ -17,7 +17,7 @@ namespace StitchTrack.Application.ViewModels;
 /// - User taps Play  → starts visual timer + creates in-memory Session
 /// - User taps Pause → pauses visual timer (session keeps its start time)
 /// - Save Progress   → saves Project.CurrentCount only, stays on page
-/// - End Session     → saves Session + Project.CurrentCount, navigates back
+/// - End Session     → saves Project.CurrentCount and Session, then navigates back
 /// </summary>
 public class ProjectCounterViewModel : INotifyPropertyChanged
 {
@@ -93,7 +93,11 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     public string SessionButtonText => IsSessionRunning ? "PAUSE" : "START SESSION";
     public string SessionButtonIcon => IsSessionRunning ? "pause.svg" : "play.svg";
 
-    // ─── Pattern ─────────────────────────────────────────────────
+    // ─── Project Files (Pattern) ──────────────────────────────
+    /// <summary>
+    /// Checks if the project has any pattern-type files attached.
+    /// Note: Use PatternFiles property to access the collection directly.
+    /// </summary>
     public bool HasPattern =>
     (_project?.ProjectFiles.Any(f => f.FileType == ProjectFileType.Pattern) ?? false);
 
@@ -112,7 +116,10 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             .OrderByDescending(f => f.UploadedAt)
             .ToList() ?? [];
 
-    // Set by the Page — same pattern as SingleProjectViewModel
+    /// <summary>
+    /// Set by the ProjectCounterPage — callback to open a file in the native viewer.
+    /// Receives a local file path to a pattern file or other project attachment.
+    /// </summary>
     public Func<string, Task>? OpenFileAsync { get; set; }
 
     // ─── Notes expand/collapse ───────────────────────────────────

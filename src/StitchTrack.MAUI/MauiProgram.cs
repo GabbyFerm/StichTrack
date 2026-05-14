@@ -87,51 +87,41 @@ public static class MauiProgram
         var app = builder.Build();
 
         // Remove Android Material underline from all Entry and Editor controls
-        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(  // ← add this block
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(
             "NoUnderline", (handler, view) =>
             {
-#if ANDROID
+        #if ANDROID
                 handler.PlatformView.BackgroundTintList =
                     Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
-#endif
+        #endif
             });
 
-        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping(  // ← already there
-            "NoUnderline", (handler, view) =>
-            {
-#if ANDROID
-                handler.PlatformView.BackgroundTintList =
-                    Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
-#endif
-            });
-
-        // Remove Android Material underline from all Entry and Editor controls
         Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping(
-    "NoUnderline", (handler, view) =>
-    {
-#if ANDROID
-        handler.PlatformView.BackgroundTintList =
-            Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
-#endif
-    });
+            "NoUnderline", (handler, view) =>
+            {
+        #if ANDROID
+                        handler.PlatformView.BackgroundTintList =
+                            Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+        #endif
+            });
+
+        #if DEBUG
+                System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
+        #endif
+
         Task.Run(async () =>
         {
             try
             {
                 using var scope = app.Services.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-                System.Diagnostics.Debug.WriteLine("🔄 Applying database migrations...");
-
-                await dbContext.Database.MigrateAsync().ConfigureAwait(false);
-
-                System.Diagnostics.Debug.WriteLine("✅ Database migrations applied successfully");
+                await DbInitializer.InitializeAsync(dbContext).ConfigureAwait(false);
             }
-#pragma warning disable CA1031 // Do not catch general exception types
+        #pragma warning disable CA1031
             catch (Exception ex)
-#pragma warning restore CA1031
+        #pragma warning restore CA1031
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Migration error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Startup DB error: {ex.Message}");
             }
         });
 

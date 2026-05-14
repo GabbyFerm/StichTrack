@@ -67,7 +67,8 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // Relationships - one-to-many
+        // Relationships - one-to-many (configured here: CounterHistory, Sessions, RowNotes, Reminders)
+        // Note: ProjectFiles relationship is configured in ProjectFileConfiguration for separation of concerns
         builder.HasMany(p => p.CounterHistoryEntries)
             .WithOne(ch => ch.Project)
             .HasForeignKey(ch => ch.ProjectId)

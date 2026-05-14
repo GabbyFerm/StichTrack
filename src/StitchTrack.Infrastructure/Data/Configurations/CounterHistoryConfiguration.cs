@@ -23,8 +23,8 @@ public class CounterHistoryConfiguration : IEntityTypeConfiguration<CounterHisto
         builder.Property(ch => ch.ChangedAt)
             .IsRequired();
 
-        // Foreign key configured in ProjectConfiguration
-        // Index for undo queries (get latest by date)
+        // Foreign key and cascade delete configured in ProjectConfiguration via HasMany().WithOne()
+        // This index optimizes undo queries that fetch the latest change by date
         builder.HasIndex(ch => new { ch.ProjectId, ch.ChangedAt });
     }
 }

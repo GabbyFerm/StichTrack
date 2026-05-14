@@ -6,8 +6,9 @@ namespace StitchTrack.MAUI.Views;
 
 /// <summary>
 /// Code-behind for ProjectCounterPage.
-/// Owns the session timer — the ViewModel handles all business logic.
-/// Timer tick updates the ViewModel which updates the UI via binding.
+/// Owns the session timer (lifecycle + disposal). ViewModel handles all business logic and time formatting.
+/// Timer tick updates ViewModel → ViewModel updates UI via binding (separation of concerns).
+/// This layering keeps MAUI dependencies out of the application layer.
 /// </summary>
 [QueryProperty(nameof(ProjectId), "ProjectId")]
 // Timer is disposed in OnDisappearing — MAUI pages use lifecycle methods
@@ -19,7 +20,7 @@ public partial class ProjectCounterPage : ContentPage
     private readonly ProjectCounterViewModel _viewModel;
     private string _projectId = string.Empty;
 
-    // Timer lives here (MAUI layer) — ViewModel stays free of System.Timers
+    // Timer lives in the MAUI layer (UI lifecycle) — ViewModel stays framework-agnostic
     private System.Timers.Timer? _sessionTimer;
     private TimeSpan _sessionDuration;
 
@@ -171,8 +172,9 @@ public partial class ProjectCounterPage : ContentPage
     }
 
     /// <summary>
-    /// Fires every second — updates the ViewModel with the new elapsed time.
-    /// ViewModel formats and notifies the UI via binding.
+    /// Timer callback fires every second on a background thread.
+    /// Increments _sessionDuration on that timer thread, then dispatches the ViewModel update to the main thread.
+    /// ViewModel formats the display string and notifies the UI via binding.
     /// </summary>
     private void OnTimerTick(object? sender, System.Timers.ElapsedEventArgs e)
     {
@@ -213,7 +215,8 @@ public partial class ProjectCounterPage : ContentPage
 
     /// <summary>
     /// Rebuilds the 2-column notes grid from the ViewModel's current RowNotes list.
-    /// Called on initial load and after every add or delete via the RowNotesChanged event.
+    /// Each row displays up to 2 note chips; odd counts get a placeholder in the second column.
+    /// Called on initial load (OnAppearing) and after every add/delete via the RowNotesChanged event.
     /// </summary>
     private void BuildRowNotesGrid()
     {
@@ -327,8 +330,10 @@ public partial class ProjectCounterPage : ContentPage
     }
 
     /// <summary>
-    /// Builds the pattern files row with a gold left accent bar, file icon,
+    /// Builds the project files row with a gold left accent bar, file icon, "Pattern:" label,
     /// and inline tappable filenames separated by |.
+    /// Called on page appear to populate the FlexLayout with current pattern files from ViewModel.
+    /// Supports multiple files and shows each filename as a tappable link.
     /// </summary>
     private void BuildCounterPatternFilesRow()
     {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -8,7 +8,12 @@ namespace StitchTrack.Infrastructure.Data.Migrations
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Creates the initial database schema including all core tables:
+        /// AppSettings, Users, Projects, Sessions, RowNotes, Reminders, PatternFiles, etc.
+        /// Note: PatternFiles table is later replaced by ProjectFiles in migration 20260514140640
+        /// to support multiple file types (Pattern, InspirationPhoto).
+        /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -98,6 +103,8 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            // ⚠️ PatternFiles table (temporary) — replaced in migration 20260514140640_ReplacePatternFilesWithProjectFiles
+            // by ProjectFiles table that adds FileType support for Pattern and InspirationPhoto files.
             migrationBuilder.CreateTable(
                 name: "PatternFiles",
                 columns: table => new

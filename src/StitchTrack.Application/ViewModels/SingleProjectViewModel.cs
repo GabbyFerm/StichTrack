@@ -53,8 +53,10 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         }
     }
 
-    // ─── Pattern ──────────────────────────────────────────────────
-
+    // ─── Project Files ────────────────────────────────────────────
+    /// <summary>
+    /// Checks if the project has any pattern-type files.
+    /// </summary>
     public bool HasPatternFiles =>
         (_project?.ProjectFiles.Any(f => f.FileType == ProjectFileType.Pattern) ?? false);
 
@@ -75,7 +77,8 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
 
     /// <summary>
-    /// Set by SingleProjectPage to open a file in the native viewer.
+    /// Set by SingleProjectPage — callback to open a file (pattern, inspiration photo, etc.) in the native viewer.
+    /// Receives a local file path and handles platform-specific file opening.
     /// </summary>
     public Func<string, Task>? OpenFileAsync { get; set; }
 
@@ -97,7 +100,8 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     public bool HasNeedleOrHookSize => !string.IsNullOrWhiteSpace(_project?.NeedleOrHookSize);
 
     /// <summary>
-    /// Set by SingleProjectPage to open the create/edit form popup.
+    /// Set by SingleProjectPage — callback to display the project edit form popup.
+    /// Returns the updated form result with any changes (tags, files, details), or null if cancelled.
     /// </summary>
     public Func<Project?, Task<ProjectFormResult?>>? ShowProjectFormAsync { get; set; }
 
@@ -179,7 +183,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         {
             System.Diagnostics.Debug.WriteLine($"📂 Loading project: {ProjectId}");
 
-            // GetByIdAsync includes ProjectFiles so HasPattern and PatternFileName work
             _project = await _projectRepository.GetByIdAsync(ProjectId).ConfigureAwait(false);
 
             if (_project == null)
@@ -240,12 +243,12 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await _projectRepository.UpdateTagsAsync(_project.Id, result.Tags).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            // Save pattern file if a new one was picked
+            // Sync project files (pattern files, inspiration photos, etc.) with the database
             await SyncProjectFilesAsync(_project.Id, result.ProjectFiles, _projectFileRepository)
                     .ConfigureAwait(false);
 
 
-            // Reload to get fresh data including any new pattern file
+            // Reload to get fresh data including any newly attached project files
             await LoadProjectAsync().ConfigureAwait(false);
 
             System.Diagnostics.Debug.WriteLine($"✅ Project updated: {_project.Name}");

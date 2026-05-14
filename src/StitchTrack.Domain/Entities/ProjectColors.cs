@@ -3,7 +3,9 @@ using System.Security.Cryptography;
 namespace StitchTrack.Domain.Entities;
 
 /// <summary>
-/// Predefined color palette for project color tags. 
+/// Predefined color palette for project cards and display elements.
+/// (For tag colors, see TagColors class.)
+/// Provides a random selection from the palette for new projects.
 /// </summary>
 public static class ProjectColors
 {

@@ -21,7 +21,8 @@ public partial class QuickCounterPage : ContentPage
     }
 
     /// <summary>
-    /// Check if this is first launch and show onboarding popup.
+    /// Checks if this is the first app launch and shows the onboarding popup if needed.
+    /// Small delay allows the page to render before the popup appears.
     /// </summary>
     protected override async void OnAppearing()
     {
@@ -30,7 +31,7 @@ public partial class QuickCounterPage : ContentPage
         try
         {
             // Small delay for page to settle before showing popup
-            await Task.Delay(300);
+            await Task.Delay(300).ConfigureAwait(true);
 
             var settings = await _appSettingsRepository.GetAppSettingsAsync();
             if (settings?.IsFirstRun == true)

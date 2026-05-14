@@ -45,7 +45,14 @@ public class Project
 
     private Project() { }
 
-    // Factory method to create a new project with validated initial state
+    /// <summary>
+    /// Creates a new project with validated initial state.
+    /// Initializes counter to 0, assigns random color if not specified, and sets timestamps.
+    /// </summary>
+    /// <param name="name">Project name (required, trimmed)</param>
+    /// <param name="userId">Optional user ID for project ownership</param>
+    /// <param name="colorHex">Optional project color; random color assigned if null</param>
+    /// <returns>A new Project instance ready for persistence</returns>
     public static Project CreateProject(string name, Guid? userId = null, string? colorHex = null)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -78,6 +85,9 @@ public class Project
         UpdatedAt = DateTime.UtcNow;
     }
 
+    /// <summary>
+    /// Increments the counter by 1 and records the change for undo.
+    /// </summary>
     public void IncrementCount()
     {
         int oldValue = CurrentCount;
@@ -87,6 +97,9 @@ public class Project
         RecordCounterChange(oldValue, CurrentCount);
     }
 
+    /// <summary>
+    /// Decrements the counter by 1 if greater than 0, and records the change for undo.
+    /// </summary>
     public void DecrementCount()
     {
         if (CurrentCount > 0)
@@ -99,6 +112,9 @@ public class Project
         }
     }
 
+    /// <summary>
+    /// Resets the counter to 0 and records the change for undo.
+    /// </summary>
     public void ResetCount()
     {
         int oldValue = CurrentCount;
@@ -108,6 +124,11 @@ public class Project
         RecordCounterChange(oldValue, CurrentCount);
     }
 
+    /// <summary>
+    /// Undoes the last counter change, restoring the counter to its previous value.
+    /// Removes the associated history entry from the change tracking.
+    /// </summary>
+    /// <returns>True if an undo was performed, false if no history exists</returns>
     public bool UndoLastChange()
     {
         var lastChange = CounterHistoryEntries
@@ -134,12 +155,18 @@ public class Project
         CounterHistoryEntries.Add(history);
     }
 
+    /// <summary>
+    /// Archives the project (soft delete). The project remains in the database but is hidden from active views.
+    /// </summary>
     public void ArchiveProject()
     {
         IsArchived = true;
         UpdatedAt = DateTime.UtcNow;
     }
 
+    /// <summary>
+    /// Restores an archived project to active status.
+    /// </summary>
     public void UnarchiveProject()
     {
         IsArchived = false;
@@ -166,6 +193,12 @@ public class Project
     }
 
 
+    /// <summary>
+    /// Sets the project's cover image by local path and/or cloud URL.
+    /// Pass null to clear both paths.
+    /// </summary>
+    /// <param name="imagePath">Local file path to the cover image</param>
+    /// <param name="imageUrl">Cloud URL for the cover image (Phase 3)</param>
     public void SetProjectImage(string? imagePath, string? imageUrl = null)
     {
         ImagePath = imagePath;
@@ -218,6 +251,10 @@ public class Project
 
     // ─── Cloud sync ────────────────────────────────────────────────
 
+    /// <summary>
+    /// Marks the project as synced to cloud storage, recording the file ID and incrementing sync version.
+    /// </summary>
+    /// <param name="cloudFileId">The cloud storage file ID (iCloud/Drive/etc.)</param>
     public void MarkAsSynced(string cloudFileId)
     {
         if (string.IsNullOrWhiteSpace(cloudFileId))
