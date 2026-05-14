@@ -3,8 +3,9 @@ using StitchTrack.Application.ViewModels;
 namespace StitchTrack.MAUI.Views;
 
 /// <summary>
-/// Export page — allows users to export project data as JSON or CSV.
-/// All logic lives in ExportViewModel — this code-behind only wires up the BindingContext.
+/// Export page — allows users to export project data as JSON or CSV files.
+/// All business logic lives in ExportViewModel.
+/// This code-behind only wires the BindingContext; the Page is presentation-only.
 /// </summary>
 public partial class ExportPage : ContentPage
 {

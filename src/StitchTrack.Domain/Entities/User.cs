@@ -15,7 +15,14 @@ public class User
 
     private User() { }
 
-    // Creates a new user account with validated credentials.
+    /// <summary>
+    /// Creates a new user account with validated credentials.
+    /// Email is stored in uppercase; password should already be hashed by the caller.
+    /// </summary>
+    /// <param name="email">User email (required, converted to uppercase)</param>
+    /// <param name="passwordHash">Pre-hashed password (required)</param>
+    /// <param name="displayName">Optional display name (trimmed)</param>
+    /// <returns>A new User instance ready for persistence</returns>
     public static User CreateUser(string email, string passwordHash, string? displayName = null)
     {
         if (string.IsNullOrWhiteSpace(email))

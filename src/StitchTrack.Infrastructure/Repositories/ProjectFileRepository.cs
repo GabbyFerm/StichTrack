@@ -43,7 +43,10 @@ public class ProjectFileRepository : IProjectFileRepository
     }
 
     /// <summary>
-    /// Uses ExecuteDeleteAsync — bypasses change tracker, no SaveChanges needed.
+    /// Uses ExecuteDeleteAsync to delete directly via SQL — bypasses change tracker entirely.
+    /// No SaveChangesAsync needed; executes immediately as a separate database operation.
+    /// This asymmetry with AddAsync (which requires SaveChangesAsync) is intentional for
+    /// transactional safety when removing files immediately after upload decisions.
     /// </summary>
     public async Task DeleteAsync(Guid id)
     {

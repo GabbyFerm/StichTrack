@@ -5,10 +5,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace StitchTrack.Infrastructure.Data.Migrations
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Replaces PatternFiles table with ProjectFiles, adding FileType column 
+    /// to support multiple file types (Pattern, InspirationPhoto).
+    /// Migrates existing pattern file records (FileType = 0 = Pattern enum value).
+    /// </summary>
     public partial class ReplacePatternFilesWithProjectFiles : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Creates ProjectFiles table with FileType support and migrates existing PatternFiles data.
+        /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // 1. Create the new table first
@@ -37,11 +43,12 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            // 2. Copy existing pattern data before dropping the old table
+            // 2. Copy existing pattern data before dropping the old table.
+            // All existing PatternFiles are assigned FileType = 0 (Pattern enum value).
             migrationBuilder.Sql(
                 @"INSERT INTO ProjectFiles (Id, ProjectId, FileType, FileName, FilePath, FileUrl,
                   FileSizeBytes, ContentType, UploadedAt)
-                  SELECT Id, ProjectId, 0, FileName, FilePath, FileUrl,
+                  SELECT Id, ProjectId, 0 AS FileType, FileName, FilePath, FileUrl,
                   FileSizeBytes, ContentType, UploadedAt FROM PatternFiles");
 
             // 3. Now safe to drop
@@ -54,7 +61,10 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                 columns: new[] { "ProjectId", "FileType" });
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Rolls back to PatternFiles table (legacy schema without FileType support).
+        /// Note: Recreates with simplified index (ProjectId only) vs forward migration's composite index.
+        /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
@@ -84,6 +94,7 @@ namespace StitchTrack.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            // Simplified index for legacy table (FileType filtering not supported in rollback)
             migrationBuilder.CreateIndex(
                 name: "IX_PatternFiles_ProjectId",
                 table: "PatternFiles",

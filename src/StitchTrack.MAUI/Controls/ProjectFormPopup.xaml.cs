@@ -6,7 +6,8 @@ namespace StitchTrack.MAUI.Controls;
 
 /// <summary>
 /// Reusable popup for creating or editing a project.
-/// Handles photo upload (camera/library) and PDF pattern upload (file picker).
+/// Handles photo upload (camera/library) and file attachment support (PDF patterns, inspiration photos).
+/// Multiple files of different types are now supported (replaced single pattern upload).
 /// Returns a ProjectFormResult on save, or null on cancel.
 /// </summary>
 public partial class ProjectFormPopup : Popup
@@ -162,8 +163,9 @@ public partial class ProjectFormPopup : Popup
     }
 
     /// <summary>
-    /// Rebuilds the chip FlexLayout from _selectedTags.
-    /// Called after every add or remove so the UI stays in sync.
+    /// Rebuilds the tag chip FlexLayout from _selectedTags list.
+    /// Colors cycle through TagColors.Palette by position (index % Palette.Length).
+    /// Called after every add or remove so the UI stays in sync with the tag list.
     /// </summary>
     private void BuildTagChips()
     {

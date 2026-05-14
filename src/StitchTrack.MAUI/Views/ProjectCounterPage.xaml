@@ -110,7 +110,7 @@
           </Grid>
         </Border>
 
-        <!-- PATTERN FILES — 2-column grid built in code-behind -->
+        <!-- PROJECT FILES (PATTERN) — 2-column grid of file chips built in code-behind -->
         <Grid IsVisible="{Binding HasPattern}"
               Margin="10,15,0,0"
               ColumnDefinitions="3,*"
@@ -146,7 +146,7 @@
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                                Dark={StaticResource DarkTextSecondary}}" />
 
-            <!-- File links added here by code-behind -->
+            <!-- File links added here by code-behind BuildCounterPatternFilesRow() -->
           </FlexLayout>
 
         </Grid>

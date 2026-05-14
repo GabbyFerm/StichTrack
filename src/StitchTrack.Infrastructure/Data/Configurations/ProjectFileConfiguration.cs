@@ -4,6 +4,11 @@ using StitchTrack.Domain.Entities;
 
 namespace StitchTrack.Infrastructure.Data.Configurations;
 
+/// <summary>
+/// Configures ProjectFile entity mapping to database.
+/// Supports multiple file types (Pattern, InspirationPhoto) per project.
+/// Uses composite index on (ProjectId, FileType) for efficient filtering by file type.
+/// </summary>
 public class ProjectFileConfiguration : IEntityTypeConfiguration<ProjectFile>
 {
     public void Configure(EntityTypeBuilder<ProjectFile> builder)

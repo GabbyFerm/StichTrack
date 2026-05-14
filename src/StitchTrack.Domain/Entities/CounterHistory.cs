@@ -16,7 +16,14 @@ public class CounterHistory
 
     private CounterHistory() { }
 
-    // Creates a new counter history entry. Called by Project entity when counter changes.
+    /// <summary>
+    /// Creates a new counter history entry to track a counter change.
+    /// Called internally by the Project entity when the counter is modified.
+    /// </summary>
+    /// <param name="projectId">The project this change belongs to</param>
+    /// <param name="oldValue">The counter value before the change</param>
+    /// <param name="newValue">The counter value after the change</param>
+    /// <returns>A new CounterHistory instance ready for persistence</returns>
     internal static CounterHistory CreateCounterHistory(Guid projectId, int oldValue, int newValue)
     {
         return new CounterHistory

@@ -1,5 +1,9 @@
 namespace StitchTrack.Domain.Entities;
 
+/// <summary>
+/// Application-wide settings (single-row table).
+/// Manages onboarding state, theme preference, sync configuration, and haptics.
+/// </summary>
 public class AppSettings
 {
     public Guid Id { get; private set; } = Guid.Parse("00000000-0000-0000-0000-000000000001");
@@ -17,6 +21,11 @@ public class AppSettings
 
     private AppSettings() { }
 
+    /// <summary>
+    /// Creates default AppSettings for first-run scenarios.
+    /// Initializes with onboarding enabled, auto theme, and haptics on.
+    /// </summary>
+    /// <returns>A new AppSettings instance with default values</returns>
     public static AppSettings CreateDefault()
     {
         return new AppSettings
@@ -27,6 +36,9 @@ public class AppSettings
         };
     }
 
+    /// <summary>
+    /// Marks the app as no longer in first-run state after onboarding completes.
+    /// </summary>
     public void CompleteFirstRun()
     {
         IsFirstRun = false;
@@ -42,6 +54,10 @@ public class AppSettings
         FirstRunCompletedAt = null;
     }
 
+    /// <summary>
+    /// Enables cloud sync and sets the provider (e.g., "iCloud", "GoogleDrive").
+    /// </summary>
+    /// <param name="provider">The cloud sync provider name (required)</param>
     public void EnableSync(string provider)
     {
         if (string.IsNullOrWhiteSpace(provider))
@@ -52,12 +68,20 @@ public class AppSettings
         SyncProvider = provider;
     }
 
+    /// <summary>
+    /// Disables cloud sync and clears the provider.
+    /// </summary>
     public void DisableSync()
     {
         SyncEnabled = false;
         SyncProvider = null;
     }
 
+    /// <summary>
+    /// Updates the app theme preference.
+    /// Valid values: "Light", "Dark", "Auto".
+    /// </summary>
+    /// <param name="theme">The new theme setting</param>
     public void UpdateTheme(string theme)
     {
         if (theme != "Light" && theme != "Dark" && theme != "Auto")
@@ -76,6 +100,9 @@ public class AppSettings
         return HapticFeedbackEnabled;
     }
 
+    /// <summary>
+    /// Increments the project creation counter for analytics or feature gating.
+    /// </summary>
     public void IncrementProjectCreationCount()
     {
         ProjectCreationCount++;

@@ -38,7 +38,7 @@ public partial class SingleProjectPage : ContentPage
             catch (InvalidOperationException ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Invalid operation: {ex.Message}");
-                await DisplayAlert("Cannot Open File", "Could not open the pattern file due to an invalid operation.", "OK");
+                await DisplayAlert("Cannot Open File", "Could not open the file due to an invalid operation.", "OK");
             }
             catch (System.IO.IOException ex)
             {
@@ -78,6 +78,10 @@ public partial class SingleProjectPage : ContentPage
         BuildFilesGrid(InspirationPhotosGrid, _viewModel.InspirationPhotos);
     }
 
+    /// <summary>
+    /// Builds a 2-column grid of file chips for either pattern files or inspiration photos.
+    /// Used to display project attachments with proper layout for odd/even counts.
+    /// </summary>
     private void BuildFilesGrid(VerticalStackLayout container, IReadOnlyList<ProjectFile> files)
     {
         container.Children.Clear();
@@ -106,6 +110,10 @@ public partial class SingleProjectPage : ContentPage
         }
     }
 
+    /// <summary>
+    /// Creates a single file chip with icon (📄 for PDF, 🖼️ for image) and tappable filename.
+    /// Used for both pattern files and inspiration photos.
+    /// </summary>
     private Border CreatePageFileChip(ProjectFile file)
     {
         var isDark = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark;

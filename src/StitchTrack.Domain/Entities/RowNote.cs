@@ -16,7 +16,13 @@ public class RowNote
 
     private RowNote() { }
 
-    // Creates a note for a specific row.
+    /// <summary>
+    /// Creates a validated row note with row number and optional text.
+    /// </summary>
+    /// <param name="projectId">The project this note belongs to</param>
+    /// <param name="rowNumber">The row number for this note (must be >= 0)</param>
+    /// <param name="noteText">Optional reminder text (trimmed)</param>
+    /// <returns>A new RowNote instance ready for persistence</returns>
     public static RowNote CreateRowNote(Guid projectId, int rowNumber, string? noteText)
     {
         if (rowNumber < 0)
