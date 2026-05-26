@@ -12,6 +12,9 @@ public record ProjectFormResult(
     string? NeedleOrHookSize,
     IReadOnlyList<string> Tags,
     string? ImagePath,
-    // Replaces PatternFilePath + PatternFileName — supports multiple files of any type
-    IReadOnlyList<PendingProjectFile> ProjectFiles
+    // Supports multiple files of any type (Pattern / InspirationPhoto)
+    IReadOnlyList<PendingProjectFile> ProjectFiles,
+    // Counter names to create on project creation.
+    // Empty list → ViewModel defaults to a single "Rows" counter.
+    IReadOnlyList<string> InitialCounterNames
 );

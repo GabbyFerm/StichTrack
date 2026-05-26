@@ -19,6 +19,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectFileRepository _projectFileRepository;
+    private readonly IProjectCounterRepository _counterRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly SynchronizationContext? _syncContext;
@@ -114,11 +115,13 @@ public class ProjectsViewModel : INotifyPropertyChanged
     public ProjectsViewModel(
         IProjectRepository projectRepository,
         IProjectFileRepository projectFileRepository,
+        IProjectCounterRepository counterRepository,
         IDialogService dialogService,
         INavigationService navigationService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _projectFileRepository = projectFileRepository ?? throw new ArgumentNullException(nameof(projectFileRepository));
+        _counterRepository = counterRepository ?? throw new ArgumentNullException(nameof(counterRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
@@ -260,6 +263,16 @@ public class ProjectsViewModel : INotifyPropertyChanged
                     .ConfigureAwait(false);
             }
 
+            var counterNames = result.InitialCounterNames.Count > 0
+                ? result.InitialCounterNames.ToList()
+                : new List<string> { "Rows" };
+
+            for (int i = 0; i < counterNames.Count; i++)
+            {
+                var counter = ProjectCounter.Create(newProject.Id, counterNames[i], sortOrder: i);
+                await _counterRepository.AddAsync(counter).ConfigureAwait(false);
+            }
+            await _counterRepository.SaveChangesAsync().ConfigureAwait(false);
 
             System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Name}");
             await LoadProjectsAsync().ConfigureAwait(false);

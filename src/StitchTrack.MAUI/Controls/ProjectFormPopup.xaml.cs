@@ -17,9 +17,8 @@ public partial class ProjectFormPopup : Popup
     private readonly List<PendingProjectFile> _pendingFiles = new();
     private readonly bool _isEditMode;
 
-    // Tracks tag names in the order the user added them
     private readonly List<string> _selectedTags = new();
-
+    private readonly List<string> _selectedCounterNames = new();
 
     public ProjectFormPopup(Project? existingProject = null)
     {
@@ -72,6 +71,12 @@ public partial class ProjectFormPopup : Popup
         }
 
         BuildTagChips();
+
+        if (!_isEditMode)
+            BuildCounterChips();   // counters only shown in create mode
+        else
+            CounterSection.IsVisible = false;  // hide in edit mode — managed from SingleProjectPage
+
     }
 
     // Static to avoid allocating new arrays on every file picker call
@@ -224,6 +229,86 @@ public partial class ProjectFormPopup : Popup
 
             chip.Content = row;
             TagChipContainer.Children.Add(chip);
+        }
+    }
+
+    private void OnAddCounterTapped(object sender, TappedEventArgs e)
+    => TryAddCurrentCounter();
+
+    private void OnCounterEntryCompleted(object sender, EventArgs e)
+        => TryAddCurrentCounter();
+
+    private void TryAddCurrentCounter()
+    {
+        var name = CounterEntry.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        // Silently ignore duplicates (case-insensitive)
+        if (_selectedCounterNames.Any(c => c.Equals(name, StringComparison.OrdinalIgnoreCase)))
+        {
+            CounterEntry.Text = string.Empty;
+            return;
+        }
+
+        _selectedCounterNames.Add(name);
+        CounterEntry.Text = string.Empty;
+        BuildCounterChips();
+    }
+
+    private void BuildCounterChips()
+    {
+        CounterChipContainer.Children.Clear();
+
+        foreach (var counterName in _selectedCounterNames)
+        {
+            var chip = new Border
+            {
+                StrokeThickness = 0,
+                BackgroundColor = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark
+                    ? Color.FromArgb("#4A5259")
+                    : Color.FromArgb("#F5EDD3"),
+                Padding = new Thickness(10, 6),
+                Margin = new Thickness(0, 0, 6, 6),
+                StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+                {
+                    CornerRadius = new CornerRadius(10)
+                }
+            };
+
+            var row = new HorizontalStackLayout { Spacing = 6 };
+
+            row.Children.Add(new Label
+            {
+                Text = counterName,
+                FontFamily = "MontserratMedium",
+                FontSize = 12,
+                TextColor = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark
+                    ? Colors.White
+                    : Color.FromArgb("#2C3338"),
+                VerticalOptions = LayoutOptions.Center
+            });
+
+            var removeLabel = new Label
+            {
+                Text = "×",
+                FontFamily = "MontserratBold",
+                FontSize = 14,
+                TextColor = Color.FromArgb("#E1AD37"),
+                VerticalOptions = LayoutOptions.Center
+            };
+
+            var captured = counterName;
+            var tap = new TapGestureRecognizer();
+            tap.Tapped += (_, _) =>
+            {
+                _selectedCounterNames.Remove(captured);
+                BuildCounterChips();
+            };
+            removeLabel.GestureRecognizers.Add(tap);
+            row.Children.Add(removeLabel);
+
+            chip.Content = row;
+            CounterChipContainer.Children.Add(chip);
         }
     }
 
@@ -592,11 +677,11 @@ public partial class ProjectFormPopup : Popup
             TotalRows: totalRows,
             Notes: string.IsNullOrWhiteSpace(NotesEditor.Text) ? null : NotesEditor.Text.Trim(),
             NeedleOrHookSize: string.IsNullOrWhiteSpace(NeedleSizeEntry.Text) ? null : NeedleSizeEntry.Text.Trim(),
-            Tags: _selectedTags.AsReadOnly(),  // snapshot of the current tag list
+            Tags: _selectedTags.AsReadOnly(),
             ImagePath: _selectedImagePath,
-            ProjectFiles: _pendingFiles.AsReadOnly()
+            ProjectFiles: _pendingFiles.AsReadOnly(),
+            InitialCounterNames: _selectedCounterNames.AsReadOnly()  // ← new
         );
-
         await CloseAsync(result);
     }
 

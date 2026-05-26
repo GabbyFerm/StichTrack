@@ -10,26 +10,22 @@
 
   <Grid RowDefinitions="Auto,Auto,*">
 
-    <!-- ============================================ -->
-    <!-- TOP BAR: Logo                                -->
-    <!-- ============================================ -->
+    <!-- TOP BAR: Logo -->
     <Grid Grid.Row="0"
           BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-          Padding="30,30">
+          Padding="30,30,30,30">
       <Image Source="logo.svg"
              HeightRequest="35"
              HorizontalOptions="Start"
              Aspect="AspectFit" />
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- HEADER: Icon + Title                         -->
-    <!-- ============================================ -->
+    <!-- HEADER: Icon + Title -->
     <Grid Grid.Row="1"
       BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-      Padding="20,0,20,20">
+      Padding="30,10,20,20">
 
-      <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+      <HorizontalStackLayout Spacing="10" HorizontalOptions="Start">
         <Image Source="settings.svg"
            WidthRequest="22"
            HeightRequest="22"
@@ -46,15 +42,11 @@
 
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- SCROLLABLE CONTENT                           -->
-    <!-- ============================================ -->
+    <!-- SCROLLABLE CONTENT -->
     <ScrollView Grid.Row="2">
       <VerticalStackLayout Spacing="0" Padding="20,24,20,32">
 
-        <!-- ============================================ -->
-        <!-- SECTION: App Settings                        -->
-        <!-- ============================================ -->
+        <!-- SECTION: App Settings -->
         <Label Text="App Settings"
                FontFamily="MontserratBold"
                FontSize="16"
@@ -193,9 +185,7 @@
         <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
                  Opacity="0.3" Margin="0,4,0,24" />
 
-        <!-- ============================================ -->
-        <!-- SECTION: Backup & Sync                       -->
-        <!-- ============================================ -->
+        <!-- SECTION: Backup & Sync -->
         <Label Text="Backup &amp; Sync"
                FontFamily="MontserratBold"
                FontSize="16"
@@ -239,9 +229,7 @@
         <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
                  Opacity="0.3" Margin="0,4,0,24" />
 
-        <!-- ============================================ -->
-        <!-- SECTION: About                               -->
-        <!-- ============================================ -->
+        <!-- SECTION: About -->
         <Label Text="About"
                FontFamily="MontserratBold"
                FontSize="16"

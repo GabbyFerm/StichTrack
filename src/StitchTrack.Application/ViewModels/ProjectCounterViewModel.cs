@@ -11,17 +11,19 @@ namespace StitchTrack.Application.ViewModels;
 
 /// <summary>
 /// ViewModel for ProjectCounterPage.
-/// Handles counting rows against an existing project, with optional session tracking.
+/// Manages a list of named counters — each with independent count, undo, and reset.
+/// The primary counter (SortOrder == 0) drives progress, sessions, and Project.CurrentCount.
 ///
 /// Flow:
-/// - User taps Play  → starts visual timer + creates in-memory Session
-/// - User taps Pause → pauses visual timer (session keeps its start time)
-/// - Save Progress   → saves Project.CurrentCount only, stays on page
-/// - End Session     → saves Project.CurrentCount and Session, then navigates back
+/// - Load → fetches project + counters from DB, fires CountersChanged so page builds cards
+/// - Each counter card in code-behind calls Increment/Decrement/Reset/UndoCounterAsync(id)
+/// - Save / End Session → persists all counter counts, ends the session
 /// </summary>
+
 public class ProjectCounterViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly IProjectCounterRepository _counterRepository;
     private readonly ISessionRepository _sessionRepository;
     private readonly IRowNoteRepository _rowNoteRepository;
     private readonly IDialogService _dialogService;
@@ -29,6 +31,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     private readonly IHapticsService _hapticsService = null!;
 
     private Project? _project;
+    private List<ProjectCounter> _counters = new();
     private Session? _currentSession;
     private bool _isSessionRunning;
     private TimeSpan _sessionDuration;
@@ -36,25 +39,38 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     private List<RowNote> _rowNotes = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    // Fired when counters are added, removed, or counts change — page rebuilds all counter cards in response
+    public event EventHandler? CountersChanged;
     public event EventHandler? RowNotesChanged;
 
-    // Project ID set from Shell navigation query parameter
+
     public Guid ProjectId { get; set; }
 
     // ─── Project properties ──────────────────────────────────────
 
     public string ProjectName => _project?.Name ?? "Project";
     public string? ColorHex => _project?.ColorHex;
-    public int CurrentCount => _project?.CurrentCount ?? 0;
     public int? TotalRows => _project?.TotalRows;
     public string? Notes => _project?.Notes;
     public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
     public bool HasTotalRows => TotalRows.HasValue && TotalRows > 0;
     public bool HasRowNotes => _rowNotes.Count > 0;
 
-    // ─── Progress ────────────────────────────────────────────────
+    // ─── Counters ────────────────────────────────────────────────
 
-    // Progress 0.0–1.0 for the progress bar
+    public IReadOnlyList<ProjectCounter> Counters => _counters.AsReadOnly();
+
+    // Primary counter drives progress display and sessions
+    private ProjectCounter? PrimaryCounter =>
+        _counters.FirstOrDefault(c => c.SortOrder == 0);
+
+    // CurrentCount reflects the primary counter for progress bar / ProgressText
+    public int CurrentCount => PrimaryCounter?.CurrentCount ?? 0;
+
+
+    // ─── Progress (driven by primary counter) ────────────────────
+
     public double ProgressValue =>
         HasTotalRows && TotalRows!.Value > 0
             ? Math.Min((double)CurrentCount / TotalRows.Value, 1.0)
@@ -70,45 +86,10 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             ? $"{(int)(ProgressValue * 100)}% done"
             : string.Empty;
 
-    // ─── Session / Timer ─────────────────────────────────────────
+    // ─── Pattern files ───────────────────────────────────────────
 
-    public bool IsSessionRunning
-    {
-        get => _isSessionRunning;
-        private set
-        {
-            if (_isSessionRunning != value)
-            {
-                _isSessionRunning = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(SessionButtonText));
-                OnPropertyChanged(nameof(SessionButtonIcon));
-            }
-        }
-    }
-
-    // Timer duration formatted for display e.g. "1h 23m" or "4m 12s"
-    public string SessionTimerText => FormatDuration(_sessionDuration);
-
-    public string SessionButtonText => IsSessionRunning ? "PAUSE" : "START SESSION";
-    public string SessionButtonIcon => IsSessionRunning ? "pause.svg" : "play.svg";
-
-    // ─── Project Files (Pattern) ──────────────────────────────
-    /// <summary>
-    /// Checks if the project has any pattern-type files attached.
-    /// Note: Use PatternFiles property to access the collection directly.
-    /// </summary>
     public bool HasPattern =>
-    (_project?.ProjectFiles.Any(f => f.FileType == ProjectFileType.Pattern) ?? false);
-
-    public string PatternFileName =>
-        _project?.ProjectFiles
-            .FirstOrDefault(f => f.FileType == ProjectFileType.Pattern)?.FileName
-            ?? string.Empty;
-
-    private string? PatternFilePath =>
-        _project?.ProjectFiles
-            .FirstOrDefault(f => f.FileType == ProjectFileType.Pattern)?.FilePath;
+        _project?.ProjectFiles.Any(f => f.FileType == ProjectFileType.Pattern) ?? false;
 
     public IReadOnlyList<ProjectFile> PatternFiles =>
         _project?.ProjectFiles
@@ -116,11 +97,27 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             .OrderByDescending(f => f.UploadedAt)
             .ToList() ?? [];
 
-    /// <summary>
-    /// Set by the ProjectCounterPage — callback to open a file in the native viewer.
-    /// Receives a local file path to a pattern file or other project attachment.
-    /// </summary>
     public Func<string, Task>? OpenFileAsync { get; set; }
+
+
+    // ─── Session / Timer ─────────────────────────────────────────
+
+    public bool IsSessionRunning
+    {
+        get => _isSessionRunning;
+        private set
+        {
+            if (_isSessionRunning == value) return;
+            _isSessionRunning = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SessionButtonText));
+            OnPropertyChanged(nameof(SessionButtonIcon));
+        }
+    }
+
+    public string SessionTimerText => FormatDuration(_sessionDuration);
+    public string SessionButtonText => IsSessionRunning ? "PAUSE" : "START SESSION";
+    public string SessionButtonIcon => IsSessionRunning ? "pause.svg" : "play.svg";
 
     // ─── Notes expand/collapse ───────────────────────────────────
 
@@ -128,79 +125,76 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     public int NotesMaxLines => _notesExpanded ? int.MaxValue : 6;
     public string NotesToggleText => _notesExpanded ? "See less ▲" : "See all notes ▼";
 
-    // ─── Commands ────────────────────────────────────────────────
+    // ─── Page-level commands (session, save, notes) ──────────────
 
-    public ICommand IncrementCommand { get; }
-    public ICommand DecrementCommand { get; }
-    public ICommand ResetCommand { get; }
     public ICommand ToggleSessionCommand { get; }
     public ICommand SaveProgressCommand { get; }
     public ICommand EndSessionCommand { get; }
     public ICommand ToggleNotesCommand { get; }
-    public ICommand UndoCommand { get; }
-    public ICommand ViewPatternCommand { get; }
 
-    // Set by the Page to handle navigation back
     public Func<Task>? OnNavigateBack { get; set; }
 
+
     public ProjectCounterViewModel(
-        IProjectRepository projectRepository,
-        IRowNoteRepository rowNoteRepository,
-        ISessionRepository sessionRepository,
-        IDialogService dialogService,
-        INavigationService navigationService,
-        IHapticsService hapticsService)
+    IProjectRepository projectRepository,
+    IProjectCounterRepository counterRepository,
+    IRowNoteRepository rowNoteRepository,
+    ISessionRepository sessionRepository,
+    IDialogService dialogService,
+    INavigationService navigationService,
+    IHapticsService hapticsService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
+        _counterRepository = counterRepository ?? throw new ArgumentNullException(nameof(counterRepository));
         _rowNoteRepository = rowNoteRepository ?? throw new ArgumentNullException(nameof(rowNoteRepository));
         _sessionRepository = sessionRepository ?? throw new ArgumentNullException(nameof(sessionRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
         _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
 
-        IncrementCommand = new RelayCommand(OnIncrement);
-        DecrementCommand = new RelayCommand(OnDecrement);
-        ResetCommand = new RelayCommand(OnReset);
         ToggleSessionCommand = new RelayCommand(OnToggleSession);
         SaveProgressCommand = new RelayCommand(OnSaveProgress);
         EndSessionCommand = new RelayCommand(OnEndSession);
         ToggleNotesCommand = new RelayCommand(OnToggleNotes);
-        UndoCommand = new RelayCommand(OnUndo);
-        ViewPatternCommand = new RelayCommand(OnViewPattern);
 
         System.Diagnostics.Debug.WriteLine("✅ ProjectCounterViewModel created");
     }
 
-    /// <summary>
-    /// Loads the project from the database using ProjectId set by navigation.
-    /// </summary>
+    // ─── Load ─────────────────────────────────────────────────────
+
     public async Task LoadProjectAsync()
     {
         try
         {
             System.Diagnostics.Debug.WriteLine($"📂 Loading project for counter: {ProjectId}");
 
-            _project = await _projectRepository.GetByIdWithoutHistoryAsync(ProjectId).ConfigureAwait(false);
+            _project = await _projectRepository
+                .GetByIdWithoutHistoryAsync(ProjectId)
+                .ConfigureAwait(false);
 
             if (_project == null)
             {
-                System.Diagnostics.Debug.WriteLine($"⚠️ Project not found: {ProjectId}");
                 await _dialogService.ShowAlertAsync("Error", "Project not found").ConfigureAwait(false);
                 return;
             }
 
-            OnPropertyChanged(string.Empty);
+            _counters = (await _counterRepository
+                .GetByProjectIdAsync(ProjectId)
+                .ConfigureAwait(false)).ToList();
+
             _rowNotes = (await _rowNoteRepository
                 .GetByProjectIdAsync(ProjectId)
                 .ConfigureAwait(false)).ToList();
 
+            OnPropertyChanged(string.Empty);
             OnPropertyChanged(nameof(HasRowNotes));
+            OnPropertyChanged(nameof(HasPattern));
+
+            CountersChanged?.Invoke(this, EventArgs.Empty);
             RowNotesChanged?.Invoke(this, EventArgs.Empty);
 
-            OnPropertyChanged(nameof(HasPattern));
-            OnPropertyChanged(nameof(PatternFileName));
-
-            System.Diagnostics.Debug.WriteLine($"✅ Project loaded for counter: {_project.Name} (row {_project.CurrentCount})");
+            System.Diagnostics.Debug.WriteLine(
+                $"✅ Project loaded: {_project.Name}, {_counters.Count} counter(s)");
         }
 #pragma warning disable CA1031
         catch (Exception ex)
@@ -211,72 +205,157 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         }
     }
 
-    // ─── Counter actions ─────────────────────────────────────────
+    // ─── Per-counter actions (called from code-behind with counter ID) ──
 
-    private void OnIncrement()
+    /// <summary>Increments a specific counter. Fires CountersChanged for UI rebuild.</summary>
+    public async void IncrementCounter(Guid counterId)
     {
-        if (_project == null) return;
-        _project.IncrementCount();
+        var counter = _counters.FirstOrDefault(c => c.Id == counterId);
+        if (counter == null) return;
+
+        counter.Increment();
         _hapticsService.Click();
-        NotifyCounterChanged();
+        NotifyCounterChanged(counter);
+
+        await _counterRepository.UpdateCountAsync(
+            counter.Id, counter.CurrentCount,
+            isPrimary: counter.SortOrder == 0,
+            projectId: _project!.Id)
+            .ConfigureAwait(false);
     }
 
-    private void OnDecrement()
+    /// <summary>Decrements a specific counter. No-op if already at 0.</summary>
+    public async void DecrementCounter(Guid counterId)
     {
-        if (_project == null) return;
-        _project.DecrementCount();
+        var counter = _counters.FirstOrDefault(c => c.Id == counterId);
+        if (counter == null) return;
+
+        counter.Decrement();
         _hapticsService.Click();
-        NotifyCounterChanged();
+        NotifyCounterChanged(counter);
+
+        await _counterRepository.UpdateCountAsync(
+            counter.Id, counter.CurrentCount,
+            isPrimary: counter.SortOrder == 0,
+            projectId: _project!.Id)
+            .ConfigureAwait(false);
     }
 
-    private async void OnReset()
+    /// <summary>Resets a specific counter to 0 after confirmation.</summary>
+    public async Task ResetCounterAsync(Guid counterId)
     {
-        if (_project == null) return;
+        var counter = _counters.FirstOrDefault(c => c.Id == counterId);
+        if (counter == null) return;
 
-        // Reset is destructive in context — confirm before clearing progress
         var confirmed = await _dialogService.ShowConfirmAsync(
             title: "Reset Counter?",
-            message: "This will reset the counter to 0. Your saved progress won't be affected until you save.",
+            message: $"Reset '{counter.Name}' to 0? Saved progress is unaffected until you save.",
             accept: "Reset",
-            cancel: "Cancel"
-        ).ConfigureAwait(true);
+            cancel: "Cancel")
+            .ConfigureAwait(true);
 
         if (!confirmed) return;
 
-        _project.ResetCount();
-        NotifyCounterChanged();
+        counter.Reset();
+        NotifyCounterChanged(counter);
+
+        await _counterRepository.UpdateCountAsync(
+            counter.Id, counter.CurrentCount,
+            isPrimary: counter.SortOrder == 0,
+            projectId: _project!.Id)
+            .ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Notifies all counter-related properties so the UI updates.
-    /// </summary>
-    private void NotifyCounterChanged()
+    /// <summary>Undoes the last change on a specific counter using its in-memory history.</summary>
+    public async void UndoCounter(Guid counterId)
     {
-        OnPropertyChanged(nameof(CurrentCount));
-        OnPropertyChanged(nameof(ProgressValue));
-        OnPropertyChanged(nameof(ProgressText));
-        OnPropertyChanged(nameof(ProgressPercentage));
+        var counter = _counters.FirstOrDefault(c => c.Id == counterId);
+        if (counter == null) return;
+
+        var undone = counter.UndoLastChange();
+        if (!undone) return;
+
+        NotifyCounterChanged(counter);
+
+        await _counterRepository.UpdateCountAsync(
+            counter.Id, counter.CurrentCount,
+            isPrimary: counter.SortOrder == 0,
+            projectId: _project!.Id)
+            .ConfigureAwait(false);
     }
 
-    // ─── Session actions ─────────────────────────────────────────
+    // ─── Counter management ──────────────────────────────────────
+
+    /// <summary>Adds a new named counter. Fires CountersChanged for page rebuild.</summary>
+    public async Task AddCounterAsync(string name)
+    {
+        if (_project == null || string.IsNullOrWhiteSpace(name)) return;
+
+        var sortOrder = _counters.Count > 0
+            ? _counters.Max(c => c.SortOrder) + 1
+            : 0;
+
+        var counter = ProjectCounter.Create(_project.Id, name.Trim(), sortOrder);
+
+        await _counterRepository.AddAsync(counter).ConfigureAwait(false);
+        await _counterRepository.SaveChangesAsync().ConfigureAwait(false);
+
+        _counters.Add(counter);
+        CountersChanged?.Invoke(this, EventArgs.Empty);
+
+        System.Diagnostics.Debug.WriteLine($"✅ Counter added: {name}");
+    }
+
+    /// <summary>Deletes a counter after confirmation. Primary counter cannot be deleted if it's the only one.</summary>
+    public async Task DeleteCounterAsync(Guid counterId)
+    {
+        var counter = _counters.FirstOrDefault(c => c.Id == counterId);
+        if (counter == null) return;
+
+        if (_counters.Count == 1)
+        {
+            await _dialogService.ShowAlertAsync(
+                "Cannot Delete",
+                "A project must have at least one counter.")
+                .ConfigureAwait(false);
+            return;
+        }
+
+        var confirmed = await _dialogService.ShowConfirmAsync(
+            title: "Delete Counter?",
+            message: $"Delete '{counter.Name}' and all its history? This cannot be undone.",
+            accept: "Delete",
+            cancel: "Cancel")
+            .ConfigureAwait(true);
+
+        if (!confirmed) return;
+
+        await _counterRepository.DeleteAsync(counterId).ConfigureAwait(false);
+        _counters.Remove(counter);
+        CountersChanged?.Invoke(this, EventArgs.Empty);
+
+        System.Diagnostics.Debug.WriteLine($"🗑️ Counter deleted: {counter.Name}");
+    }
+
+    // ─── Session ─────────────────────────────────────────────────
 
     private void OnToggleSession()
     {
-        if (IsSessionRunning)
-            PauseSession();
-        else
-            StartSession();
+        if (IsSessionRunning) PauseSession(); else StartSession();
     }
 
     private void StartSession()
     {
         if (_project == null) return;
 
-        // Create session in memory — only persisted on EndSession
-        _currentSession ??= Session.StartSession(_project.Id, _project.CurrentCount);
+        // Pass primary counter name so session history shows the correct label
+        _currentSession ??= Session.StartSession(
+            _project.Id,
+            PrimaryCounter?.CurrentCount,
+            PrimaryCounter?.Name);
 
         IsSessionRunning = true;
-        System.Diagnostics.Debug.WriteLine($"▶️ Session started for {_project.Name}");
+        System.Diagnostics.Debug.WriteLine($"▶️ Session started: {_project.Name}");
     }
 
     private void PauseSession()
@@ -285,10 +364,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         System.Diagnostics.Debug.WriteLine("⏸️ Session paused");
     }
 
-    /// <summary>
-    /// Updates the session timer display — called by the Page's timer tick.
-    /// Kept here so the ViewModel controls the formatted display string.
-    /// </summary>
     public void UpdateSessionTimer(TimeSpan elapsed)
     {
         _sessionDuration = elapsed;
@@ -300,51 +375,34 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     private void OnSaveProgress() => _ = SaveProgressAsync();
     private void OnEndSession() => _ = EndSessionAsync();
 
-    /// <summary>
-    /// Saves the current count to the database.
-    /// Stays on the page — session keeps running.
-    /// </summary>
+    /// <summary>Saves all counter counts. Stays on the page.</summary>
     public async Task SaveProgressAsync()
     {
         if (_project == null) return;
-
         try
         {
-            // Direct SQL update — bypasses change tracker entirely
-            await _projectRepository.UpdateCountAsync(
-                _project.Id,
-                _project.CurrentCount,
-                DateTime.UtcNow
-            ).ConfigureAwait(false);
-
-            await _dialogService.ShowToastAsync($"Progress saved — row {_project.CurrentCount}").ConfigureAwait(false);
+            await SaveAllCountersAsync().ConfigureAwait(false);
+            await _dialogService
+                .ShowToastAsync($"Progress saved — row {CurrentCount}")
+                .ConfigureAwait(false);
         }
 #pragma warning disable CA1031
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error saving progress: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"❌ Save failed: {ex.Message}");
             await _dialogService.ShowAlertAsync("Save Failed", "Could not save progress.").ConfigureAwait(false);
         }
     }
 
-    /// <summary>
-    /// Silently saves the current count when the page disappears.
-    /// Covers swipe back and other navigation gestures that bypass OnBackButtonPressed.
-    /// </summary>
+    /// <summary>Silently saves all counter counts on page disappear (swipe back etc.).</summary>
     public async Task AutoSaveAsync()
     {
         if (_project == null) return;
-
         try
         {
-            await _projectRepository.UpdateCountAsync(
-                _project.Id,
-                _project.CurrentCount,
-                DateTime.UtcNow
-            ).ConfigureAwait(false);
-
-            System.Diagnostics.Debug.WriteLine($"💾 Auto-saved count: {_project.CurrentCount}");
+            await SaveAllCountersAsync().ConfigureAwait(false);
+            System.Diagnostics.Debug.WriteLine("💾 Auto-saved all counters");
         }
 #pragma warning disable CA1031
         catch (Exception ex)
@@ -354,37 +412,31 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         }
     }
 
-    /// <summary>
-    /// Ends the session: saves count + session record, then navigates back.
-    /// If no session was started, just saves the count and goes back.
-    /// </summary>
     private async Task EndSessionAsync()
     {
         if (_project == null) return;
-
         try
         {
-            // Direct SQL update — bypasses change tracker entirely
-            await _projectRepository.UpdateCountAsync(
-                _project.Id,
-                _project.CurrentCount,
-                DateTime.UtcNow
-            ).ConfigureAwait(false);
+            await SaveAllCountersAsync().ConfigureAwait(false);
 
-            // Save the session record if one was started
             if (_currentSession != null)
             {
-                _currentSession.EndSession(_project.CurrentCount);
+                _currentSession.EndSession(PrimaryCounter?.CurrentCount);
                 await _sessionRepository.AddAsync(_currentSession).ConfigureAwait(false);
                 await _sessionRepository.SaveChangesAsync().ConfigureAwait(false);
 
-                System.Diagnostics.Debug.WriteLine($"✅ Session ended: {_currentSession.DurationSeconds}s, rows {_currentSession.StartingRowCount}→{_currentSession.EndingRowCount}");
+                System.Diagnostics.Debug.WriteLine(
+                    $"✅ Session ended: {_currentSession.DurationSeconds}s");
 
-                await _dialogService.ShowToastAsync($"Session saved — row {_project.CurrentCount}").ConfigureAwait(false);
+                await _dialogService
+                    .ShowToastAsync($"Session saved — row {CurrentCount}")
+                    .ConfigureAwait(false);
             }
             else
             {
-                await _dialogService.ShowToastAsync($"Progress saved — row {_project.CurrentCount}").ConfigureAwait(false);
+                await _dialogService
+                    .ShowToastAsync($"Progress saved — row {CurrentCount}")
+                    .ConfigureAwait(false);
             }
 
             IsSessionRunning = false;
@@ -399,6 +451,21 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Persists all counter counts. Primary counter also syncs Project.CurrentCount.</summary>
+    private async Task SaveAllCountersAsync()
+    {
+        foreach (var counter in _counters)
+        {
+            await _counterRepository.UpdateCountAsync(
+                counter.Id,
+                counter.CurrentCount,
+                isPrimary: counter.SortOrder == 0,
+                projectId: _project!.Id)
+                .ConfigureAwait(false);
+        }
+    }
+
+
     // ─── Notes ───────────────────────────────────────────────────
 
     private void OnToggleNotes()
@@ -408,77 +475,57 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(NotesToggleText));
     }
 
-    private void OnUndo()
-    {
-        if (_project == null) return;
-
-        var undone = _project.UndoLastChange();
-        if (undone)
-            NotifyCounterChanged();
-    }
-
-    /// <summary>
-    /// Saves a new row note and notifies the Page to rebuild the grid.
-    /// Called directly from the Page code-behind on the add button tap.
-    /// </summary>
     public async Task AddRowNoteAsync(int rowNumber, string noteText)
     {
         if (_project == null) return;
 
         var note = RowNote.CreateRowNote(_project.Id, rowNumber, noteText);
-
         await _rowNoteRepository.AddAsync(note).ConfigureAwait(false);
         await _rowNoteRepository.SaveChangesAsync().ConfigureAwait(false);
 
-        // Re-sort in memory so the grid displays in row number order
         _rowNotes.Add(note);
         _rowNotes = _rowNotes.OrderBy(rn => rn.RowNumber).ToList();
 
         OnPropertyChanged(nameof(HasRowNotes));
         RowNotesChanged?.Invoke(this, EventArgs.Empty);
-
-        System.Diagnostics.Debug.WriteLine($"✅ Row note added: row {rowNumber} — {noteText}");
     }
 
-    /// <summary>
-    /// Deletes a row note by ID and notifies the Page to rebuild the grid.
-    /// ExecuteDeleteAsync in the repository handles the SQL directly — no SaveChanges needed.
-    /// </summary>
     public async Task DeleteRowNoteAsync(Guid noteId)
     {
         await _rowNoteRepository.DeleteAsync(noteId).ConfigureAwait(false);
-
         _rowNotes.RemoveAll(rn => rn.Id == noteId);
-
         OnPropertyChanged(nameof(HasRowNotes));
         RowNotesChanged?.Invoke(this, EventArgs.Empty);
-
-        System.Diagnostics.Debug.WriteLine($"🗑️ Row note deleted: {noteId}");
     }
 
-    public System.Collections.ObjectModel.ReadOnlyCollection<RowNote> RowNotes
-    => _rowNotes.AsReadOnly();
+    public ReadOnlyCollection<RowNote> RowNotes => _rowNotes.AsReadOnly();
 
     // ─── Helpers ─────────────────────────────────────────────────
-    private async void OnViewPattern()
+    /// <summary>Notifies progress properties for a specific counter change.</summary>
+    private void NotifyCounterChanged(ProjectCounter counter)
     {
-        if (string.IsNullOrWhiteSpace(PatternFilePath) || OpenFileAsync == null) return;
-        await OpenFileAsync(PatternFilePath).ConfigureAwait(false);
+        // Always notify CountersChanged so code-behind can refresh the count display
+        CountersChanged?.Invoke(this, EventArgs.Empty);
+
+        // Only notify progress properties when the primary counter changes
+        if (counter.SortOrder == 0)
+        {
+            OnPropertyChanged(nameof(CurrentCount));
+            OnPropertyChanged(nameof(ProgressValue));
+            OnPropertyChanged(nameof(ProgressText));
+            OnPropertyChanged(nameof(ProgressPercentage));
+        }
     }
 
     private static string FormatDuration(TimeSpan duration)
     {
         if (duration.TotalHours >= 1)
             return $"{(int)duration.TotalHours}h {duration.Minutes}m";
-
         if (duration.TotalMinutes >= 1)
             return $"{duration.Minutes}m {duration.Seconds}s";
-
         return $"{duration.Seconds}s";
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

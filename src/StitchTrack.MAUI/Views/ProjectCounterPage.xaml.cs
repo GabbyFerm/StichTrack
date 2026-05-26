@@ -1,30 +1,29 @@
-using Microsoft.Maui.Layouts;
 using StitchTrack.Application.ViewModels;
 using StitchTrack.Domain.Entities;
+using System.Globalization;
 
 namespace StitchTrack.MAUI.Views;
 
 /// <summary>
 /// Code-behind for ProjectCounterPage.
-/// Owns the session timer (lifecycle + disposal). ViewModel handles all business logic and time formatting.
-/// Timer tick updates ViewModel → ViewModel updates UI via binding (separation of concerns).
-/// This layering keeps MAUI dependencies out of the application layer.
+/// Owns the session timer (lifecycle + disposal).
+/// Builds counter cards dynamically from _viewModel.Counters via BuildCounterCards().
+/// Each card wires directly to per-counter ViewModel methods by counter ID.
 /// </summary>
 [QueryProperty(nameof(ProjectId), "ProjectId")]
-// Timer is disposed in OnDisappearing — MAUI pages use lifecycle methods
-// instead of IDisposable since the framework controls their lifetime
-#pragma warning disable CA1001
+#pragma warning disable CA1001  // Timer disposed in OnDisappearing via MAUI lifecycle
 public partial class ProjectCounterPage : ContentPage
 #pragma warning restore CA1001
 {
     private readonly ProjectCounterViewModel _viewModel;
     private string _projectId = string.Empty;
 
-    // Timer lives in the MAUI layer (UI lifecycle) — ViewModel stays framework-agnostic
     private System.Timers.Timer? _sessionTimer;
     private TimeSpan _sessionDuration;
-
     private bool _isHandlingBackPress;
+
+    // Maps counter ID → its count Label so we can update just the text without a full rebuild
+    private readonly Dictionary<Guid, Label> _counterDisplayLabels = new();
 
     public ProjectCounterPage(ProjectCounterViewModel viewModel)
     {
@@ -32,9 +31,11 @@ public partial class ProjectCounterPage : ContentPage
         _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         BindingContext = _viewModel;
 
-        // Watch for session start/stop so we can run/stop the timer
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         _viewModel.RowNotesChanged += (_, _) => BuildRowNotesGrid();
+
+        // CountersChanged fires after LoadProjectAsync and after add/delete/count changes
+        _viewModel.CountersChanged += OnCountersChanged;
 
         _viewModel.OpenFileAsync = async (filePath) =>
         {
@@ -53,7 +54,7 @@ public partial class ProjectCounterPage : ContentPage
             catch (InvalidOperationException ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Cannot open file: {ex.Message}");
-                await DisplayAlert("Cannot Open File", "Could not open the pattern file.", "OK");
+                await DisplayAlert("Cannot Open File", "Could not open the file.", "OK");
             }
             catch (System.IO.IOException ex)
             {
@@ -83,21 +84,17 @@ public partial class ProjectCounterPage : ContentPage
     {
         base.OnAppearing();
         await _viewModel.LoadProjectAsync();
+        // BuildCounterCards() and BuildRowNotesGrid() are triggered by
+        // CountersChanged and RowNotesChanged events fired from LoadProjectAsync
         BuildCounterPatternFilesRow();
-        RowNoteRowEntry.Text = _viewModel.CurrentCount
-            .ToString(System.Globalization.CultureInfo.InvariantCulture);
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-
-        // Always clean up the timer when leaving the page
         StopTimer();
         _sessionTimer?.Dispose();
         _sessionTimer = null;
-
-        // Auto-save count silently when leaving — covers swipe back gesture
         _ = _viewModel.AutoSaveAsync();
     }
 
@@ -131,25 +128,262 @@ public partial class ProjectCounterPage : ContentPage
         return base.OnBackButtonPressed();
     }
 
+    // ─── Counter cards ────────────────────────────────────────────
+
     /// <summary>
-    /// Watches IsSessionRunning on the ViewModel and starts/stops the timer accordingly.
-    /// Keeps timer lifecycle in the Page where it belongs.
+    /// Handles CountersChanged from the ViewModel.
+    /// Full rebuild when counter count changes (add/delete); label-only update otherwise.
     /// </summary>
-    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnCountersChanged(object? sender, EventArgs e)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            if (_counterDisplayLabels.Count != _viewModel.Counters.Count)
+            {
+                // Structure changed — full rebuild
+                BuildCounterCards();
+            }
+            else
+            {
+                // Only counts changed — update labels in place (no layout thrash)
+                foreach (var counter in _viewModel.Counters)
+                {
+                    if (_counterDisplayLabels.TryGetValue(counter.Id, out var label))
+                        label.Text = counter.CurrentCount.ToString(CultureInfo.InvariantCulture);
+                }
+            }
+
+            // Keep row note entry in sync with primary counter
+            RowNoteRowEntry.Text = _viewModel.CurrentCount
+                .ToString(CultureInfo.InvariantCulture);
+        });
+    }
+
+    /// <summary>
+    /// Clears and rebuilds all counter cards from the ViewModel's Counters list.
+    /// Called on initial load and when counters are added or deleted.
+    /// </summary>
+    private void BuildCounterCards()
+    {
+        CountersContainer.Children.Clear();
+        _counterDisplayLabels.Clear();
+
+        foreach (var counter in _viewModel.Counters)
+            CountersContainer.Children.Add(CreateCounterCard(counter));
+
+        System.Diagnostics.Debug.WriteLine($"🔢 Built {_viewModel.Counters.Count} counter card(s)");
+    }
+
+    /// <summary>
+    /// Builds a single counter card with name, [−] count [+], and Undo/Reset actions.
+    /// Wires tap handlers directly to ViewModel methods via the counter's ID.
+    /// </summary>
+    private Border CreateCounterCard(ProjectCounter counter)
+    {
+        var isDark = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark;
+        var capturedId = counter.Id;
+
+        // Count label — tracked so OnCountersChanged can update it without a full rebuild
+        var countLabel = new Label
+        {
+            Text = counter.CurrentCount.ToString(CultureInfo.InvariantCulture),
+            FontFamily = "MontserratExtraBold",
+            FontSize = 70,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            TextColor = isDark ? Colors.White : Color.FromArgb("#2C3338")
+        };
+        _counterDisplayLabels[counter.Id] = countLabel;
+
+        // [−] decrease button
+        var decrementBorder = CreateCounterButton(
+            "minus.svg",
+            isDark ? Color.FromArgb("#5E6B76") : Color.FromArgb("#424B54"));
+        var decrementTap = new TapGestureRecognizer();
+        decrementTap.Tapped += (_, _) => _viewModel.DecrementCounter(capturedId);
+        decrementBorder.GestureRecognizers.Add(decrementTap);
+
+        // [+] increase button
+        var incrementBorder = CreateCounterButton(
+            "plus.svg",
+            Color.FromArgb("#E1AD37"));
+        var incrementTap = new TapGestureRecognizer();
+        incrementTap.Tapped += (_, _) => _viewModel.IncrementCounter(capturedId);
+        incrementBorder.GestureRecognizers.Add(incrementTap);
+
+        // [−] count [+] row
+        var counterRow = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitionCollection
+        {
+            new ColumnDefinition { Width = GridLength.Auto },
+            new ColumnDefinition { Width = GridLength.Star },
+            new ColumnDefinition { Width = GridLength.Auto }
+        },
+            ColumnSpacing = 16
+        };
+        counterRow.Add(decrementBorder, 0, 0);
+        counterRow.Add(countLabel, 1, 0);
+        counterRow.Add(incrementBorder, 2, 0);
+
+        // ─── Header row: [icon + name]  ...  [reset icon + Reset] ────
+
+        var counterIcon = new Image
+        {
+            WidthRequest = 16,
+            HeightRequest = 16,
+            VerticalOptions = LayoutOptions.Center,
+            Source = isDark
+                ? ImageSource.FromFile("counter_dark.svg")
+                : ImageSource.FromFile("counter_light.svg")
+        };
+
+        var namePart = new HorizontalStackLayout
+        {
+            Spacing = 8,
+            VerticalOptions = LayoutOptions.Center,
+            Children =
+        {
+            counterIcon,
+            new Label
+            {
+                Text = counter.Name,
+                FontFamily = "MontserratSemiBold",
+                FontSize = 14,
+                VerticalOptions = LayoutOptions.Center,
+                TextColor = isDark ? Colors.White : Color.FromArgb("#2C3338")
+            }
+        }
+        };
+
+        var resetIcon = new Image
+        {
+            WidthRequest = 14,
+            HeightRequest = 14,
+            VerticalOptions = LayoutOptions.Center,
+            Source = isDark
+                ? ImageSource.FromFile("reset_dark.svg")
+                : ImageSource.FromFile("reset_light.svg")
+        };
+
+        var resetPart = new HorizontalStackLayout
+        {
+            Spacing = 6,
+            HorizontalOptions = LayoutOptions.End,
+            VerticalOptions = LayoutOptions.Center,
+            Children =
+        {
+            resetIcon,
+            new Label
+            {
+                Text = "Reset",
+                FontFamily = "MontserratBold",
+                FontSize = 12,
+                VerticalOptions = LayoutOptions.Center,
+                TextColor = isDark
+                    ? Colors.White.WithAlpha(0.6f)
+                    : Color.FromArgb("#6B7280")
+            }
+        }
+        };
+
+        var resetTap = new TapGestureRecognizer();
+        resetTap.Tapped += async (_, _) => await _viewModel.ResetCounterAsync(capturedId);
+        resetPart.GestureRecognizers.Add(resetTap);
+
+        var headerRow = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitionCollection
+        {
+            new ColumnDefinition { Width = GridLength.Star },
+            new ColumnDefinition { Width = GridLength.Auto }
+        }
+        };
+        headerRow.Add(namePart, 0, 0);
+        headerRow.Add(resetPart, 1, 0);
+
+        // ─── Card ─────────────────────────────────────────────────────
+
+        return new Border
+        {
+            Padding = new Thickness(16, 12, 16, 14),
+            StrokeThickness = 0,
+            BackgroundColor = isDark
+                ? Color.FromArgb("#4A5259")
+                : Color.FromArgb("#F5EDD3"),
+            StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+            {
+                CornerRadius = new CornerRadius(12)
+            },
+            Content = new VerticalStackLayout
+            {
+                Spacing = 10,
+                Children = { headerRow, counterRow }  // no actionRow — undo removed, reset in header
+            }
+        };
+    }
+
+    // Creates a square counter button (− or +) with an icon
+    private static Border CreateCounterButton(string iconSource, Color backgroundColor)
+    {
+        var image = new Image
+        {
+            Source = iconSource,
+            HeightRequest = 28,
+            WidthRequest = 28,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center
+        };
+
+        // Force white tint — same as toolkit:IconTintColorBehavior TintColor="White" in XAML
+        image.Behaviors.Add(new CommunityToolkit.Maui.Behaviors.IconTintColorBehavior
+        {
+            TintColor = Colors.White
+        });
+
+        return new Border
+        {
+            WidthRequest = 62,
+            HeightRequest = 62,
+            StrokeThickness = 0,
+            BackgroundColor = backgroundColor,
+            StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+            {
+                CornerRadius = new CornerRadius(8)
+            },
+            Content = image
+        };
+    }   
+
+    // ─── Add counter ──────────────────────────────────────────────
+
+    /// <summary>
+    /// Tapped on "+ Add Counter" — prompts for a name and adds via ViewModel.
+    /// </summary>
+    private async void OnAddCounterTapped(object sender, EventArgs e)
+    {
+        var name = await DisplayPromptAsync(
+            "Add Counter",
+            "Enter a name for the new counter:",
+            accept: "Add",
+            cancel: "Cancel",
+            placeholder: "e.g. Stitches",
+            maxLength: 50,
+            keyboard: Keyboard.Create(KeyboardFlags.CapitalizeSentence));
+
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        await _viewModel.AddCounterAsync(name);
+    }
+
+    // ─── Session timer ────────────────────────────────────────────
+
+    private void OnViewModelPropertyChanged(
+        object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ProjectCounterViewModel.IsSessionRunning))
         {
-            if (_viewModel.IsSessionRunning)
-                StartTimer();
-            else
-                StopTimer();
-        }
-
-        // Keep the row number entry in sync with the current count
-        if (e.PropertyName == nameof(ProjectCounterViewModel.CurrentCount))
-        {
-            RowNoteRowEntry.Text = _viewModel.CurrentCount
-                .ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (_viewModel.IsSessionRunning) StartTimer(); else StopTimer();
         }
     }
 
@@ -160,7 +394,6 @@ public partial class ProjectCounterPage : ContentPage
             _sessionTimer = new System.Timers.Timer(1000);
             _sessionTimer.Elapsed += OnTimerTick;
         }
-
         _sessionTimer.Start();
         System.Diagnostics.Debug.WriteLine("⏱️ Session timer started");
     }
@@ -171,53 +404,34 @@ public partial class ProjectCounterPage : ContentPage
         System.Diagnostics.Debug.WriteLine("⏹️ Session timer stopped");
     }
 
-    /// <summary>
-    /// Timer callback fires every second on a background thread.
-    /// Increments _sessionDuration on that timer thread, then dispatches the ViewModel update to the main thread.
-    /// ViewModel formats the display string and notifies the UI via binding.
-    /// </summary>
     private void OnTimerTick(object? sender, System.Timers.ElapsedEventArgs e)
     {
         _sessionDuration = _sessionDuration.Add(TimeSpan.FromSeconds(1));
-
-        // ViewModel update must happen on the main thread
         MainThread.BeginInvokeOnMainThread(() =>
-            _viewModel.UpdateSessionTimer(_sessionDuration)
-        );
+            _viewModel.UpdateSessionTimer(_sessionDuration));
     }
 
-    /// <summary>
-    /// Fired when the user taps + or presses Enter on the note text entry.
-    /// Validates inputs, calls the ViewModel, then resets for the next entry.
-    /// </summary>
+    // ─── Row notes ────────────────────────────────────────────────
+
     private async void OnAddRowNoteTapped(object sender, EventArgs e)
     {
         var rowText = RowNoteRowEntry.Text?.Trim();
         var noteText = RowNoteTextEntry.Text?.Trim();
 
-        // Silently ignore if either field is missing or row is not a valid number
         if (string.IsNullOrWhiteSpace(rowText)
             || !int.TryParse(rowText, out var rowNumber)
             || rowNumber < 0
             || string.IsNullOrWhiteSpace(noteText))
-        {
             return;
-        }
 
         await _viewModel.AddRowNoteAsync(rowNumber, noteText);
 
-        // Clear text, reset row number to current count, keep focus on text entry
         RowNoteTextEntry.Text = string.Empty;
         RowNoteRowEntry.Text = _viewModel.CurrentCount
-            .ToString(System.Globalization.CultureInfo.InvariantCulture);
+            .ToString(CultureInfo.InvariantCulture);
         RowNoteTextEntry.Focus();
     }
 
-    /// <summary>
-    /// Rebuilds the 2-column notes grid from the ViewModel's current RowNotes list.
-    /// Each row displays up to 2 note chips; odd counts get a placeholder in the second column.
-    /// Called on initial load (OnAppearing) and after every add/delete via the RowNotesChanged event.
-    /// </summary>
     private void BuildRowNotesGrid()
     {
         RowNotesContainer.Children.Clear();
@@ -225,22 +439,20 @@ public partial class ProjectCounterPage : ContentPage
         var notes = _viewModel.RowNotes;
         if (notes.Count == 0) return;
 
-        // Pair notes into rows of 2
         for (int i = 0; i < notes.Count; i += 2)
         {
             var row = new Grid
             {
                 ColumnDefinitions = new ColumnDefinitionCollection
-            {
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = GridLength.Star }
-            },
+                {
+                    new ColumnDefinition { Width = GridLength.Star },
+                    new ColumnDefinition { Width = GridLength.Star }
+                },
                 ColumnSpacing = 8
             };
 
             row.Add(CreateNoteChip(notes[i]), column: 0, row: 0);
 
-            // Second column — empty placeholder keeps the grid balanced for odd counts
             if (i + 1 < notes.Count)
                 row.Add(CreateNoteChip(notes[i + 1]), column: 1, row: 0);
             else
@@ -250,10 +462,6 @@ public partial class ProjectCounterPage : ContentPage
         }
     }
 
-    /// <summary>
-    /// Creates a single note chip with row number, note text, and a delete × button.
-    /// Background adapts to light/dark mode.
-    /// </summary>
     private Border CreateNoteChip(RowNote note)
     {
         var isDark = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark;
@@ -261,7 +469,6 @@ public partial class ProjectCounterPage : ContentPage
         var chip = new Border
         {
             StrokeThickness = 0,
-            // Slightly darker than the card background in both modes
             BackgroundColor = isDark
                 ? Color.FromArgb("#3D4449")
                 : Color.FromArgb("#EBE3C8"),
@@ -277,25 +484,23 @@ public partial class ProjectCounterPage : ContentPage
         var content = new Grid
         {
             ColumnDefinitions = new ColumnDefinitionCollection
-        {
-            new ColumnDefinition { Width = GridLength.Auto }, // "R12"
-            new ColumnDefinition { Width = GridLength.Star }, // note text
-            new ColumnDefinition { Width = GridLength.Auto }  // ×
-        },
+            {
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto }
+            },
             ColumnSpacing = 6
         };
 
-        // Row number — gold, compact ("R12")
         content.Add(new Label
         {
             Text = $"R{note.RowNumber}",
             FontFamily = "MontserratBold",
             FontSize = 12,
-            TextColor = Color.FromArgb("#E1AD37"), // BrandGold
+            TextColor = Color.FromArgb("#E1AD37"),
             VerticalOptions = LayoutOptions.Center
         }, column: 0, row: 0);
 
-        // Note text — truncates if too long for the chip
         content.Add(new Label
         {
             Text = note.NoteText,
@@ -306,7 +511,6 @@ public partial class ProjectCounterPage : ContentPage
             LineBreakMode = LineBreakMode.TailTruncation
         }, column: 1, row: 0);
 
-        // Delete button — subtle opacity so it doesn't compete with the note text
         var deleteLabel = new Label
         {
             Text = "×",
@@ -318,26 +522,20 @@ public partial class ProjectCounterPage : ContentPage
             HorizontalOptions = LayoutOptions.End
         };
 
-        var capturedId = note.Id; // capture for the async closure
+        var capturedId = note.Id;
         var deleteTap = new TapGestureRecognizer();
         deleteTap.Tapped += async (_, _) => await _viewModel.DeleteRowNoteAsync(capturedId);
         deleteLabel.GestureRecognizers.Add(deleteTap);
-
         content.Add(deleteLabel, column: 2, row: 0);
 
         chip.Content = content;
         return chip;
     }
 
-    /// <summary>
-    /// Builds the project files row with a gold left accent bar, file icon, "Pattern:" label,
-    /// and inline tappable filenames separated by |.
-    /// Called on page appear to populate the FlexLayout with current pattern files from ViewModel.
-    /// Supports multiple files and shows each filename as a tappable link.
-    /// </summary>
+    // ─── Pattern files ────────────────────────────────────────────
+
     private void BuildCounterPatternFilesRow()
     {
-        // Remove previously added file links — keep XAML children (icon + "Pattern:" label)
         while (CounterPatternFilesGrid.Children.Count > 2)
             CounterPatternFilesGrid.Children.RemoveAt(2);
 
@@ -373,7 +571,6 @@ public partial class ProjectCounterPage : ContentPage
             CounterPatternFilesGrid.Children.Add(fileLabel);
 
             if (i < files.Count - 1)
-            {
                 CounterPatternFilesGrid.Children.Add(new Label
                 {
                     Text = "  |  ",
@@ -381,54 +578,6 @@ public partial class ProjectCounterPage : ContentPage
                     TextColor = secondaryColor,
                     VerticalOptions = LayoutOptions.Center
                 });
-            }
         }
-    }
-
-    private Border CreateCounterFileChip(ProjectFile file)
-    {
-        var isDark = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark;
-        var isPhoto = file.ContentType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) == true;
-
-        var chip = new Border
-        {
-            StrokeThickness = 0,
-            BackgroundColor = isDark ? Color.FromArgb("#3D4449") : Color.FromArgb("#EBE3C8"),
-            Padding = new Thickness(10, 8),
-            StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
-            {
-                CornerRadius = new CornerRadius(8)
-            }
-        };
-
-        var content = new HorizontalStackLayout { Spacing = 6 };
-
-        content.Children.Add(new Label
-        {
-            Text = isPhoto ? "🖼️" : "📄",
-            FontSize = 12,
-            VerticalOptions = LayoutOptions.Center
-        });
-
-        content.Children.Add(new Label
-        {
-            Text = file.FileName,
-            FontFamily = "MontserratMedium",
-            FontSize = 12,
-            TextColor = Color.FromArgb("#E1AD37"),
-            VerticalOptions = LayoutOptions.Center,
-            LineBreakMode = LineBreakMode.TailTruncation
-        });
-
-        var tap = new TapGestureRecognizer();
-        tap.Tapped += async (_, _) =>
-        {
-            if (_viewModel.OpenFileAsync != null && !string.IsNullOrWhiteSpace(file.FilePath))
-                await _viewModel.OpenFileAsync(file.FilePath);
-        };
-        chip.GestureRecognizers.Add(tap);
-
-        chip.Content = content;
-        return chip;
     }
 }

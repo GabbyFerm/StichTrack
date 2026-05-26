@@ -1,14 +1,18 @@
 namespace StitchTrack.Domain.Entities;
 
 /// <summary>
-/// Tracks changes to project counter for undo functionality.
-/// Each entry represents a single increment, decrement, or reset action.
+/// Tracks a single counter change for undo functionality.
+/// Owned by a ProjectCounter, not directly by Project.
+/// In practice, entries are built up in memory during a counting session
+/// and used for per-counter undo — they are not persisted during active counting.
 /// </summary>
 public class CounterHistory
 {
     public Guid Id { get; private set; }
-    public Guid ProjectId { get; private set; }
-    public Project Project { get; private set; } = null!;
+
+    // FK to the specific counter this change belongs to
+    public Guid ProjectCounterId { get; private set; }
+    public ProjectCounter ProjectCounter { get; private set; } = null!;
 
     public int OldValue { get; private set; }
     public int NewValue { get; private set; }
@@ -17,19 +21,16 @@ public class CounterHistory
     private CounterHistory() { }
 
     /// <summary>
-    /// Creates a new counter history entry to track a counter change.
-    /// Called internally by the Project entity when the counter is modified.
+    /// Creates a history entry for a counter change.
+    /// Called internally by ProjectCounter — not for direct use.
     /// </summary>
-    /// <param name="projectId">The project this change belongs to</param>
-    /// <param name="oldValue">The counter value before the change</param>
-    /// <param name="newValue">The counter value after the change</param>
-    /// <returns>A new CounterHistory instance ready for persistence</returns>
-    internal static CounterHistory CreateCounterHistory(Guid projectId, int oldValue, int newValue)
+    internal static CounterHistory CreateCounterHistory(
+        Guid projectCounterId, int oldValue, int newValue)
     {
         return new CounterHistory
         {
             Id = Guid.NewGuid(),
-            ProjectId = projectId,
+            ProjectCounterId = projectCounterId,
             OldValue = oldValue,
             NewValue = newValue,
             ChangedAt = DateTime.UtcNow

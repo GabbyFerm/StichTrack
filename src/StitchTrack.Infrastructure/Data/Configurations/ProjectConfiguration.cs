@@ -69,11 +69,6 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         // Relationships - one-to-many (configured here: CounterHistory, Sessions, RowNotes, Reminders)
         // Note: ProjectFiles relationship is configured in ProjectFileConfiguration for separation of concerns
-        builder.HasMany(p => p.CounterHistoryEntries)
-            .WithOne(ch => ch.Project)
-            .HasForeignKey(ch => ch.ProjectId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.HasMany(p => p.Sessions)
             .WithOne(s => s.Project)
             .HasForeignKey(s => s.ProjectId)
