@@ -44,7 +44,7 @@
         <Label Text="{Binding ProjectName}"
                Style="{StaticResource HeaderTitle}"
                TextTransform="Uppercase"
-               FontSize="16"
+               FontSize="20"
                VerticalOptions="Center" />
 
       </HorizontalStackLayout>
@@ -171,8 +171,8 @@
               <Border Grid.Column="0"
                       BackgroundColor="{AppThemeBinding Light={StaticResource ButtonDecrease}, 
                                           Dark={StaticResource ButtonSecondaryDark}}"
-                      WidthRequest="72"
-                      HeightRequest="72"
+                      WidthRequest="62"
+                      HeightRequest="62"
                       StrokeThickness="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -195,14 +195,15 @@
               <Label Grid.Column="1"
                      Text="{Binding CurrentCount}"
                      Style="{StaticResource CounterLabel}"
+                     FontSize="70"
                      HorizontalOptions="Center"
                      VerticalOptions="Center" />
 
               <!-- Increase -->
               <Border Grid.Column="2"
                       BackgroundColor="{StaticResource ButtonIncrease}"
-                      WidthRequest="72"
-                      HeightRequest="72"
+                      WidthRequest="62"
+                      HeightRequest="62"
                       StrokeThickness="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
