@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using Microsoft.EntityFrameworkCore;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
@@ -21,7 +22,6 @@ public class SessionRepository : ISessionRepository
     {
         ArgumentNullException.ThrowIfNull(session);
         await _context.Sessions.AddAsync(session).ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"📝 Session added to context: {session.Id}");
     }
 
     /// <summary>
@@ -44,7 +44,6 @@ public class SessionRepository : ISessionRepository
             entry.State = EntityState.Detached;
 
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"💾 Saved {changes} session changes");
         return changes;
     }
 
@@ -108,6 +107,5 @@ public class SessionRepository : ISessionRepository
             .ConfigureAwait(false);
 
         _context.Sessions.RemoveRange(sessions);
-        System.Diagnostics.Debug.WriteLine($"🗑️ Deleted {sessions.Count} sessions for project {projectId}");
     }
 }

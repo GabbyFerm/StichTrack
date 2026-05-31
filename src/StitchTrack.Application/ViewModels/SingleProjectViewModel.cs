@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using StitchTrack.Application.Commands;
 using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.Models;
@@ -75,7 +76,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         .Where(f => f.FileType == ProjectFileType.InspirationPhoto)
         .OrderByDescending(f => f.UploadedAt)
         .ToList() ?? [];
-
 
     /// <summary>
     /// Set by SingleProjectPage — callback to open a file (pattern, inspiration photo, etc.) in the native viewer.
@@ -180,7 +180,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         ArchiveProjectCommand = new RelayCommand(OnArchiveProject);
         DeleteProjectCommand = new RelayCommand(OnDeleteProject);
 
-        System.Diagnostics.Debug.WriteLine("✅ SingleProjectViewModel created");
     }
 
     // ─── Load ─────────────────────────────────────────────────────
@@ -189,13 +188,11 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine($"📂 Loading project: {ProjectId}");
 
             _project = await _projectRepository.GetByIdAsync(ProjectId).ConfigureAwait(false);
 
             if (_project == null)
             {
-                System.Diagnostics.Debug.WriteLine($"⚠️ Project not found: {ProjectId}");
                 await _dialogService.ShowAlertAsync("Error", "Project not found").ConfigureAwait(false);
                 return;
             }
@@ -204,13 +201,11 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             _notesExpanded = false;
 
             OnPropertyChanged(string.Empty);
-            System.Diagnostics.Debug.WriteLine($"✅ Project loaded: {_project.Name}");
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error loading project: {ex.Message}");
             await _dialogService.ShowAlertAsync("Error", "Could not load project").ConfigureAwait(false);
         }
     }
@@ -223,7 +218,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
         if (ShowProjectFormAsync == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectFormAsync callback not set");
             return;
         }
 
@@ -255,21 +249,17 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await SyncProjectFilesAsync(_project.Id, result.ProjectFiles, _projectFileRepository)
                     .ConfigureAwait(false);
 
-
             // Reload to get fresh data including any newly attached project files
             await LoadProjectAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"✅ Project updated: {_project.Name}");
             await _dialogService.ShowToastAsync($"'{_project.Name}' updated!").ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error updating project: {ex.Message}");
             await _dialogService.ShowAlertAsync("Update Failed", "Could not save changes.").ConfigureAwait(false);
         }
         catch (ArgumentException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Validation error: {ex.Message}");
             await _dialogService.ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
         }
     }
@@ -285,15 +275,13 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await _projectRepository.ArchiveAsync(_project.Id).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"📦 Project archived: {_project.Name}");
             await _dialogService.ShowToastAsync($"'{_project.Name}' archived").ConfigureAwait(false);
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error archiving: {ex.Message}");
             await _dialogService.ShowAlertAsync("Archive Failed", "Could not archive project.").ConfigureAwait(false);
         }
     }
@@ -312,10 +300,9 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error unarchiving: {ex.Message}");
             await _dialogService.ShowAlertAsync("Restore Failed", "Could not restore project.").ConfigureAwait(false);
         }
     }
@@ -342,15 +329,13 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await _projectRepository.DeleteAsync(_project.Id).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"🗑️ Project deleted: {_project.Name}");
             await _dialogService.ShowToastAsync($"'{_project.Name}' deleted").ConfigureAwait(false);
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error deleting: {ex.Message}");
             await _dialogService.ShowAlertAsync("Delete Failed", "Could not delete project.").ConfigureAwait(false);
         }
     }
@@ -379,7 +364,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         await _counterRepository.SaveChangesAsync().ConfigureAwait(false);
 
         await LoadProjectAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"✅ Counter added: {name}");
     }
 
     /// <summary>
@@ -411,7 +395,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
         await _counterRepository.DeleteAsync(counterId).ConfigureAwait(false);
         await LoadProjectAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"🗑️ Counter deleted: {counter.Name}");
     }
 
     /// <summary>
@@ -423,7 +406,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
         await _counterRepository.RenameAsync(counterId, newName).ConfigureAwait(false);
         await LoadProjectAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"✏️ Counter renamed to: {newName}");
     }
 
     // ─── Other handlers ──────────────────────────────────────────
@@ -481,7 +463,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             if (!string.IsNullOrWhiteSpace(removed.FilePath) && File.Exists(removed.FilePath))
                 File.Delete(removed.FilePath);
 
-            System.Diagnostics.Debug.WriteLine($"🗑️ Removed file: {removed.FileName}");
         }
 
         // Add new files (those without an existing DB ID)
@@ -496,7 +477,6 @@ public class SingleProjectViewModel : INotifyPropertyChanged
                 newFile.ContentType);
 
             await projectFileRepository.AddAsync(file).ConfigureAwait(false);
-            System.Diagnostics.Debug.WriteLine($"📎 Added file: {newFile.FileName} ({newFile.FileType})");
         }
 
         if (pendingFiles.Any(f => f.ExistingId == null) || existingFiles.Any(f => !keptIds.Contains(f.Id)))

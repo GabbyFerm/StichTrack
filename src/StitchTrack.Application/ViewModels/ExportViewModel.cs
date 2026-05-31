@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using StitchTrack.Application.Commands;
 using StitchTrack.Application.Interfaces;
 using System.ComponentModel;
@@ -107,10 +108,9 @@ public class ExportViewModel : INotifyPropertyChanged
                 await _dialogService.ShowToastAsync("No projects to export").ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ JSON export error: {ex.Message}");
             await _dialogService.ShowAlertAsync(
                 "Export Failed",
                 "Could not export projects. Please try again."
@@ -133,10 +133,9 @@ public class ExportViewModel : INotifyPropertyChanged
                 await _dialogService.ShowToastAsync("No projects to export").ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ CSV export error: {ex.Message}");
             await _dialogService.ShowAlertAsync(
                 "Export Failed",
                 "Could not export projects. Please try again."
@@ -168,10 +167,9 @@ public class ExportViewModel : INotifyPropertyChanged
                 .ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Import error: {ex.Message}");
             await _dialogService.ShowAlertAsync(
                 "Import Failed",
                 "Could not read the file. Make sure it's a valid StitchTrack JSON export.")

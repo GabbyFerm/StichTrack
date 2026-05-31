@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.Models;
 using StitchTrack.Domain.Entities;
@@ -85,7 +86,6 @@ public class MauiExportService : IExportService
         var fileName = $"stitchtrack-export-{DateTime.Now:yyyy-MM-dd}.json";
 
         await WriteAndShareAsync(fileName, json, "application/json").ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"✅ JSON export complete: {fileName} ({projectList.Count} projects)");
 
         return projectList.Count;
     }
@@ -121,7 +121,6 @@ public class MauiExportService : IExportService
         var fileName = $"stitchtrack-export-{DateTime.Now:yyyy-MM-dd}.csv";
 
         await WriteAndShareAsync(fileName, csv.ToString(), "text/csv").ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"✅ CSV export complete: {fileName} ({projectList.Count} projects)");
 
         return projectList.Count;
     }
@@ -136,8 +135,6 @@ public class MauiExportService : IExportService
         // Write to app cache directory — accessible by share sheet
         var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
         await File.WriteAllTextAsync(filePath, content, Encoding.UTF8).ConfigureAwait(false);
-
-        System.Diagnostics.Debug.WriteLine($"📁 Export file written: {filePath}");
 
         // Open share sheet on main thread — UI API
         await MainThread.InvokeOnMainThreadAsync(async () =>

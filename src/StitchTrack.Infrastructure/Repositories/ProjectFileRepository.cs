@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using Microsoft.EntityFrameworkCore;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
@@ -18,7 +19,6 @@ public class ProjectFileRepository : IProjectFileRepository
     {
         ArgumentNullException.ThrowIfNull(file);
         await _context.ProjectFiles.AddAsync(file).ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"📎 Project file added: {file.FileName} ({file.FileType})");
     }
 
     public async Task<IEnumerable<ProjectFile>> GetByProjectIdAsync(Guid projectId)
@@ -55,13 +55,11 @@ public class ProjectFileRepository : IProjectFileRepository
             .ExecuteDeleteAsync()
             .ConfigureAwait(false);
 
-        System.Diagnostics.Debug.WriteLine($"🗑️ Project file deleted: {id}");
     }
 
     public async Task<int> SaveChangesAsync()
     {
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"💾 Saved {changes} project file changes");
         return changes;
     }
 }

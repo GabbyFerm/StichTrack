@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using CommunityToolkit.Maui.Views;
 using StitchTrack.Application.Models;
 using StitchTrack.Domain.Entities;
@@ -312,7 +313,6 @@ public partial class ProjectFormPopup : Popup
         }
     }
 
-
     // ─── File pickers ─────────────────────────────────────────────
 
     /// <summary>
@@ -362,13 +362,11 @@ public partial class ProjectFormPopup : Popup
             PhotoFileNameLabel.Text = photo.FileName;
             PhotoFileNameLabel.IsVisible = true;
 
-            System.Diagnostics.Debug.WriteLine($"Photo saved: {_selectedImagePath}");
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Photo upload error: {ex.Message}");
             await ShowAlertAsync("Could Not Add Photo", "Something went wrong. Please try again.");
         }
     }
@@ -400,10 +398,9 @@ public partial class ProjectFormPopup : Popup
             BuildFileChips(PatternFilesContainer, ProjectFileType.Pattern);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Pattern upload error: {ex.Message}");
         }
     }
 
@@ -430,10 +427,9 @@ public partial class ProjectFormPopup : Popup
             BuildFileChips(InspirationPhotosContainer, ProjectFileType.InspirationPhoto);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Inspiration photo error: {ex.Message}");
         }
     }
 

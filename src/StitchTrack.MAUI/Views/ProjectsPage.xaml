@@ -42,7 +42,6 @@
         </Image>
         <Label Text="MY PROJECTS"
                Style="{StaticResource HeaderTitle}"
-               FontSize="20"
                VerticalOptions="Center" />
       </HorizontalStackLayout>
 
@@ -94,7 +93,7 @@
                  PlaceholderColor="{AppThemeBinding Light=#999999, Dark=#AAAAAA}"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                              Dark=White}"
-                 FontFamily="MontserratRegular"
+                 Style="{StaticResource FontRegular}"
                  FontSize="14"
                  Keyboard="Text"
                  Margin="10,0" />
@@ -129,7 +128,7 @@
           <!-- Active Projects Tab (Left) -->
           <Label Grid.Column="0"
                  Text="{Binding ActiveProjectsTabText}"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="14"
                  HorizontalOptions="Start"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
@@ -143,13 +142,13 @@
             </Label.Triggers>
             <Label.GestureRecognizers>
               <TapGestureRecognizer Command="{Binding ShowActiveProjectsCommand}" />
-              </Label.GestureRecognizers>
+            </Label.GestureRecognizers>
           </Label>
 
           <!-- Archived Projects Tab (Right) -->
           <Label Grid.Column="1"
                  Text="{Binding ArchivedProjectsTabText}"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="14"
                  HorizontalOptions="End"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
@@ -182,7 +181,7 @@
                      Value="False">
                 <Setter Property="Color" Value="{StaticResource BrandGold}" />
               </DataTrigger>
-              </BoxView.Triggers>
+            </BoxView.Triggers>
           </BoxView>
 
           <!-- Right Half Underline (Archived Projects) -->
@@ -202,7 +201,7 @@
         </Grid>
 
       </VerticalStackLayout>
-      
+
       <!-- Projects List -->
       <CollectionView Grid.Row="1"
                       ItemsSource="{Binding Projects}"
@@ -222,13 +221,13 @@
                    HorizontalOptions="Center" />
 
             <Label Text="No projects yet"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="18"
                    HorizontalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
 
             <Label Text="Tap + to create your first project"
-                   FontFamily="MontserratRegular"
+                   Style="{StaticResource FontRegular}"
                    FontSize="14"
                    HorizontalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
@@ -255,14 +254,14 @@
                     x:DataType="{x:Null}"
                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProjectsViewModel}}, Path=NavigateToProjectCommand}"
                     CommandParameter="{Binding Id}" />
-                  </Grid.GestureRecognizers>
+                </Grid.GestureRecognizers>
 
                 <!-- Project Image -->
                 <Border Grid.Column="0"
                         WidthRequest="80"
                         HeightRequest="80"
                         StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource LightBorder}, Dark={StaticResource DarkSurface}}"
                         VerticalOptions="Start">
 
                   <Border.StrokeShape>
@@ -292,7 +291,7 @@
 
                   <!-- Project Name -->
                   <Label Text="{Binding Name}"
-                         FontFamily="MontserratSemiBold"
+                         Style="{StaticResource FontSemiBold}"
                          FontSize="16"
                          LineBreakMode="TailTruncation"
                          TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
@@ -300,7 +299,7 @@
                   <!-- Row Count with Progress -->
                   <HorizontalStackLayout Spacing="8">
 
-                    <Label FontFamily="MontserratRegular"
+                    <Label Style="{StaticResource FontRegular}"
                            FontSize="14"
                            TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
                       <Label.Text>
@@ -308,11 +307,11 @@
                           <Binding Path="CurrentCount" />
                           <Binding Path="TotalRows" Converter="{StaticResource TotalRowsConverter}" />
                         </MultiBinding>
-                        </Label.Text>
+                      </Label.Text>
                     </Label>
 
                     <!-- Progress Percentage (only if TotalRows is set) -->
-                    <Label FontFamily="MontserratMedium"
+                    <Label Style="{StaticResource FontMedium}"
                            FontSize="14"
                            TextColor="{StaticResource BrandGold}"
                            IsVisible="{Binding TotalRows, Converter={StaticResource IsNotNullConverter}}">
@@ -320,20 +319,20 @@
                         <MultiBinding StringFormat="// {0}% done">
                           <Binding Path="." Converter="{StaticResource ProgressPercentageConverter}" />
                         </MultiBinding>
-                        </Label.Text>
+                      </Label.Text>
                     </Label>
 
                   </HorizontalStackLayout>
 
                   <!-- Last Updated -->
-                  <Label FontFamily="MontserratRegular"
+                  <Label Style="{StaticResource FontRegular}"
                          FontSize="12"
                          TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
                     <Label.Text>
                       <MultiBinding StringFormat="Last worked on: {0}">
                         <Binding Path="UpdatedAt" Converter="{StaticResource RelativeTimeConverter}" />
                       </MultiBinding>
-                      </Label.Text>
+                    </Label.Text>
                   </Label>
 
                 </VerticalStackLayout>
@@ -366,5 +365,4 @@
     </Grid>
 
   </Grid>
-
 </ContentPage>

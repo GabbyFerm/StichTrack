@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using CommunityToolkit.Maui.Views;
 using StitchTrack.Application.Models;
 using StitchTrack.Application.ViewModels;
@@ -32,30 +33,25 @@ public partial class SingleProjectPage : ContentPage
                     File = new ReadOnlyFile(filePath)
                 });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Invalid file path: {ex.Message}");
                 await DisplayAlert("Cannot Open File", "The specified file path is invalid.", "OK");
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Invalid operation: {ex.Message}");
                 await DisplayAlert("Cannot Open File", "Could not open the file due to an invalid operation.", "OK");
             }
-            catch (System.IO.IOException ex)
+            catch (System.IO.IOException)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ IO error: {ex.Message}");
                 await DisplayAlert("Cannot Open File", "There was an error accessing the file.", "OK");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Unexpected error opening file: {ex.Message}");
                 await DisplayAlert("Cannot Open File", "Could not open the pattern file.", "OK");
                 throw;
             }
         };
 
-        System.Diagnostics.Debug.WriteLine("✅ SingleProjectPage initialized");
     }
 
     public string ProjectId
@@ -67,7 +63,6 @@ public partial class SingleProjectPage : ContentPage
             if (Guid.TryParse(value, out var projectId))
             {
                 _viewModel.ProjectId = projectId;
-                System.Diagnostics.Debug.WriteLine($"📌 ProjectId set:  {projectId}");
             }
         }
     }

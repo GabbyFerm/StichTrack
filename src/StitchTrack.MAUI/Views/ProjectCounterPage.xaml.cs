@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using StitchTrack.Application.ViewModels;
 using StitchTrack.Domain.Entities;
 using System.Globalization;
@@ -46,24 +47,20 @@ public partial class ProjectCounterPage : ContentPage
                     File = new ReadOnlyFile(filePath)
                 });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Invalid file path: {ex.Message}");
                 await DisplayAlert("Cannot Open File", "The file path is invalid.", "OK");
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Cannot open file: {ex.Message}");
                 await DisplayAlert("Cannot Open File", "Could not open the file.", "OK");
             }
-            catch (System.IO.IOException ex)
+            catch (System.IO.IOException)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ IO error: {ex.Message}");
                 await DisplayAlert("Cannot Open File", "There was an error accessing the file.", "OK");
             }
         };
 
-        System.Diagnostics.Debug.WriteLine("✅ ProjectCounterPage initialized");
     }
 
     public string ProjectId
@@ -75,7 +72,6 @@ public partial class ProjectCounterPage : ContentPage
             if (Guid.TryParse(value, out var projectId))
             {
                 _viewModel.ProjectId = projectId;
-                System.Diagnostics.Debug.WriteLine($"📌 ProjectId set: {projectId}");
             }
         }
     }
@@ -171,7 +167,6 @@ public partial class ProjectCounterPage : ContentPage
         foreach (var counter in _viewModel.Counters)
             CountersContainer.Children.Add(CreateCounterCard(counter));
 
-        System.Diagnostics.Debug.WriteLine($"🔢 Built {_viewModel.Counters.Count} counter card(s)");
     }
 
     /// <summary>
@@ -395,13 +390,11 @@ public partial class ProjectCounterPage : ContentPage
             _sessionTimer.Elapsed += OnTimerTick;
         }
         _sessionTimer.Start();
-        System.Diagnostics.Debug.WriteLine("⏱️ Session timer started");
     }
 
     private void StopTimer()
     {
         _sessionTimer?.Stop();
-        System.Diagnostics.Debug.WriteLine("⏹️ Session timer stopped");
     }
 
     private void OnTimerTick(object? sender, System.Timers.ElapsedEventArgs e)

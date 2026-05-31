@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -44,7 +45,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     public event EventHandler? CountersChanged;
     public event EventHandler? RowNotesChanged;
 
-
     public Guid ProjectId { get; set; }
 
     // ─── Project properties ──────────────────────────────────────
@@ -67,7 +67,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
 
     // CurrentCount reflects the primary counter for progress bar / ProgressText
     public int CurrentCount => PrimaryCounter?.CurrentCount ?? 0;
-
 
     // ─── Progress (driven by primary counter) ────────────────────
 
@@ -98,7 +97,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             .ToList() ?? [];
 
     public Func<string, Task>? OpenFileAsync { get; set; }
-
 
     // ─── Session / Timer ─────────────────────────────────────────
 
@@ -134,7 +132,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
 
     public Func<Task>? OnNavigateBack { get; set; }
 
-
     public ProjectCounterViewModel(
     IProjectRepository projectRepository,
     IProjectCounterRepository counterRepository,
@@ -157,7 +154,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         EndSessionCommand = new RelayCommand(OnEndSession);
         ToggleNotesCommand = new RelayCommand(OnToggleNotes);
 
-        System.Diagnostics.Debug.WriteLine("✅ ProjectCounterViewModel created");
     }
 
     // ─── Load ─────────────────────────────────────────────────────
@@ -166,7 +162,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine($"📂 Loading project for counter: {ProjectId}");
 
             _project = await _projectRepository
                 .GetByIdWithoutHistoryAsync(ProjectId)
@@ -193,14 +188,11 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             CountersChanged?.Invoke(this, EventArgs.Empty);
             RowNotesChanged?.Invoke(this, EventArgs.Empty);
 
-            System.Diagnostics.Debug.WriteLine(
-                $"✅ Project loaded: {_project.Name}, {_counters.Count} counter(s)");
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error loading project: {ex.Message}");
             await _dialogService.ShowAlertAsync("Error", "Could not load project").ConfigureAwait(false);
         }
     }
@@ -303,7 +295,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         _counters.Add(counter);
         CountersChanged?.Invoke(this, EventArgs.Empty);
 
-        System.Diagnostics.Debug.WriteLine($"✅ Counter added: {name}");
     }
 
     /// <summary>Deletes a counter after confirmation. Primary counter cannot be deleted if it's the only one.</summary>
@@ -334,7 +325,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         _counters.Remove(counter);
         CountersChanged?.Invoke(this, EventArgs.Empty);
 
-        System.Diagnostics.Debug.WriteLine($"🗑️ Counter deleted: {counter.Name}");
     }
 
     // ─── Session ─────────────────────────────────────────────────
@@ -355,13 +345,11 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             PrimaryCounter?.Name);
 
         IsSessionRunning = true;
-        System.Diagnostics.Debug.WriteLine($"▶️ Session started: {_project.Name}");
     }
 
     private void PauseSession()
     {
         IsSessionRunning = false;
-        System.Diagnostics.Debug.WriteLine("⏸️ Session paused");
     }
 
     public void UpdateSessionTimer(TimeSpan elapsed)
@@ -387,10 +375,9 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
                 .ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Save failed: {ex.Message}");
             await _dialogService.ShowAlertAsync("Save Failed", "Could not save progress.").ConfigureAwait(false);
         }
     }
@@ -402,13 +389,11 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
         try
         {
             await SaveAllCountersAsync().ConfigureAwait(false);
-            System.Diagnostics.Debug.WriteLine("💾 Auto-saved all counters");
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Auto-save failed: {ex.Message}");
         }
     }
 
@@ -425,9 +410,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
                 await _sessionRepository.AddAsync(_currentSession).ConfigureAwait(false);
                 await _sessionRepository.SaveChangesAsync().ConfigureAwait(false);
 
-                System.Diagnostics.Debug.WriteLine(
-                    $"✅ Session ended: {_currentSession.DurationSeconds}s");
-
                 await _dialogService
                     .ShowToastAsync($"Session saved — row {CurrentCount}")
                     .ConfigureAwait(false);
@@ -443,10 +425,9 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error ending session: {ex.Message}");
             await _dialogService.ShowAlertAsync("Error", "Could not save session.").ConfigureAwait(false);
         }
     }
@@ -464,7 +445,6 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
                 .ConfigureAwait(false);
         }
     }
-
 
     // ─── Notes ───────────────────────────────────────────────────
 

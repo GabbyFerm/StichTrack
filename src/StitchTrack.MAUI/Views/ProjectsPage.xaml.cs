@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using CommunityToolkit.Maui.Views;
 using StitchTrack.Application.Models;
 using StitchTrack.Application.ViewModels;
@@ -24,7 +25,6 @@ public partial class ProjectsPage : ContentPage
         _viewModel.ShowProjectFormAsync = ShowProjectFormPopupAsync;
         _viewModel.ShowProjectMenuPopupAsync = ShowProjectMenuPopupAsync;
 
-        System.Diagnostics.Debug.WriteLine("✅ ProjectsPage initialized");
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 namespace StitchTrack.MAUI;
 
 public partial class MainPage : ContentPage

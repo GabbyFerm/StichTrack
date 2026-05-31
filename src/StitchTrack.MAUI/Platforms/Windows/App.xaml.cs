@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using Microsoft.UI.Xaml;
 
 // To learn more about WinUI, the WinUI project structure,

@@ -18,7 +18,7 @@
            VerticalOptions="Fill" />
 
     <!-- Dark Overlay for readability -->
-    <BoxView BackgroundColor="#80000000"
+    <BoxView BackgroundColor="{StaticResource OverlayScrim}"
              Opacity="0.6" />
 
     <!-- Content Grid with Safe Area -->
@@ -34,7 +34,7 @@
                    WidthRequest="32"
                    HeightRequest="32"
                    CornerRadius="16"
-                   BackgroundColor="#40FFFFFF"
+                   BackgroundColor="{StaticResource OverlayButtonScrim}"
                    Padding="6"
                    Margin="15,15,15,0"
                    Clicked="OnCloseClicked"
@@ -55,7 +55,7 @@
 
         <!-- "Welcome to" Text -->
         <Label Text="Welcome to"
-               FontFamily="MontserratRegular"
+               Style="{StaticResource FontRegular}"
                FontSize="16"
                TextColor="White"
                HorizontalOptions="Center"
@@ -75,7 +75,7 @@
 
         <!-- Subtitle -->
         <Label Text="Start counting rows effortlessly"
-               FontFamily="MontserratMedium"
+               Style="{StaticResource FontMedium}"
                FontSize="15"
                TextColor="White"
                HorizontalOptions="Center"
@@ -85,7 +85,7 @@
 
         <!-- Description -->
         <Label Text="Your projects are saved locally and&#10;you always have access to them."
-               FontFamily="MontserratRegular"
+               Style="{StaticResource FontRegular}"
                FontSize="15"
                TextColor="White"
                HorizontalOptions="Center"
@@ -102,12 +102,12 @@
           <HorizontalStackLayout Spacing="12"
                                  HorizontalOptions="Center">
             <Label Text="✓"
-                   FontFamily="MontserratBold"
+                   Style="{StaticResource FontBold}"
                    FontSize="20"
                    TextColor="{StaticResource BrandGold}"
                    VerticalOptions="Center" />
             <Label Text="Track multiple projects"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="14"
                    TextColor="White"
                    VerticalOptions="Center"
@@ -118,12 +118,12 @@
           <HorizontalStackLayout Spacing="12"
                                  HorizontalOptions="Center">
             <Label Text="✓"
-                   FontFamily="MontserratBold"
+                   Style="{StaticResource FontBold}"
                    FontSize="20"
                    TextColor="{StaticResource BrandGold}"
                    VerticalOptions="Center" />
             <Label Text="Count rows with ease"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="14"
                    TextColor="White"
                    VerticalOptions="Center"
@@ -134,12 +134,12 @@
           <HorizontalStackLayout Spacing="12"
                                  HorizontalOptions="Center">
             <Label Text="✓"
-                   FontFamily="MontserratBold"
+                   Style="{StaticResource FontBold}"
                    FontSize="20"
                    TextColor="{StaticResource BrandGold}"
                    VerticalOptions="Center" />
             <Label Text="Never lose your progress"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="14"
                    TextColor="White"
                    VerticalOptions="Center"
@@ -184,7 +184,7 @@
             </Image>
             <Label Text="GET STARTED"
                    TextColor="White"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="15"
                    VerticalOptions="Center" />
           </HorizontalStackLayout>

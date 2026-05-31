@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using CommunityToolkit.Maui;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -38,7 +39,6 @@ public static class MauiProgram
             });
 
         // DATABASE
-        System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
 
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
@@ -109,7 +109,6 @@ public static class MauiProgram
             });
 
 #if DEBUG
-        System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
 #endif
 
         Task.Run(async () =>
@@ -121,10 +120,9 @@ public static class MauiProgram
                 await DbInitializer.InitializeAsync(dbContext).ConfigureAwait(false);
             }
 #pragma warning disable CA1031
-            catch (Exception ex)
+            catch (Exception)
 #pragma warning restore CA1031
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Startup DB error: {ex.Message}");
             }
         });
 

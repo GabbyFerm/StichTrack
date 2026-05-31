@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using StitchTrack.Domain.Interfaces;
 using StitchTrack.Application.Interfaces;
 
@@ -46,13 +47,11 @@ public partial class App : Microsoft.Maui.Controls.Application
             // Sync haptics service with persisted value
             hapticsService.IsEnabled = settings.HapticFeedbackEnabled;
 
-            System.Diagnostics.Debug.WriteLine($"✅ Applied settings — theme: {settings.Theme}, haptics: {settings.HapticFeedbackEnabled}");
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error applying stored settings: {ex.Message}");
             // Safe fallback — Auto theme, haptics on
         }
     }

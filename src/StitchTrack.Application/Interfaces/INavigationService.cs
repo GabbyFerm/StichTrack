@@ -1,7 +1,8 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 namespace StitchTrack.Application.Interfaces;
 
 /// <summary>
-/// Service for handling navigation between pages. 
+/// Service for handling navigation between pages.
 /// </summary>
 public interface INavigationService
 {

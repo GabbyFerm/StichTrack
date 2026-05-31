@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 // Global using directives for MAUI project
 global using System.ComponentModel;
 global using System.Windows.Input;

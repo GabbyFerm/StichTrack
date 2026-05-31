@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using Microsoft.EntityFrameworkCore;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
@@ -53,7 +54,6 @@ public class RowNoteRepository : IRowNoteRepository
     public async Task<int> SaveChangesAsync()
     {
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"💾 RowNote: saved {changes} changes");
         return changes;
     }
 }

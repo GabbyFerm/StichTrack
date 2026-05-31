@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using ObjCRuntime;
 using StitchTrack.MAUI.Platforms.iOS;
 using UIKit;

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using CommunityToolkit.Maui.Views;
 using StitchTrack.Domain.Interfaces;
 
@@ -44,7 +45,6 @@ public partial class OnboardingPopup : Popup
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine("📝 Marking onboarding as seen...");
 
             // Use correct method name from IAppSettingsRepository
             var settings = await _appSettingsRepository.GetAppSettingsAsync();
@@ -56,14 +56,12 @@ public partial class OnboardingPopup : Popup
                 // Save changes using correct method name
                 await _appSettingsRepository.SaveAppSettingsAsync(settings);
 
-                System.Diagnostics.Debug.WriteLine("✅ Onboarding marked as seen");
             }
         }
 #pragma warning disable CA1031 // Do not catch general exception types
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error marking onboarding as seen: {ex.Message}");
             // Don't crash the app if this fails - just log it
         }
     }

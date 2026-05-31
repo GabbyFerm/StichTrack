@@ -1,8 +1,12 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 namespace StitchTrack.Domain.Entities;
 
 /// <summary>
-/// Represents a periodic reminder for a project.
-/// Triggers at configurable intervals when enabled and sufficient time has passed since last trigger.
+/// Planned feature — not yet implemented.
+/// Represents a recurring reminder to work on a project.
+/// Infrastructure exists (EF config, navigation property on Project)
+/// but no repository, ViewModel, or UI has been built.
+/// Tracked for Phase 6.
 /// </summary>
 public class Reminder
 {

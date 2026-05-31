@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using Microsoft.EntityFrameworkCore;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
@@ -36,7 +37,6 @@ public class AppSettingsRepository : IAppSettingsRepository
             _context.AppSettings.Add(settings);
             await _context.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine("✨ Created default AppSettings");
         }
 
         return settings;
@@ -53,6 +53,5 @@ public class AppSettingsRepository : IAppSettingsRepository
         _context.AppSettings.Update(settings);
         await _context.SaveChangesAsync().ConfigureAwait(false);
 
-        System.Diagnostics.Debug.WriteLine("💾 Saved AppSettings");
     }
 }

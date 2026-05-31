@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using StitchTrack.MAUI.Views;
 
 namespace StitchTrack.MAUI;
@@ -25,7 +26,6 @@ public partial class AppShell : Shell
              (target.Contains("SingleProjectPage", StringComparison.OrdinalIgnoreCase) ||
              target.Contains("ProjectCounterPage", StringComparison.OrdinalIgnoreCase)))
         {
-            System.Diagnostics.Debug.WriteLine("⛔ Blocked navigation to cached child page");
             e.Cancel();
             await Shell.Current.GoToAsync("//projects", false).ConfigureAwait(true);
         }

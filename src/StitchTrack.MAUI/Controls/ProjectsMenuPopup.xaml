@@ -11,7 +11,7 @@
   <Grid>
 
     <!-- Semi-transparent backdrop -->
-    <BoxView BackgroundColor="#80000000" />
+    <BoxView BackgroundColor="{StaticResource OverlayScrim}" />
 
     <!-- Card pinned to the bottom with rounded top corners -->
     <Border Margin="0"
@@ -30,20 +30,20 @@
         <BoxView WidthRequest="40"
                  HeightRequest="4"
                  CornerRadius="2"
-                 BackgroundColor="{AppThemeBinding Light=#D1D5DB, Dark=#4B5563}"
+                 BackgroundColor="{AppThemeBinding Light={StaticResource LightMuted}, Dark={StaticResource DarkMuted}}"
                  HorizontalOptions="Center"
                  Margin="0,8,0,16" />
 
         <!-- Project Name -->
         <Label x:Name="ProjectNameLabel"
-               FontFamily="MontserratBold"
+               Style="{StaticResource FontBold}"
                FontSize="18"
                Margin="24,0,24,16"
                TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
         <!-- Divider -->
         <BoxView HeightRequest="1"
-                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                 BackgroundColor="{AppThemeBinding Light={StaticResource LightSurface}, Dark={StaticResource DarkSurface}}"
                  HorizontalOptions="Fill" />
 
         <!-- Edit Row -->
@@ -65,7 +65,7 @@
 
           <Label Grid.Column="1"
                  Text="Edit"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="16"
                  Margin="12,0,0,0"
                  VerticalOptions="Center"
@@ -74,7 +74,7 @@
 
         <!-- Divider -->
         <BoxView HeightRequest="1"
-                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                 BackgroundColor="{AppThemeBinding Light={StaticResource LightSurface}, Dark={StaticResource DarkSurface}}"
                  HorizontalOptions="Fill" />
 
         <!-- Archive / Unarchive Row — label set in code-behind based on project state -->
@@ -96,7 +96,7 @@
 
           <Label x:Name="ArchiveLabel"
                  Grid.Column="1"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="16"
                  Margin="12,0,0,0"
                  VerticalOptions="Center"
@@ -105,7 +105,7 @@
 
         <!-- Divider -->
         <BoxView HeightRequest="1"
-                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                 BackgroundColor="{AppThemeBinding Light={StaticResource LightSurface}, Dark={StaticResource DarkSurface}}"
                  HorizontalOptions="Fill" />
 
         <!-- Delete Row — red to signal destructive action -->
@@ -121,29 +121,29 @@
                  HeightRequest="20"
                  VerticalOptions="Center">
             <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="#EF4444" />
+              <toolkit:IconTintColorBehavior TintColor="{StaticResource ErrorRed}" />
             </Image.Behaviors>
           </Image>
 
           <Label Grid.Column="1"
                  Text="Delete"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="16"
                  Margin="12,0,0,0"
                  VerticalOptions="Center"
-                 TextColor="#EF4444" />
+                 TextColor="{StaticResource ErrorRed}" />
         </Grid>
 
         <!-- Divider above cancel -->
         <BoxView HeightRequest="1"
-                 BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                 BackgroundColor="{AppThemeBinding Light={StaticResource LightSurface}, Dark={StaticResource DarkSurface}}"
                  HorizontalOptions="Fill" />
 
         <!-- Cancel Button -->
         <Border Margin="24,16,24,40"
                 Padding="0"
                 StrokeThickness="1"
-                Stroke="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                Stroke="{AppThemeBinding Light={StaticResource LightBorder}, Dark={StaticResource DarkSurface}}"
                 BackgroundColor="Transparent"
                 HeightRequest="50">
           <Border.StrokeShape>
@@ -154,7 +154,7 @@
           </Border.GestureRecognizers>
 
           <Label Text="Cancel"
-                 FontFamily="MontserratSemiBold"
+                 Style="{StaticResource FontSemiBold}"
                  FontSize="15"
                  HorizontalOptions="Center"
                  VerticalOptions="Center"
@@ -163,8 +163,8 @@
 
       </VerticalStackLayout>
 
-    </Border>
+      </Border>
 
-  </Grid>
+    </Grid>
 
 </toolkit:Popup>

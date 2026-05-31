@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using Microsoft.EntityFrameworkCore;
 using StitchTrack.Domain.Entities;
 
@@ -18,18 +19,12 @@ public static class DbInitializer
 
         try
         {
-            System.Diagnostics.Debug.WriteLine("📦 Applying migrations...");
             await context.Database.MigrateAsync().ConfigureAwait(false);
-            System.Diagnostics.Debug.WriteLine("✅ Migrations applied successfully");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ DATABASE INIT FAILED: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"Exception Type: {ex.GetType().Name}");
             if (ex.InnerException != null)
-                System.Diagnostics.Debug.WriteLine($"Inner: {ex.InnerException.Message}");
-            System.Diagnostics.Debug.WriteLine($"Stack: {ex.StackTrace}");
-            throw;
+                throw;
         }
     }
 }

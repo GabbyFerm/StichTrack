@@ -8,7 +8,6 @@
   <!-- BRAND COLORS (Same in Light & Dark)          -->
   <!-- ============================================ -->
   <Color x:Key="BrandGold">#E1AD37</Color>
-  <Color x:Key="BrandCancel">#EB9057</Color>
   <Color x:Key="LinkColor">#16697A</Color>
 
   <!-- ============================================ -->
@@ -20,7 +19,6 @@
   <!-- Darkened from #424B54 — better contrast on warm backgrounds -->
   <Color x:Key="LightTextSecondary">#424B54</Color>
   <!-- Darkened from #6B7280 — readable on cream card backgrounds -->
-  <Color x:Key="LightLine">#E1AD37</Color>
   <Color x:Key="LightCardBackground">#F5EDD3</Color>
   <Color x:Key="LightIconColor">#2C3338</Color>
   <!-- Matches new LightTextPrimary -->
@@ -35,24 +33,14 @@
   <Color x:Key="DarkTextPrimary">#FFFFFF</Color>
   <Color x:Key="DarkTextSecondary">#E5E7EB</Color>
   <!-- Lightened from #D1D5DB — much more readable on dark grey -->
-  <Color x:Key="DarkLine">#424B54</Color>
   <Color x:Key="DarkCardBackground">#4A5259</Color>
   <!-- Slightly darkened to match new page background -->
   <Color x:Key="DarkIconColor">#FFFFFF</Color>
-
-  <!-- ============================================ -->
-  <!-- THEME-AWARE COLORS (Switch Automatically)    -->
-  <!-- Use AppThemeBinding in XAML where needed     -->
-  <!-- ============================================ -->
-
-  <Color x:Key="TextPrimary">#2C3338</Color>
-  <Color x:Key="TextSecondary">#424B54</Color>
   <Color x:Key="TextWhite">#ffffff</Color>
 
   <!-- ============================================ -->
   <!-- BUTTON COLORS -->
   <!-- ============================================ -->
-  <!-- BUTTON COLORS -->
   <Color x:Key="ButtonIncrease">#E1AD37</Color>
   <Color x:Key="ButtonDecrease">#424B54</Color>
   <!-- light mode only -->
@@ -66,15 +54,6 @@
   <Color x:Key="ButtonTextOnDark">#FFFFFF</Color>
 
   <!-- ============================================ -->
-  <!-- NAVIGATION COLORS                            -->
-  <!-- ============================================ -->
-  <Color x:Key="NavBackground">#d39d55</Color>
-  <Color x:Key="NavTextUnselected">#FFFFFF</Color>
-  <Color x:Key="NavTextSelected">#424B54</Color>
-  <Color x:Key="NavIconUnselected">#FFFFFF</Color>
-  <Color x:Key="NavIconSelected">#424B54</Color>
-
-  <!-- ============================================ -->
   <!-- SEMANTIC COLORS                              -->
   <!-- ============================================ -->
   <Color x:Key="SuccessGreen">#10B981</Color>
@@ -85,5 +64,33 @@
   <Color x:Key="SecondaryGold">#d39d55</Color>
   <Color x:Key="LightGreen">#d6cfb4</Color>
   <Color x:Key="DarkGreen">#606C5D</Color>
+
+  <!-- ============================================ -->
+  <!-- UI SURFACE COLORS                            -->
+  <!-- ============================================ -->
+  <Color x:Key="LightSurface">#F3F4F6</Color>
+  <!-- subtle backgrounds: dividers, icon buttons (light) -->
+  <Color x:Key="DarkSurface">#374151</Color>
+  <!-- subtle backgrounds: dividers, icon buttons, borders (dark) -->
+  <Color x:Key="LightBorder">#E5E7EB</Color>
+  <!-- borders, image placeholders (light) -->
+  <Color x:Key="LightMuted">#D1D5DB</Color>
+  <!-- muted elements: drag handle, nav icons (light) -->
+  <Color x:Key="DarkMuted">#4B5563</Color>
+  <!-- muted elements: drag handle (dark) -->
+  <Color x:Key="DarkInputBackground">#1F2937</Color>
+  <!-- input field background (dark) -->
+  <Color x:Key="ProgressBarTrack">#E6E1D0</Color>
+  <!-- progress bar unfilled track (light) -->
+
+  <!-- ============================================ -->
+  <!-- OVERLAY / SCRIM COLORS                       -->
+  <!-- ============================================ -->
+  <Color x:Key="OverlayScrim">#80000000</Color>
+  <!-- 50% black — used as popup backdrop -->
+  <Color x:Key="OverlayButtonScrim">#40FFFFFF</Color>
+  <!-- 25% white — used for icon buttons over dark overlays -->
+  <Color x:Key="ImageGradientScrim">#90000000</Color>
+  <!-- 56% black — used for gradient scrims over cover images -->
 
 </ResourceDictionary>

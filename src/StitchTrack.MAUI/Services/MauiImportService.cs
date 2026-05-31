@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.Models;
 using StitchTrack.Domain.Entities;
@@ -61,16 +62,13 @@ public class MauiImportService : IImportService
                 imported++;
             }
 #pragma warning disable CA1031
-            catch (Exception ex)
+            catch (Exception)
 #pragma warning restore CA1031
             {
                 // Skip failed projects — don't abort the whole import
-                System.Diagnostics.Debug.WriteLine(
-                    $"⚠️ Skipped project '{dto.Name}': {ex.Message}");
             }
         }
 
-        System.Diagnostics.Debug.WriteLine($"✅ Import complete: {imported} projects");
         return imported;
     }
 
