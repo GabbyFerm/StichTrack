@@ -38,7 +38,7 @@
             <BoxView.Background>
               <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                 <GradientStop Color="Transparent" Offset="0.0" />
-                <GradientStop Color="#90000000" Offset="1.0" />
+                <GradientStop Color="{StaticResource ImageGradientScrim}" Offset="1.0" />
               </LinearGradientBrush>
             </BoxView.Background>
           </BoxView>

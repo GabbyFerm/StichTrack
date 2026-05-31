@@ -11,7 +11,7 @@
   <Grid>
 
     <!-- Semi-transparent backdrop -->
-    <BoxView BackgroundColor="#80000000" />
+    <BoxView BackgroundColor="{StaticResource OverlayScrim}" />
 
     <!-- Card pinned to the bottom with rounded top corners -->
     <Border Margin="0"
@@ -121,7 +121,7 @@
                  HeightRequest="20"
                  VerticalOptions="Center">
             <Image.Behaviors>
-              <toolkit:IconTintColorBehavior TintColor="#EF4444" />
+              <toolkit:IconTintColorBehavior TintColor="{StaticResource ErrorRed}" />
             </Image.Behaviors>
           </Image>
 
@@ -131,7 +131,7 @@
                  FontSize="16"
                  Margin="12,0,0,0"
                  VerticalOptions="Center"
-                 TextColor="#EF4444" />
+                 TextColor="{StaticResource ErrorRed}" />
         </Grid>
 
         <!-- Divider above cancel -->

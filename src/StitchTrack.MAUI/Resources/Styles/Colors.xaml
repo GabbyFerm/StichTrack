@@ -86,4 +86,14 @@
   <Color x:Key="LightGreen">#d6cfb4</Color>
   <Color x:Key="DarkGreen">#606C5D</Color>
 
+  <!-- ============================================ -->
+  <!-- OVERLAY / SCRIM COLORS                       -->
+  <!-- ============================================ -->
+  <Color x:Key="OverlayScrim">#80000000</Color>
+  <!-- 50% black — used as popup backdrop -->
+  <Color x:Key="OverlayButtonScrim">#40FFFFFF</Color>
+  <!-- 25% white — used for icon buttons over dark overlays -->
+  <Color x:Key="ImageGradientScrim">#90000000</Color>
+  <!-- 56% black — used for gradient scrims over cover images -->
+
 </ResourceDictionary>

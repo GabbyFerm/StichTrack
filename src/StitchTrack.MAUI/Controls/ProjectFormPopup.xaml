@@ -10,7 +10,7 @@
 
   <Grid>
 
-    <BoxView BackgroundColor="#80000000" />
+    <BoxView BackgroundColor="{StaticResource OverlayScrim}" />
 
     <!-- Card sits at the bottom with rounded top corners -->
     <Border Margin="0"

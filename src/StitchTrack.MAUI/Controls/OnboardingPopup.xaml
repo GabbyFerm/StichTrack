@@ -18,7 +18,7 @@
            VerticalOptions="Fill" />
 
     <!-- Dark Overlay for readability -->
-    <BoxView BackgroundColor="#80000000"
+    <BoxView BackgroundColor="{StaticResource OverlayScrim}"
              Opacity="0.6" />
 
     <!-- Content Grid with Safe Area -->
@@ -34,7 +34,7 @@
                    WidthRequest="32"
                    HeightRequest="32"
                    CornerRadius="16"
-                   BackgroundColor="#40FFFFFF"
+                   BackgroundColor="{StaticResource OverlayButtonScrim}"
                    Padding="6"
                    Margin="15,15,15,0"
                    Clicked="OnCloseClicked"
