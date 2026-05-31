@@ -66,6 +66,24 @@
   <Color x:Key="DarkGreen">#606C5D</Color>
 
   <!-- ============================================ -->
+  <!-- UI SURFACE COLORS                            -->
+  <!-- ============================================ -->
+  <Color x:Key="LightSurface">#F3F4F6</Color>
+  <!-- subtle backgrounds: dividers, icon buttons (light) -->
+  <Color x:Key="DarkSurface">#374151</Color>
+  <!-- subtle backgrounds: dividers, icon buttons, borders (dark) -->
+  <Color x:Key="LightBorder">#E5E7EB</Color>
+  <!-- borders, image placeholders (light) -->
+  <Color x:Key="LightMuted">#D1D5DB</Color>
+  <!-- muted elements: drag handle, nav icons (light) -->
+  <Color x:Key="DarkMuted">#4B5563</Color>
+  <!-- muted elements: drag handle (dark) -->
+  <Color x:Key="DarkInputBackground">#1F2937</Color>
+  <!-- input field background (dark) -->
+  <Color x:Key="ProgressBarTrack">#E6E1D0</Color>
+  <!-- progress bar unfilled track (light) -->
+
+  <!-- ============================================ -->
   <!-- OVERLAY / SCRIM COLORS                       -->
   <!-- ============================================ -->
   <Color x:Key="OverlayScrim">#80000000</Color>

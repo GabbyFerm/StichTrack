@@ -22,7 +22,7 @@
     </Shell.TabBarTitleColor>
 
     <Shell.TabBarUnselectedColor>
-      <AppThemeBinding Light="#FFFFFF" Dark="#D1D5DB" />
+      <AppThemeBinding Light="#FFFFFF" Dark="{StaticResource LightMuted}" />
     </Shell.TabBarUnselectedColor>
 
     <!-- 

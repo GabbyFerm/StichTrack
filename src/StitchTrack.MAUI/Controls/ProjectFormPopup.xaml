@@ -35,7 +35,7 @@
 
           <Label x:Name="FormTitleLabel"
                  Grid.Column="0"
-                 FontFamily="MontserratBold"
+                 Style="{StaticResource FontBold}"
                  FontSize="20"
                  VerticalOptions="Center"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
@@ -45,7 +45,7 @@
                        WidthRequest="32"
                        HeightRequest="32"
                        CornerRadius="16"
-                       BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#374151}"
+                       BackgroundColor="{AppThemeBinding Light={StaticResource LightSurface}, Dark={StaticResource DarkSurface}}"
                        Padding="6"
                        Clicked="OnCancelClicked">
             <ImageButton.Behaviors>
@@ -67,11 +67,11 @@
 
               <HorizontalStackLayout Spacing="4">
                 <Label Text="Project Name"
-                       FontFamily="MontserratSemiBold"
+                       Style="{StaticResource FontSemiBold}"
                        FontSize="14"
                        TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
                 <Label Text="*"
-                       FontFamily="MontserratSemiBold"
+                       Style="{StaticResource FontSemiBold}"
                        FontSize="14"
                        TextColor="{StaticResource BrandGold}" />
               </HorizontalStackLayout>
@@ -79,7 +79,7 @@
               <!-- Golden border matching Figma -->
               <Border StrokeThickness="1"
                       Stroke="{StaticResource BrandGold}"
-                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkInputBackground}}"
                       Padding="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -88,7 +88,7 @@
                 <Entry x:Name="NameEntry"
                        Keyboard="Text"
                        Placeholder="My Knitting Project"
-                       FontFamily="MontserratRegular"
+                       Style="{StaticResource FontRegular}"
                        FontSize="14"
                        MaxLength="200"
                        Margin="12,0"
@@ -102,13 +102,13 @@
             <VerticalStackLayout Spacing="6">
 
               <Label Text="Cover Photo"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                        Dark={StaticResource DarkTextPrimary}}" />
 
               <Label Text="Shown as the project thumbnail"
-                     FontFamily="MontserratRegular"
+                     Style="{StaticResource FontRegular}"
                      FontSize="12"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                        Dark={StaticResource DarkTextSecondary}}" />
@@ -133,7 +133,7 @@
                   </Image>
                   <Label x:Name="PhotoLabel"
                          Text="Add Cover Photo"
-                         FontFamily="MontserratMedium"
+                         Style="{StaticResource FontMedium}"
                          FontSize="12"
                          TextColor="White"
                          VerticalOptions="Center" />
@@ -142,7 +142,7 @@
 
               <!-- Shown below the button once a photo is selected -->
               <Label x:Name="PhotoFileNameLabel"
-                     FontFamily="MontserratRegular"
+                     Style="{StaticResource FontRegular}"
                      FontSize="11"
                      TextColor="{StaticResource BrandGold}"
                      IsVisible="False" />
@@ -153,19 +153,19 @@
             <VerticalStackLayout Spacing="6">
 
               <Label Text="Pattern Files"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                        Dark={StaticResource DarkTextPrimary}}" />
 
               <Label Text="PDF or photo of your pattern"
-                     FontFamily="MontserratRegular"
+                     Style="{StaticResource FontRegular}"
                      FontSize="12"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                        Dark={StaticResource DarkTextSecondary}}" />
 
               <Border StrokeThickness="0"
-                      BackgroundColor="{AppThemeBinding Light=#424B54, Dark=#5E6B76}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource ButtonSecondary}, Dark={StaticResource ButtonSecondaryDark}}"
                       Padding="12,10">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -182,7 +182,7 @@
                     </Image.Behaviors>
                   </Image>
                   <Label Text="Add Pattern"
-                         FontFamily="MontserratMedium"
+                         Style="{StaticResource FontMedium}"
                          FontSize="12"
                          TextColor="White"
                          VerticalOptions="Center" />
@@ -198,19 +198,19 @@
             <VerticalStackLayout Spacing="6">
 
               <Label Text="Inspiration Photos"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                        Dark={StaticResource DarkTextPrimary}}" />
 
               <Label Text="Photos for inspiration or reference"
-                     FontFamily="MontserratRegular"
+                     Style="{StaticResource FontRegular}"
                      FontSize="12"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                        Dark={StaticResource DarkTextSecondary}}" />
 
               <Border StrokeThickness="0"
-                      BackgroundColor="{AppThemeBinding Light=#424B54, Dark=#5E6B76}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource ButtonSecondary}, Dark={StaticResource ButtonSecondaryDark}}"
                       Padding="12,10">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -227,7 +227,7 @@
                     </Image.Behaviors>
                   </Image>
                   <Label Text="Add Photo"
-                         FontFamily="MontserratMedium"
+                         Style="{StaticResource FontMedium}"
                          FontSize="12"
                          TextColor="White"
                          VerticalOptions="Center" />
@@ -243,7 +243,7 @@
             <VerticalStackLayout Spacing="10">
 
               <Label Text="Colour Tag"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
@@ -256,7 +256,7 @@
             <VerticalStackLayout Spacing="8">
 
               <Label Text="Tags"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
@@ -266,7 +266,7 @@
                 <Border Grid.Column="0"
                         StrokeThickness="1"
                         Stroke="{StaticResource BrandGold}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkInputBackground}}"
                         Padding="0">
                   <Border.StrokeShape>
                     <RoundRectangle CornerRadius="8" />
@@ -274,7 +274,7 @@
                   <Entry x:Name="TagEntry"
                          Keyboard="Text"
                          Placeholder="e.g. Knitting, Amigurumi..."
-                         FontFamily="MontserratRegular"
+                         Style="{StaticResource FontRegular}"
                          FontSize="14"
                          MaxLength="40"
                          Margin="12,0"
@@ -297,7 +297,7 @@
                     <TapGestureRecognizer Tapped="OnAddTagTapped" />
                   </Border.GestureRecognizers>
                   <Label Text="+"
-                         FontFamily="MontserratBold"
+                         Style="{StaticResource FontBold}"
                          FontSize="22"
                          TextColor="White"
                          HorizontalOptions="Center"
@@ -319,13 +319,13 @@
             <VerticalStackLayout x:Name="CounterSection" Spacing="8" Margin="0,16,0,0">
 
               <Label Text="Counters"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                                  Dark={StaticResource DarkTextPrimary}}" />
 
               <Label Text="Add counters for your project, e.g. Rows, Stitches. A 'Rows' counter is added by default if you leave this empty."
-                     FontFamily="MontserratRegular"
+                     Style="{StaticResource FontRegular}"
                      FontSize="12"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                                  Dark={StaticResource DarkTextSecondary}}" />
@@ -337,7 +337,7 @@
                         StrokeThickness="1"
                         Stroke="{StaticResource BrandGold}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground},
-                                                           Dark=#1F2937}"
+                                                           Dark={StaticResource DarkInputBackground}}"
                         Padding="0">
                   <Border.StrokeShape>
                     <RoundRectangle CornerRadius="8" />
@@ -345,7 +345,7 @@
                   <Entry x:Name="CounterEntry"
                          Keyboard="Text"
                          Placeholder="e.g. Rows, Stitches"
-                         FontFamily="MontserratRegular"
+                         Style="{StaticResource FontRegular}"
                          FontSize="13"
                          MaxLength="50"
                          Margin="10,0"
@@ -368,7 +368,7 @@
                     <TapGestureRecognizer Tapped="OnAddCounterTapped" />
                   </Border.GestureRecognizers>
                   <Label Text="+"
-                         FontFamily="MontserratBold"
+                         Style="{StaticResource FontBold}"
                          FontSize="22"
                          TextColor="White"
                          HorizontalOptions="Center"
@@ -388,13 +388,13 @@
             <VerticalStackLayout Spacing="8">
 
               <Label Text="Needle / Hook Size"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
               <Border StrokeThickness="1"
                       Stroke="{StaticResource BrandGold}"
-                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkInputBackground}}"
                       Padding="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -402,7 +402,7 @@
                 <Entry x:Name="NeedleSizeEntry"
                        Keyboard="Text"
                        Placeholder="e.g. 5.0mm, US 8, 4.5mm / G-6"
-                       FontFamily="MontserratRegular"
+                       Style="{StaticResource FontRegular}"
                        FontSize="14"
                        MaxLength="50"
                        Margin="12,0"
@@ -416,13 +416,13 @@
             <VerticalStackLayout Spacing="8">
 
               <Label Text="Total rows"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
               <Border StrokeThickness="1"
                       Stroke="{StaticResource BrandGold}"
-                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkInputBackground}}"
                       Padding="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -431,7 +431,7 @@
                 <Entry x:Name="TotalRowsEntry"
                        Placeholder="Optional"
                        Keyboard="Numeric"
-                       FontFamily="MontserratRegular"
+                       Style="{StaticResource FontRegular}"
                        FontSize="14"
                        MaxLength="6"
                        Margin="12,0"
@@ -445,13 +445,13 @@
             <VerticalStackLayout Spacing="8">
 
               <Label Text="Notes"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
               <Border StrokeThickness="1"
                       Stroke="{StaticResource BrandGold}"
-                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkInputBackground}}"
                       Padding="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -462,7 +462,7 @@
                   <Editor x:Name="NotesEditor"
                           Keyboard="Text"
                           Placeholder="Optional notes about this project..."
-                          FontFamily="MontserratRegular"
+                          Style="{StaticResource FontRegular}"
                           FontSize="14"
                           Margin="12,8"
                           AutoSize="TextChanges"
@@ -500,7 +500,7 @@
             </Border.GestureRecognizers>
 
             <Label Text="CANCEL"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="14"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
@@ -520,7 +520,7 @@
             </Border.GestureRecognizers>
 
             <Label x:Name="SaveButtonLabel"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="14"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
@@ -534,5 +534,3 @@
     </Border>
 
   </Grid>
-
-</toolkit:Popup>

@@ -261,7 +261,7 @@
                         WidthRequest="80"
                         HeightRequest="80"
                         StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource LightBorder}, Dark={StaticResource DarkSurface}}"
                         VerticalOptions="Start">
 
                   <Border.StrokeShape>
@@ -364,6 +364,4 @@
 
     </Grid>
 
-  </Grid>
-
-</ContentPage>
+  </G

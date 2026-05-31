@@ -147,7 +147,7 @@
           </Grid>
           <ProgressBar Progress="{Binding ProgressValue}"
                        ProgressColor="{StaticResource BrandGold}"
-                       BackgroundColor="{AppThemeBinding Light=#E6E1D0, Dark=#374151}"
+                       BackgroundColor="{AppThemeBinding Light={StaticResource ProgressBarTrack}, Dark={StaticResource DarkSurface}}"
                        HeightRequest="4" />
         </VerticalStackLayout>
 
@@ -220,7 +220,7 @@
               <Border Grid.Column="0"
                       StrokeThickness="1"
                       Stroke="{StaticResource BrandGold}"
-                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkInputBackground}}"
                       Padding="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -239,7 +239,7 @@
               <Border Grid.Column="1"
                       StrokeThickness="1"
                       Stroke="{StaticResource BrandGold}"
-                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark=#1F2937}"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground}, Dark={StaticResource DarkInputBackground}}"
                       Padding="0">
                 <Border.StrokeShape>
                   <RoundRectangle CornerRadius="8" />
@@ -325,9 +325,4 @@
                 Style="{StaticResource PrimaryButton}"
                 Command="{Binding EndSessionCommand}" />
 
-      </VerticalStackLayout>
-    </ScrollView>
-
-  </Grid>
-
-</ContentPage>
+      </VerticalStackLayou
