@@ -36,23 +36,18 @@ public partial class QuickCounterPage : ContentPage
             var settings = await _appSettingsRepository.GetAppSettingsAsync();
             if (settings?.IsFirstRun == true)
             {
-                System.Diagnostics.Debug.WriteLine("🎉 First run detected - showing onboarding");
                 var popup = new OnboardingPopup(_appSettingsRepository);
                 await this.ShowPopupAsync(popup);
-                System.Diagnostics.Debug.WriteLine("✅ Onboarding popup closed");
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("✅ Not first run - skipping onboarding");
             }
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error checking first run: {ex.Message}");
         }
         catch (TaskCanceledException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Popup cancelled: {ex.Message}");
         }
     }
 }

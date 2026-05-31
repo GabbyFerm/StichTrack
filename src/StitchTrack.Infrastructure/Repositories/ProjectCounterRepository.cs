@@ -28,7 +28,6 @@ public class ProjectCounterRepository : IProjectCounterRepository
     {
         ArgumentNullException.ThrowIfNull(counter);
         await _context.ProjectCounters.AddAsync(counter).ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"➕ Counter added: {counter.Name}");
     }
 
     /// <summary>
@@ -49,7 +48,6 @@ public class ProjectCounterRepository : IProjectCounterRepository
             .ExecuteDeleteAsync()
             .ConfigureAwait(false);
 
-        System.Diagnostics.Debug.WriteLine($"🗑️ Counter deleted: {counterId}");
     }
 
     /// <summary>
@@ -78,8 +76,6 @@ public class ProjectCounterRepository : IProjectCounterRepository
                 .ConfigureAwait(false);
         }
 
-        System.Diagnostics.Debug.WriteLine(
-            $"💾 Counter {counterId} count → {newCount}{(isPrimary ? " (primary, synced to project)" : "")}");
     }
 
     /// <summary>
@@ -95,13 +91,11 @@ public class ProjectCounterRepository : IProjectCounterRepository
                 .SetProperty(c => c.Name, newName.Trim()))
             .ConfigureAwait(false);
 
-        System.Diagnostics.Debug.WriteLine($"✏️ Counter {counterId} renamed to '{newName}'");
     }
 
     public async Task<int> SaveChangesAsync()
     {
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"💾 Counter: saved {changes} changes");
         return changes;
     }
 }

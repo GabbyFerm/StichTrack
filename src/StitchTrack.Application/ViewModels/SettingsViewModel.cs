@@ -74,7 +74,6 @@ public class SettingsViewModel : INotifyPropertyChanged
         ToggleHapticFeedbackCommand = new RelayCommand(() => _ = ToggleHapticsAsync());
         ResetOnboardingCommand = new RelayCommand(() => _ = ResetOnboardingAsync());
 
-        System.Diagnostics.Debug.WriteLine("✅ SettingsViewModel created");
     }
 
     // ─── Load ────────────────────────────────────────────────────
@@ -91,13 +90,11 @@ public class SettingsViewModel : INotifyPropertyChanged
             // Notify on UI thread so Switch binding updates correctly
             UpdateOnUiThread(() => OnPropertyChanged(string.Empty));
 
-            System.Diagnostics.Debug.WriteLine($"✅ Settings loaded — theme: {_settings.Theme}, haptics: {_settings.HapticFeedbackEnabled}");
         }
 #pragma warning disable CA1031
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error loading settings: {ex.Message}");
         }
     }
 
@@ -124,7 +121,6 @@ public class SettingsViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ThemeDisplayText));
         });
 
-        System.Diagnostics.Debug.WriteLine($"🎨 Theme set to: {theme}");
     }
 
     // ─── Haptics ─────────────────────────────────────────────────
@@ -143,7 +139,6 @@ public class SettingsViewModel : INotifyPropertyChanged
         // Notify on UI thread so Switch binding updates correctly
         UpdateOnUiThread(() => OnPropertyChanged(string.Empty));
 
-        System.Diagnostics.Debug.WriteLine($"📳 Haptic feedback: {newValue}");
     }
 
     // ─── Onboarding ──────────────────────────────────────────────
@@ -158,7 +153,6 @@ public class SettingsViewModel : INotifyPropertyChanged
             .ShowToastAsync("Welcome screen will show on next launch")
             .ConfigureAwait(false);
 
-        System.Diagnostics.Debug.WriteLine("🔄 Onboarding reset — will show on next launch");
     }
 
     // ─── Persist ─────────────────────────────────────────────────
@@ -175,7 +169,6 @@ public class SettingsViewModel : INotifyPropertyChanged
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error saving settings: {ex.Message}");
         }
     }
 

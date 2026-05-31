@@ -38,7 +38,6 @@ public static class MauiProgram
             });
 
         // DATABASE
-        System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
 
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
@@ -109,7 +108,6 @@ public static class MauiProgram
             });
 
 #if DEBUG
-        System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
 #endif
 
         Task.Run(async () =>
@@ -124,7 +122,6 @@ public static class MauiProgram
             catch (Exception ex)
 #pragma warning restore CA1031
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Startup DB error: {ex.Message}");
             }
         });
 

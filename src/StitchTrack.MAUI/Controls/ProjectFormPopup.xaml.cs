@@ -312,7 +312,6 @@ public partial class ProjectFormPopup : Popup
         }
     }
 
-
     // ─── File pickers ─────────────────────────────────────────────
 
     /// <summary>
@@ -362,13 +361,11 @@ public partial class ProjectFormPopup : Popup
             PhotoFileNameLabel.Text = photo.FileName;
             PhotoFileNameLabel.IsVisible = true;
 
-            System.Diagnostics.Debug.WriteLine($"Photo saved: {_selectedImagePath}");
         }
 #pragma warning disable CA1031
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Photo upload error: {ex.Message}");
             await ShowAlertAsync("Could Not Add Photo", "Something went wrong. Please try again.");
         }
     }
@@ -403,7 +400,6 @@ public partial class ProjectFormPopup : Popup
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Pattern upload error: {ex.Message}");
         }
     }
 
@@ -433,7 +429,6 @@ public partial class ProjectFormPopup : Popup
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Inspiration photo error: {ex.Message}");
         }
     }
 

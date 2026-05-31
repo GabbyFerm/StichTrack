@@ -24,7 +24,6 @@ public partial class ProjectsPage : ContentPage
         _viewModel.ShowProjectFormAsync = ShowProjectFormPopupAsync;
         _viewModel.ShowProjectMenuPopupAsync = ShowProjectMenuPopupAsync;
 
-        System.Diagnostics.Debug.WriteLine("✅ ProjectsPage initialized");
     }
 
     /// <summary>

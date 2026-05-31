@@ -110,7 +110,6 @@ public class ExportViewModel : INotifyPropertyChanged
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ JSON export error: {ex.Message}");
             await _dialogService.ShowAlertAsync(
                 "Export Failed",
                 "Could not export projects. Please try again."
@@ -136,7 +135,6 @@ public class ExportViewModel : INotifyPropertyChanged
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ CSV export error: {ex.Message}");
             await _dialogService.ShowAlertAsync(
                 "Export Failed",
                 "Could not export projects. Please try again."
@@ -171,7 +169,6 @@ public class ExportViewModel : INotifyPropertyChanged
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Import error: {ex.Message}");
             await _dialogService.ShowAlertAsync(
                 "Import Failed",
                 "Could not read the file. Make sure it's a valid StitchTrack JSON export.")

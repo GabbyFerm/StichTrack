@@ -62,7 +62,6 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         ResetCommand = new RelayCommand(OnReset);
         SaveToProjectCommand = new RelayCommand(OnSaveToProject);
 
-        System.Diagnostics.Debug.WriteLine("✅ QuickCounterViewModel created");
     }
 
     // ─── Counter actions ──────────────────────────────────────────
@@ -73,7 +72,6 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         AddToUndoStack(CounterAction.Increment);
         _hapticsService.Click();
         NotifyCountChanged();
-        System.Diagnostics.Debug.WriteLine($"➕ Incremented to {_count}");
     }
 
     private void OnDecrement()
@@ -84,7 +82,6 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         AddToUndoStack(CounterAction.Decrement);
         _hapticsService.Click();
         NotifyCountChanged();
-        System.Diagnostics.Debug.WriteLine($"➖ Decremented to {_count}");
     }
 
     private void OnUndo()
@@ -97,12 +94,10 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         {
             case CounterAction.Increment:
                 if (_count > 0) _count--;
-                System.Diagnostics.Debug.WriteLine($"↩️ Undid increment, now at {_count}");
                 break;
 
             case CounterAction.Decrement:
                 _count++;
-                System.Diagnostics.Debug.WriteLine($"↩️ Undid decrement, now at {_count}");
                 break;
 
             case CounterAction.Reset:
@@ -121,7 +116,6 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         _count = 0;
         _hapticsService.Click();
         NotifyCountChanged();
-        System.Diagnostics.Debug.WriteLine("🔄 Counter reset to 0");
     }
 
     private void OnSaveToProject() => _ = SaveToProjectAsync();
@@ -143,11 +137,8 @@ public class QuickCounterViewModel : INotifyPropertyChanged
 
             if (string.IsNullOrWhiteSpace(projectName))
             {
-                System.Diagnostics.Debug.WriteLine("⚠️ Project save cancelled");
                 return;
             }
-
-            System.Diagnostics.Debug.WriteLine($"💾 Creating project: {projectName}");
 
             // Create and save the project
             var newProject = Project.CreateProject(projectName.Trim());
@@ -167,8 +158,6 @@ public class QuickCounterViewModel : INotifyPropertyChanged
                 counter.Id, counter.CurrentCount, isPrimary: true, projectId: newProject.Id)
                 .ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"✅ Project saved: {newProject.Id}");
-
             await _dialogService
                 .ShowToastAsync($"'{projectName}' saved!")
                 .ConfigureAwait(false);
@@ -183,12 +172,10 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ DB error: {ex.Message}");
             await _dialogService.ShowAlertAsync("Save Failed", "Could not save project.").ConfigureAwait(false);
         }
         catch (ArgumentException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Validation: {ex.Message}");
             await _dialogService.ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
         }
     }

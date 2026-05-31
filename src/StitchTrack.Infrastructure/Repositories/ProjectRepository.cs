@@ -23,7 +23,6 @@ public class ProjectRepository : IProjectRepository
         ArgumentNullException.ThrowIfNull(project);
 
         await _context.Projects.AddAsync(project).ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"📝 Project added to context: {project.Name} (ID: {project.Id})");
     }
 
     public async Task<Project?> GetByIdAsync(Guid id)
@@ -143,7 +142,6 @@ public class ProjectRepository : IProjectRepository
                 .SetProperty(p => p.UpdatedAt, updatedAt))
             .ConfigureAwait(false);
 
-        System.Diagnostics.Debug.WriteLine($"💾 Count updated to {newCount}");
     }
 
     /// <summary>
@@ -159,7 +157,6 @@ public class ProjectRepository : IProjectRepository
                 .SetProperty(p => p.UpdatedAt, DateTime.UtcNow))
             .ConfigureAwait(false);
 
-        System.Diagnostics.Debug.WriteLine($"📦 Project archived: {id}");
     }
 
     /// <summary>
@@ -176,14 +173,12 @@ public class ProjectRepository : IProjectRepository
         if (project != null)
         {
             _context.Projects.Remove(project);
-            System.Diagnostics.Debug.WriteLine($"🗑️ Project hard-deleted: {project.Name}");
         }
     }
 
     public async Task<int> SaveChangesAsync()
     {
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"💾 Saved {changes} changes to database");
         return changes;
     }
 

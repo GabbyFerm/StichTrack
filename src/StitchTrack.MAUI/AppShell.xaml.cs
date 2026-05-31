@@ -25,7 +25,6 @@ public partial class AppShell : Shell
              (target.Contains("SingleProjectPage", StringComparison.OrdinalIgnoreCase) ||
              target.Contains("ProjectCounterPage", StringComparison.OrdinalIgnoreCase)))
         {
-            System.Diagnostics.Debug.WriteLine("⛔ Blocked navigation to cached child page");
             e.Cancel();
             await Shell.Current.GoToAsync("//projects", false).ConfigureAwait(true);
         }

@@ -36,7 +36,6 @@ public class AppSettingsRepository : IAppSettingsRepository
             _context.AppSettings.Add(settings);
             await _context.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine("✨ Created default AppSettings");
         }
 
         return settings;
@@ -53,6 +52,5 @@ public class AppSettingsRepository : IAppSettingsRepository
         _context.AppSettings.Update(settings);
         await _context.SaveChangesAsync().ConfigureAwait(false);
 
-        System.Diagnostics.Debug.WriteLine("💾 Saved AppSettings");
     }
 }

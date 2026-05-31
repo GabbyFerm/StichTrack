@@ -46,13 +46,11 @@ public partial class App : Microsoft.Maui.Controls.Application
             // Sync haptics service with persisted value
             hapticsService.IsEnabled = settings.HapticFeedbackEnabled;
 
-            System.Diagnostics.Debug.WriteLine($"✅ Applied settings — theme: {settings.Theme}, haptics: {settings.HapticFeedbackEnabled}");
         }
 #pragma warning disable CA1031
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error applying stored settings: {ex.Message}");
             // Safe fallback — Auto theme, haptics on
         }
     }

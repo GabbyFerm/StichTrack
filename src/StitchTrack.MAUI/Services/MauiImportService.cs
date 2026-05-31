@@ -65,12 +65,9 @@ public class MauiImportService : IImportService
 #pragma warning restore CA1031
             {
                 // Skip failed projects — don't abort the whole import
-                System.Diagnostics.Debug.WriteLine(
-                    $"⚠️ Skipped project '{dto.Name}': {ex.Message}");
             }
         }
 
-        System.Diagnostics.Debug.WriteLine($"✅ Import complete: {imported} projects");
         return imported;
     }
 

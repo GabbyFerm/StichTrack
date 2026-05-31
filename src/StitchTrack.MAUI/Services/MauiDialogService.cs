@@ -38,7 +38,6 @@ public class MauiDialogService : IDialogService
         var page = GetCurrentPage();
         if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show prompt: no page available");
             return null;
         }
 
@@ -61,7 +60,6 @@ public class MauiDialogService : IDialogService
         var page = GetCurrentPage();
         if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show alert: no page available");
             return;
         }
 
@@ -84,7 +82,6 @@ public class MauiDialogService : IDialogService
         var page = GetCurrentPage();
         if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show confirm: no page available");
             return false;
         }
 
@@ -100,7 +97,6 @@ public class MauiDialogService : IDialogService
         var page = GetCurrentPage();
         if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show toast: no page available");
             return;
         }
 
@@ -130,7 +126,6 @@ public class MauiDialogService : IDialogService
         var page = GetCurrentPage();
         if (page == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Cannot show action sheet: no page available");
             return null;
         }
 

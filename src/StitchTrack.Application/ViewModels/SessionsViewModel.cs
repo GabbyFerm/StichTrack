@@ -83,7 +83,6 @@ public class SessionsViewModel : INotifyPropertyChanged
         ShowAllCommand = new RelayCommand(() => SetFilter(SessionFilter.All));
         LoadCommand = new RelayCommand(OnLoad);
 
-        System.Diagnostics.Debug.WriteLine("✅ SessionsViewModel created");
     }
 
     // ─── Load ────────────────────────────────────────────────────
@@ -93,13 +92,10 @@ public class SessionsViewModel : INotifyPropertyChanged
         try
         {
             IsLoading = true;
-            System.Diagnostics.Debug.WriteLine("📂 Loading sessions...");
 
             // Load all sessions with Project included for display names
             _allSessions = (await _sessionRepository.GetAllWithProjectAsync()
                 .ConfigureAwait(false)).ToList();
-
-            System.Diagnostics.Debug.WriteLine($"✅ Loaded {_allSessions.Count} sessions");
 
             UpdateOnUiThread(ApplyFilter);
         }
@@ -107,7 +103,6 @@ public class SessionsViewModel : INotifyPropertyChanged
         catch (Exception ex)
 #pragma warning restore CA1031
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error loading sessions: {ex.Message}");
         }
         finally
         {

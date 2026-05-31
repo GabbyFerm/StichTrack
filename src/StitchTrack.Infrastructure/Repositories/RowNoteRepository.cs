@@ -53,7 +53,6 @@ public class RowNoteRepository : IRowNoteRepository
     public async Task<int> SaveChangesAsync()
     {
         var changes = await _context.SaveChangesAsync().ConfigureAwait(false);
-        System.Diagnostics.Debug.WriteLine($"💾 RowNote: saved {changes} changes");
         return changes;
     }
 }

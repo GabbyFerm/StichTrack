@@ -47,7 +47,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
                 _showArchived = value;
                 OnPropertyChanged();
                 FilterProjects();
-                System.Diagnostics.Debug.WriteLine($"🔄 Showing {(value ? "archived" : "active")} projects");
             }
         }
     }
@@ -170,8 +169,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
         // Passes the full Project object so we have name + id without an extra lookup
         ShowProjectMenuCommand = new RelayCommand<Project?>(OnShowProjectMenu);
 
-        System.Diagnostics.Debug.WriteLine("✅ ProjectsViewModel created");
-
         _ = LoadProjectsAsync();
     }
 
@@ -182,7 +179,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine("📂 Loading projects...");
             IsLoading = true;
 
             var activeProjects = await _projectRepository.GetActiveProjectsAsync().ConfigureAwait(false);
@@ -203,12 +199,10 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
                 FilterProjects();
 
-                System.Diagnostics.Debug.WriteLine($"✅ Loaded {_allProjects.Count} projects ({activeProjects.Count()} active, {archivedProjects.Count()} archived)");
             });
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error loading projects: {ex.Message}");
             await _dialogService.ShowAlertAsync("Load Failed", "Could not load projects.").ConfigureAwait(false);
         }
         finally
@@ -254,7 +248,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         if (ShowProjectFormAsync == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectFormAsync callback not set");
             return;
         }
 
@@ -262,7 +255,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
         if (result == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Project creation cancelled");
             return;
         }
 
@@ -312,18 +304,15 @@ public class ProjectsViewModel : INotifyPropertyChanged
             }
             await _counterRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Name}");
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{result.Name}' created!").ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error creating project: {ex.Message}");
             await _dialogService.ShowAlertAsync("Create Failed", "Could not create project.").ConfigureAwait(false);
         }
         catch (ArgumentException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Validation error: {ex.Message}");
             await _dialogService.ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
         }
     }
@@ -335,7 +324,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         if (ShowProjectFormAsync == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectFormAsync callback not set");
             return;
         }
 
@@ -343,7 +331,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
         if (result == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ Project edit cancelled");
             return;
         }
 
@@ -364,8 +351,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
             await _projectRepository.UpdateTagsAsync(project.Id, result.Tags).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"✅ Project updated: {project.Name}");
-
             if (!string.IsNullOrWhiteSpace(result.ImagePath))
             {
                 project.SetProjectImage(result.ImagePath);
@@ -381,12 +366,10 @@ public class ProjectsViewModel : INotifyPropertyChanged
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error updating project: {ex.Message}");
             await _dialogService.ShowAlertAsync("Update Failed", "Could not save changes.").ConfigureAwait(false);
         }
         catch (ArgumentException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Validation error: {ex.Message}");
             await _dialogService.ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
         }
     }
@@ -399,7 +382,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         if (project is null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectMenu called with null project");
             return;
         }
 
@@ -407,7 +389,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
             t =>
             {
                 if (t.IsFaulted)
-                    System.Diagnostics.Debug.WriteLine($"❌ ShowProjectMenu failed: {t.Exception?.GetBaseException().Message}");
             },
             TaskScheduler.FromCurrentSynchronizationContext()
         );
@@ -417,7 +398,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         if (ShowProjectMenuPopupAsync == null)
         {
-            System.Diagnostics.Debug.WriteLine("⚠️ ShowProjectMenuPopupAsync callback not set");
             return;
         }
 
@@ -463,7 +443,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error archiving project: {ex.Message}");
             await _dialogService.ShowAlertAsync("Archive Failed", "Could not archive project.").ConfigureAwait(false);
         }
     }
@@ -487,7 +466,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error unarchiving project: {ex.Message}");
             await _dialogService.ShowAlertAsync("Restore Failed", "Could not restore project.").ConfigureAwait(false);
         }
     }
@@ -519,7 +497,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Error deleting project: {ex.Message}");
             await _dialogService.ShowAlertAsync("Delete Failed", "Could not delete project.").ConfigureAwait(false);
         }
     }
@@ -560,7 +537,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
     private void OnRefresh()
     {
-        System.Diagnostics.Debug.WriteLine("🔄 Refreshing projects...");
         _ = LoadProjectsAsync();
     }
 
@@ -586,7 +562,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
     private void OnSync()
     {
-        System.Diagnostics.Debug.WriteLine("🔄 Sync tapped");
         // TODO: Implement sync functionality
     }
 
@@ -636,7 +611,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
             if (!string.IsNullOrWhiteSpace(removed.FilePath) && File.Exists(removed.FilePath))
                 File.Delete(removed.FilePath);
 
-            System.Diagnostics.Debug.WriteLine($"🗑️ Removed file: {removed.FileName}");
         }
 
         // Add new files (those without an existing DB ID)
@@ -651,7 +625,6 @@ public class ProjectsViewModel : INotifyPropertyChanged
                 newFile.ContentType);
 
             await projectFileRepository.AddAsync(file).ConfigureAwait(false);
-            System.Diagnostics.Debug.WriteLine($"📎 Added file: {newFile.FileName} ({newFile.FileType})");
         }
 
         if (pendingFiles.Any(f => f.ExistingId == null) || existingFiles.Any(f => !keptIds.Contains(f.Id)))
