@@ -353,7 +353,7 @@ public partial class ProjectCounterPage : ContentPage
             },
             Content = image
         };
-    }   
+    }
 
     // ─── Add counter ──────────────────────────────────────────────
 

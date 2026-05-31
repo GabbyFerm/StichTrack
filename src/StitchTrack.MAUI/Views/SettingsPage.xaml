@@ -169,7 +169,7 @@
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
           <Switch Grid.Column="2"
-                  IsToggled="{Binding HapticFeedbackEnabled}"
+                  IsToggled="{Binding HapticFeedbackEnabled, Mode=OneWay}"
                   OnColor="{StaticResource BrandGold}"
                   ThumbColor="{AppThemeBinding Light=#424B54, Dark=White}"
                   VerticalOptions="Center">

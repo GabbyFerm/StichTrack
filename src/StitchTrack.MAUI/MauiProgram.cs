@@ -58,6 +58,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<IHapticsService, MauiHapticsService>();
         builder.Services.AddTransient<IExportService, MauiExportService>();
+        builder.Services.AddTransient<IImportService, MauiImportService>();
 
         // VIEWMODELS
         builder.Services.AddTransient<QuickCounterViewModel>();
@@ -92,23 +93,23 @@ public static class MauiProgram
         Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(
             "NoUnderline", (handler, view) =>
             {
-        #if ANDROID
+#if ANDROID
                 handler.PlatformView.BackgroundTintList =
                     Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
-        #endif
+#endif
             });
 
         Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping(
             "NoUnderline", (handler, view) =>
             {
-        #if ANDROID
-                        handler.PlatformView.BackgroundTintList =
-                            Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
-        #endif
+#if ANDROID
+                handler.PlatformView.BackgroundTintList =
+                    Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
             });
 
 #if DEBUG
-                System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
+        System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
 #endif
 
         Task.Run(async () =>
@@ -119,9 +120,9 @@ public static class MauiProgram
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 await DbInitializer.InitializeAsync(dbContext).ConfigureAwait(false);
             }
-        #pragma warning disable CA1031
+#pragma warning disable CA1031
             catch (Exception ex)
-        #pragma warning restore CA1031
+#pragma warning restore CA1031
             {
                 System.Diagnostics.Debug.WriteLine($"❌ Startup DB error: {ex.Message}");
             }

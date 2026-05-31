@@ -64,4 +64,31 @@ public class Session
         DurationSeconds = (int)(EndedAt.Value - StartedAt).TotalSeconds;
         EndingRowCount = endingRowCount;
     }
+
+    /// <summary>
+    /// Reconstructs a session from imported data, preserving the original timestamps.
+    /// Only used during JSON import — never for live session tracking.
+    /// </summary>
+    public static Session ImportSession(
+        Guid projectId,
+        DateTime startedAt,
+        DateTime? endedAt,
+        int durationSeconds,
+        int? startingRowCount,
+        int? endingRowCount,
+        string? primaryCounterName = null)
+    {
+        return new Session
+        {
+            Id = Guid.NewGuid(),
+            ProjectId = projectId,
+            StartedAt = startedAt,
+            EndedAt = endedAt,
+            DurationSeconds = durationSeconds,
+            StartingRowCount = startingRowCount,
+            EndingRowCount = endingRowCount,
+            PrimaryCounterName = primaryCounterName
+        };
+    }
+
 }

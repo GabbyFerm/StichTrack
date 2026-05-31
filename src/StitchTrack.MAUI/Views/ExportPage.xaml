@@ -81,6 +81,15 @@
                FontFamily="MontserratBold"
                FontSize="16"
                TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
+               Margin="0,0,0,8" />
+
+        <Label Text="Export your projects to a file you can save or share. JSON includes full project data, counters and session history. CSV is a simple spreadsheet format."
+               FontFamily="MontserratRegular"
+               FontSize="13"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                           Dark={StaticResource DarkTextSecondary}}"
+               LineBreakMode="WordWrap"
+               Opacity="0.8"
                Margin="0,0,0,16" />
 
         <!-- JSON Export row -->
@@ -175,6 +184,79 @@
                            Color="{StaticResource BrandGold}"
                            HorizontalOptions="Center"
                            Margin="0,16,0,0" />
+
+        <!-- Divider -->
+        <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
+         Opacity="0.3" Margin="0,24,0,24" />
+
+        <!-- Import Data -->
+        <Label Text="Import Data"
+               FontFamily="MontserratBold"
+               FontSize="16"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                           Dark={StaticResource DarkTextPrimary}}"
+               Margin="0,0,0,8" />
+
+        <Label Text="Import a previously exported JSON file. Always creates new projects — your existing data is never overwritten."
+               FontFamily="MontserratRegular"
+               FontSize="13"
+               TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                           Dark={StaticResource DarkTextSecondary}}"
+               LineBreakMode="WordWrap"
+               Opacity="0.8"
+               Margin="0,0,0,16" />
+
+        <!-- JSON Import row -->
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,0,0,8">
+
+          <Image Grid.Column="0" WidthRequest="20" HeightRequest="20"
+                 VerticalOptions="Start" Margin="0,2,0,0">
+            <Image.Source>
+              <AppThemeBinding Light="json_light.svg" Dark="json_dark.svg" />
+            </Image.Source>
+          </Image>
+
+          <VerticalStackLayout Grid.Column="1" Spacing="2">
+            <Label Text="Import Projects (JSON)"
+                   FontFamily="MontserratMedium"
+                   FontSize="15"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                               Dark={StaticResource DarkTextPrimary}}" />
+            <Label Text="Restores projects, counters and session history"
+                   FontFamily="MontserratRegular"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                               Dark={StaticResource DarkTextSecondary}}"
+                   Opacity="0.6" />
+          </VerticalStackLayout>
+
+          <Border Grid.Column="2"
+                  StrokeThickness="1"
+                  Stroke="{StaticResource BrandGold}"
+                  BackgroundColor="Transparent"
+                  Padding="12,8"
+                  VerticalOptions="Center"
+                  IsEnabled="{Binding IsNotImporting}">
+            <Border.StrokeShape>
+              <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+              <TapGestureRecognizer Command="{Binding ImportJsonCommand}" />
+            </Border.GestureRecognizers>
+            <Label Text="IMPORT"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="12"
+                   TextColor="{StaticResource BrandGold}" />
+          </Border>
+
+        </Grid>
+
+        <!-- Loading indicator while importing -->
+        <ActivityIndicator IsRunning="{Binding IsImporting}"
+                   IsVisible="{Binding IsImporting}"
+                   Color="{StaticResource BrandGold}"
+                   HorizontalOptions="Center"
+                   Margin="0,8,0,0" />
 
       </VerticalStackLayout>
     </ScrollView>

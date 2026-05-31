@@ -585,7 +585,7 @@ public partial class ProjectFormPopup : Popup
             HeightRequest = 14,
             VerticalOptions = LayoutOptions.Center,
             Source = isPdf
-        ? "file_light.svg"   
+        ? "file_light.svg"
         : "photo_light.svg"
         };
         row.Add(icon, column: 0, row: 0);

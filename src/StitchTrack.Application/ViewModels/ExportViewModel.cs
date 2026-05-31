@@ -1,6 +1,7 @@
-using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.Commands;
+using StitchTrack.Application.Interfaces;
 using System.ComponentModel;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
@@ -14,9 +15,11 @@ public class ExportViewModel : INotifyPropertyChanged
 {
     private readonly IExportService _exportService;
     private readonly IDialogService _dialogService;
+    private readonly IImportService _importService;
     private readonly SynchronizationContext? _syncContext;
     private bool _includeArchived;
     private bool _isExporting;
+    private bool _isImporting;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -51,24 +54,41 @@ public class ExportViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsNotExporting));
         }
     }
-
-    // Convenience inverse for button IsEnabled binding
     public bool IsNotExporting => !_isExporting;
+
+    /// <summary>
+    /// True while an import is in progress — disables buttons to prevent double-tap and shows "Importing..." status.
+    /// </summary>
+    public bool IsImporting
+    {
+        get => _isImporting;
+        private set
+        {
+            if (_isImporting == value) return;
+            _isImporting = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsNotImporting));
+        }
+    }
+    public bool IsNotImporting => !_isImporting;
 
     // ─── Commands ────────────────────────────────────────────────
 
     public ICommand ExportJsonCommand { get; }
     public ICommand ExportCsvCommand { get; }
+    public ICommand ImportJsonCommand { get; }
 
-    public ExportViewModel(IExportService exportService, IDialogService dialogService)
+    public ExportViewModel(IExportService exportService, IImportService importService, IDialogService dialogService)
     {
         _syncContext = SynchronizationContext.Current;
 
         _exportService = exportService ?? throw new ArgumentNullException(nameof(exportService));
+        _importService = importService ?? throw new ArgumentNullException(nameof(importService));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
         ExportJsonCommand = new RelayCommand(OnExportJson);
         ExportCsvCommand = new RelayCommand(OnExportCsv);
+        ImportJsonCommand = new RelayCommand(OnImportJson);
     }
 
     // ─── Export actions ──────────────────────────────────────────
@@ -127,6 +147,43 @@ public class ExportViewModel : INotifyPropertyChanged
             UpdateOnUiThread(() => IsExporting = false);
         }
     }
+
+    // ─── Import action ──────────────────────────────────────────
+    private void OnImportJson() => _ = ImportJsonAsync();
+
+    private async Task ImportJsonAsync()
+    {
+        if (_isImporting) return;
+        try
+        {
+            IsImporting = true;
+            var count = await _importService.ImportJsonAsync().ConfigureAwait(false);
+
+            if (count == -1) return; // user cancelled — no toast
+
+            await _dialogService.ShowToastAsync(
+                count == 0
+                    ? "No projects found in file"
+                    : $"Imported {count} project{(count == 1 ? "" : "s")}!")
+                .ConfigureAwait(false);
+        }
+#pragma warning disable CA1031
+        catch (Exception ex)
+#pragma warning restore CA1031
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Import error: {ex.Message}");
+            await _dialogService.ShowAlertAsync(
+                "Import Failed",
+                "Could not read the file. Make sure it's a valid StitchTrack JSON export.")
+                .ConfigureAwait(false);
+        }
+        finally
+        {
+            UpdateOnUiThread(() => IsImporting = false);
+        }
+    }
+
+    // Helper to raise PropertyChanged on the UI thread if needed
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

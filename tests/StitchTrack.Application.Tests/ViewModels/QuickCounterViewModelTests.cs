@@ -222,7 +222,7 @@ internal sealed class QuickCounterViewModelTests
             x => x.AddAsync(It.Is<Project>(p => p.Name == "Test Project")),
             Times.Once);
         _mockProjectRepo.Verify(x => x.SaveChangesAsync(), Times.Once);
-        
+
         _mockCounterRepo.Verify(
             x => x.AddAsync(It.Is<ProjectCounter>(c => c.CurrentCount == 3)),
             Times.Once);
@@ -270,7 +270,7 @@ internal sealed class QuickCounterViewModelTests
                 It.IsAny<string>(),
                 It.IsAny<int>()))
             .ReturnsAsync(longName);
-            
+
         // Use It.IsAny<Project>() to guarantee Moq matches the setup exactly,
         // triggering the exception that simulates your DB/validation failure.
         _mockProjectRepo
@@ -287,7 +287,7 @@ internal sealed class QuickCounterViewModelTests
         _mockDialogService.Verify(
             x => x.ShowAlertAsync("Invalid Input", It.IsAny<string>(), It.IsAny<string>()),
             Times.Once);
-            
+
         // We must assert it WAS called Once because the domain method `Project.CreateProject` 
         // doesn't block the length natively—meaning it legitimately reaches AddAsync before throwing.
         _mockProjectRepo.Verify(x => x.AddAsync(It.IsAny<Project>()), Times.Once);
