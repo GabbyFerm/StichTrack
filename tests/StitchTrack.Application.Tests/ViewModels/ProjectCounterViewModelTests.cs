@@ -717,9 +717,9 @@ internal sealed class ProjectCounterViewModelTests
 
     // ─── Session timer ───────────────────────────────────────────────────────
 
-    [TestCase(0, 0, 45,  "45s")]
-    [TestCase(0, 3, 20,  "3m 20s")]
-    [TestCase(1, 15, 0,  "1h 15m")]
+    [TestCase(0, 0, 45, "45s")]
+    [TestCase(0, 3, 20, "3m 20s")]
+    [TestCase(1, 15, 0, "1h 15m")]
     public void UpdateSessionTimer_ShouldFormatDurationCorrectly(int hours, int minutes, int seconds, string expected)
     {
         _viewModel.UpdateSessionTimer(new TimeSpan(hours, minutes, seconds));

@@ -24,7 +24,7 @@ public static class DbInitializer
         catch (Exception ex)
         {
             if (ex.InnerException != null)
-            throw;
+                throw;
         }
     }
 }
