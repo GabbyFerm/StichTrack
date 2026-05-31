@@ -100,6 +100,7 @@ public class ProjectRepository : IProjectRepository
             .AsNoTracking()
             .Include(p => p.Sessions)
             .Include(p => p.Tags)
+            .Include(p => p.Counters)
             .AsQueryable();
 
         if (userId.HasValue)

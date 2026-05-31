@@ -1,6 +1,7 @@
 using CommunityToolkit.Maui;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Platform;
 using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.ViewModels;
 using StitchTrack.Domain.Interfaces;
@@ -106,9 +107,9 @@ public static class MauiProgram
         #endif
             });
 
-        #if DEBUG
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine($"📁 Database path: {DatabaseConfig.DatabasePath}");
-        #endif
+#endif
 
         Task.Run(async () =>
         {

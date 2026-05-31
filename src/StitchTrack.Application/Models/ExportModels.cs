@@ -30,7 +30,20 @@ public class ProjectExportDto
     public bool IsArchived { get; init; }
     public string CreatedAt { get; init; } = string.Empty;
     public string UpdatedAt { get; init; } = string.Empty;
+    public IReadOnlyList<CounterExportDto> Counters { get; init; } = [];
     public IReadOnlyList<SessionExportDto> Sessions { get; init; } = new List<SessionExportDto>();
+}
+
+/// <summary>
+/// Counter data for export — name, current count and sort order.
+/// SortOrder preserved so import can restore primary counter correctly.
+/// </summary>
+public class CounterExportDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public int CurrentCount { get; init; }
+    public int SortOrder { get; init; }
 }
 
 /// <summary>

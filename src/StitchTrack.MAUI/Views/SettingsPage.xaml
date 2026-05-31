@@ -185,50 +185,6 @@
         <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
                  Opacity="0.3" Margin="0,4,0,24" />
 
-        <!-- SECTION: Backup & Sync -->
-        <Label Text="Backup &amp; Sync"
-               FontFamily="MontserratBold"
-               FontSize="16"
-               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
-               Margin="0,0,0,16" />
-
-        <!-- Cloud Backup — disabled Phase 3 -->
-        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,0,0,8">
-
-          <Image Grid.Column="0" WidthRequest="20" HeightRequest="20" VerticalOptions="Start" Margin="0,2,0,0">
-            <Image.Source>
-              <AppThemeBinding Light="cloud_upload_light.svg" Dark="cloud_upload_dark.svg" />
-            </Image.Source>
-          </Image>
-
-          <VerticalStackLayout Grid.Column="1" Spacing="2">
-            <Label Text="Cloud Backup"
-                   FontFamily="MontserratMedium"
-                   FontSize="15"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
-            <Label Text="Sync to your own Google Drive or iCloud"
-                   FontFamily="MontserratRegular"
-                   FontSize="12"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
-                   Opacity="0.6" />
-            <Label Text="Coming in Phase 3"
-                   FontFamily="MontserratRegular"
-                   FontSize="12"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
-                   Opacity="0.6" />
-          </VerticalStackLayout>
-
-          <Switch Grid.Column="2"
-                  IsToggled="False"
-                  IsEnabled="False"
-                  VerticalOptions="Center" />
-
-        </Grid>
-
-        <!-- Divider -->
-        <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
-                 Opacity="0.3" Margin="0,4,0,24" />
-
         <!-- SECTION: About -->
         <Label Text="About"
                FontFamily="MontserratBold"
