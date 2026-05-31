@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;

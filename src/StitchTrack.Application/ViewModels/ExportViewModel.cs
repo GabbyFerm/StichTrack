@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Gabriella Frank Ferm / Frank Ferm Design. All rights reserved.
 using StitchTrack.Application.Commands;
 using StitchTrack.Application.Interfaces;
 using System.ComponentModel;
