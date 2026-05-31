@@ -75,46 +75,49 @@ internal sealed class ProjectCounterViewModelTests
     [Test]
     public void Constructor_ThrowsArgumentNullException_WhenProjectRepositoryIsNull()
     {
-        Action act = () => new ProjectCounterViewModel(
-            null!,
-            _mockCounterRepo.Object,
-            _mockRowNoteRepo.Object,
-            _mockSessionRepo.Object,
-            _mockDialogService.Object,
-            _mockNavigationService.Object,
-            _mockHapticsService.Object);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("projectRepository");
+        FluentActions
+            .Invoking(() => new ProjectCounterViewModel(
+                null!,
+                _mockCounterRepo.Object,
+                _mockRowNoteRepo.Object,
+                _mockSessionRepo.Object,
+                _mockDialogService.Object,
+                _mockNavigationService.Object,
+                _mockHapticsService.Object))
+            .Should().Throw<ArgumentNullException>()
+            .WithParameterName("projectRepository");
     }
 
     [Test]
     public void Constructor_ThrowsArgumentNullException_WhenCounterRepositoryIsNull()
     {
-        Action act = () => new ProjectCounterViewModel(
-            _mockProjectRepo.Object,
-            null!,
-            _mockRowNoteRepo.Object,
-            _mockSessionRepo.Object,
-            _mockDialogService.Object,
+        FluentActions
+        .Invoking(() => new ProjectCounterViewModel(
+                _mockProjectRepo.Object,
+                null!,
+                _mockRowNoteRepo.Object,
+                _mockSessionRepo.Object,
+                _mockDialogService.Object,
             _mockNavigationService.Object,
-            _mockHapticsService.Object);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("counterRepository");
+            _mockHapticsService.Object))
+            .Should().Throw<ArgumentNullException>()
+            .WithParameterName("counterRepository");
     }
 
     [Test]
     public void Constructor_ThrowsArgumentNullException_WhenDialogServiceIsNull()
     {
-        Action act = () => new ProjectCounterViewModel(
-            _mockProjectRepo.Object,
-            _mockCounterRepo.Object,
-            _mockRowNoteRepo.Object,
-            _mockSessionRepo.Object,
-            null!,
-            _mockNavigationService.Object,
-            _mockHapticsService.Object);
-
-        act.Should().Throw<ArgumentNullException>().WithParameterName("dialogService");
+        FluentActions
+            .Invoking(() => new ProjectCounterViewModel(
+                _mockProjectRepo.Object,
+                _mockCounterRepo.Object,
+                _mockRowNoteRepo.Object,
+                _mockSessionRepo.Object,
+                null!,
+                _mockNavigationService.Object,
+                _mockHapticsService.Object))
+            .Should().Throw<ArgumentNullException>()
+            .WithParameterName("dialogService");
     }
 
     [Test]

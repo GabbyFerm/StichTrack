@@ -93,7 +93,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
         }
@@ -167,7 +167,7 @@ public class SettingsViewModel : INotifyPropertyChanged
             await _settingsRepository.SaveAppSettingsAsync(_settings).ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
         }

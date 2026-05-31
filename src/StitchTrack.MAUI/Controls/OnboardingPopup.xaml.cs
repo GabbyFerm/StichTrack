@@ -59,7 +59,7 @@ public partial class OnboardingPopup : Popup
             }
         }
 #pragma warning disable CA1031 // Do not catch general exception types
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             // Don't crash the app if this fails - just log it

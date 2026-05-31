@@ -202,7 +202,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
             });
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             await _dialogService.ShowAlertAsync("Load Failed", "Could not load projects.").ConfigureAwait(false);
         }
@@ -308,7 +308,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{result.Name}' created!").ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             await _dialogService.ShowAlertAsync("Create Failed", "Could not create project.").ConfigureAwait(false);
         }
@@ -365,7 +365,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{result.Name}' updated!").ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             await _dialogService.ShowAlertAsync("Update Failed", "Could not save changes.").ConfigureAwait(false);
         }
@@ -386,13 +386,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
             return;
         }
 
-        _ = ShowProjectMenuAsync(project).ContinueWith(
-            t =>
-            {
-                if (t.IsFaulted)
-            },
-            TaskScheduler.FromCurrentSynchronizationContext()
-        );
+        _ = ShowProjectMenuAsync(project);
     }
 
     private async Task ShowProjectMenuAsync(Project project)
@@ -442,7 +436,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{project.Name}' archived").ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             await _dialogService.ShowAlertAsync("Archive Failed", "Could not archive project.").ConfigureAwait(false);
         }
@@ -465,7 +459,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
             await LoadProjectsAsync().ConfigureAwait(false);
             await _dialogService.ShowToastAsync($"'{project.Name}' restored").ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             await _dialogService.ShowAlertAsync("Restore Failed", "Could not restore project.").ConfigureAwait(false);
         }
@@ -496,7 +490,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
             await _dialogService.ShowToastAsync($"'{project.Name}' deleted").ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             await _dialogService.ShowAlertAsync("Delete Failed", "Could not delete project.").ConfigureAwait(false);
         }

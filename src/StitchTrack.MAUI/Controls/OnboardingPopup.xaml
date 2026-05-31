@@ -192,3 +192,8 @@
 
       </VerticalStackLayout>
 
+    </Grid>
+
+  </Grid>
+
+</toolkit:Popup>

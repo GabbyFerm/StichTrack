@@ -142,7 +142,7 @@
             </Label.Triggers>
             <Label.GestureRecognizers>
               <TapGestureRecognizer Command="{Binding ShowActiveProjectsCommand}" />
-              </Label.GestureRecognizers>
+            </Label.GestureRecognizers>
           </Label>
 
           <!-- Archived Projects Tab (Right) -->
@@ -181,7 +181,7 @@
                      Value="False">
                 <Setter Property="Color" Value="{StaticResource BrandGold}" />
               </DataTrigger>
-              </BoxView.Triggers>
+            </BoxView.Triggers>
           </BoxView>
 
           <!-- Right Half Underline (Archived Projects) -->
@@ -201,7 +201,7 @@
         </Grid>
 
       </VerticalStackLayout>
-      
+
       <!-- Projects List -->
       <CollectionView Grid.Row="1"
                       ItemsSource="{Binding Projects}"
@@ -254,7 +254,7 @@
                     x:DataType="{x:Null}"
                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ProjectsViewModel}}, Path=NavigateToProjectCommand}"
                     CommandParameter="{Binding Id}" />
-                  </Grid.GestureRecognizers>
+                </Grid.GestureRecognizers>
 
                 <!-- Project Image -->
                 <Border Grid.Column="0"
@@ -307,7 +307,7 @@
                           <Binding Path="CurrentCount" />
                           <Binding Path="TotalRows" Converter="{StaticResource TotalRowsConverter}" />
                         </MultiBinding>
-                        </Label.Text>
+                      </Label.Text>
                     </Label>
 
                     <!-- Progress Percentage (only if TotalRows is set) -->
@@ -319,7 +319,7 @@
                         <MultiBinding StringFormat="// {0}% done">
                           <Binding Path="." Converter="{StaticResource ProgressPercentageConverter}" />
                         </MultiBinding>
-                        </Label.Text>
+                      </Label.Text>
                     </Label>
 
                   </HorizontalStackLayout>
@@ -332,7 +332,7 @@
                       <MultiBinding StringFormat="Last worked on: {0}">
                         <Binding Path="UpdatedAt" Converter="{StaticResource RelativeTimeConverter}" />
                       </MultiBinding>
-                      </Label.Text>
+                    </Label.Text>
                   </Label>
 
                 </VerticalStackLayout>
@@ -364,4 +364,5 @@
 
     </Grid>
 
-  </G
+  </Grid>
+</ContentPage>

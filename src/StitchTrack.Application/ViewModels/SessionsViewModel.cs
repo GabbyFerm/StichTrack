@@ -101,7 +101,7 @@ public class SessionsViewModel : INotifyPropertyChanged
             UpdateOnUiThread(ApplyFilter);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
         }
@@ -230,8 +230,8 @@ public class SessionsViewModel : INotifyPropertyChanged
             {
                 ProjectName = session.Project?.Name ?? "Unknown project",
                 ImagePath = session.Project?.ImagePath,
-                DateText = $"{dateText}  |  Duration: {FormatDuration(TimeSpan.FromSeconds(session.DurationSeconds))}",
-                RowsText = rowsText
+                DateText = dateText,
+                DurationText = $"Duration: {FormatDuration(TimeSpan.FromSeconds(session.DurationSeconds))}"
             });
         }
     }
@@ -279,8 +279,6 @@ public class SessionDisplayItem
     public bool HasImage => !string.IsNullOrWhiteSpace(ImagePath);
     public string DateText { get; init; } = string.Empty;
     public string DurationText { get; init; } = string.Empty;
-    public string RowsText { get; init; } = string.Empty;
-    public bool HasRows => !string.IsNullOrEmpty(RowsText);
 }
 
 /// <summary>

@@ -364,7 +364,7 @@ public partial class ProjectFormPopup : Popup
 
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await ShowAlertAsync("Could Not Add Photo", "Something went wrong. Please try again.");
@@ -398,7 +398,7 @@ public partial class ProjectFormPopup : Popup
             BuildFileChips(PatternFilesContainer, ProjectFileType.Pattern);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
         }
@@ -427,7 +427,7 @@ public partial class ProjectFormPopup : Popup
             BuildFileChips(InspirationPhotosContainer, ProjectFileType.InspirationPhoto);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
         }

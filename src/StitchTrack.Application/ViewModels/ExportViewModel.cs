@@ -108,7 +108,7 @@ public class ExportViewModel : INotifyPropertyChanged
                 await _dialogService.ShowToastAsync("No projects to export").ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync(
@@ -133,7 +133,7 @@ public class ExportViewModel : INotifyPropertyChanged
                 await _dialogService.ShowToastAsync("No projects to export").ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync(
@@ -167,7 +167,7 @@ public class ExportViewModel : INotifyPropertyChanged
                 .ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync(

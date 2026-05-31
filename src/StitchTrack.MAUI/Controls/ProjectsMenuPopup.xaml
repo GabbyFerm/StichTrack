@@ -161,4 +161,10 @@
                  TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
         </Border>
 
-      </VerticalStackLay
+      </VerticalStackLayout>
+
+      </Border>
+
+    </Grid>
+
+</toolkit:Popup>

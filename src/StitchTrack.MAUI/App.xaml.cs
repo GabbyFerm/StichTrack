@@ -49,7 +49,7 @@ public partial class App : Microsoft.Maui.Controls.Application
 
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             // Safe fallback — Auto theme, haptics on

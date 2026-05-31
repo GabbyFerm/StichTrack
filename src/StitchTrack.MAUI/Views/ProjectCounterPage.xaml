@@ -325,4 +325,9 @@
                 Style="{StaticResource PrimaryButton}"
                 Command="{Binding EndSessionCommand}" />
 
-      </VerticalStackLayou
+      </VerticalStackLayout>
+    </ScrollView>
+
+  </Grid>
+
+</ContentPage>

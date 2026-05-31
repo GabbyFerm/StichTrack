@@ -171,7 +171,7 @@ public class QuickCounterViewModel : INotifyPropertyChanged
             if (OnProjectSaved != null)
                 await OnProjectSaved.Invoke().ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             await _dialogService.ShowAlertAsync("Save Failed", "Could not save project.").ConfigureAwait(false);
         }

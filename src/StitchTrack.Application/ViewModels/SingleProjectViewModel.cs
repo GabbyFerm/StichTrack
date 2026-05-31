@@ -203,7 +203,7 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             OnPropertyChanged(string.Empty);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync("Error", "Could not load project").ConfigureAwait(false);
@@ -254,7 +254,7 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 
             await _dialogService.ShowToastAsync($"'{_project.Name}' updated!").ConfigureAwait(false);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             await _dialogService.ShowAlertAsync("Update Failed", "Could not save changes.").ConfigureAwait(false);
         }
@@ -279,7 +279,7 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync("Archive Failed", "Could not archive project.").ConfigureAwait(false);
@@ -300,7 +300,7 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync("Restore Failed", "Could not restore project.").ConfigureAwait(false);
@@ -333,7 +333,7 @@ public class SingleProjectViewModel : INotifyPropertyChanged
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync("Delete Failed", "Could not delete project.").ConfigureAwait(false);

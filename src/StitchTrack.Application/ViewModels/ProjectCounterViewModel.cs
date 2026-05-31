@@ -190,7 +190,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
 
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync("Error", "Could not load project").ConfigureAwait(false);
@@ -375,7 +375,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
                 .ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync("Save Failed", "Could not save progress.").ConfigureAwait(false);
@@ -391,7 +391,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             await SaveAllCountersAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
         }
@@ -425,7 +425,7 @@ public class ProjectCounterViewModel : INotifyPropertyChanged
             await _navigationService.GoBackAsync().ConfigureAwait(false);
         }
 #pragma warning disable CA1031
-        catch (Exception ex)
+        catch (Exception)
 #pragma warning restore CA1031
         {
             await _dialogService.ShowAlertAsync("Error", "Could not save session.").ConfigureAwait(false);

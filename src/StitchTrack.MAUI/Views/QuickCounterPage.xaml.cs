@@ -44,10 +44,10 @@ public partial class QuickCounterPage : ContentPage
             {
             }
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
         }
-        catch (TaskCanceledException ex)
+        catch (TaskCanceledException)
         {
         }
     }

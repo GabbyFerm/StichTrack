@@ -207,44 +207,6 @@
     <Setter Property="Padding" Value="15,0" />
   </Style>
 
-
-
-  <!-- ============================================ -->
-  <!-- CARD & FRAME STYLES                          -->
-  <!-- ============================================ -->
-
-  <!-- Standard Card -->
-  <Style x:Key="CardFrame" TargetType="Frame">
-    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}" />
-    <Setter Property="BorderColor" Value="Transparent" />
-    <Setter Property="CornerRadius" Value="12" />
-    <Setter Property="Padding" Value="15" />
-    <Setter Property="Margin" Value="0,5" />
-    <Setter Property="HasShadow" Value="False" />
-  </Style>
-
-  <!-- Counter Display Card -->
-  <Style x:Key="CounterCard" TargetType="Frame">
-    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}" />
-    <Setter Property="BorderColor" Value="Transparent" />
-    <Setter Property="CornerRadius" Value="16" />
-    <Setter Property="Padding" Value="20" />
-    <Setter Property="Margin" Value="0,10" />
-    <Setter Property="HasShadow" Value="False" />
-  </Style>
-
-
-  <!-- Project Image Frame -->
-  <Style x:Key="ProjectImageFrame" TargetType="Frame">
-    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightSurface}, Dark={StaticResource DarkMuted}}" />
-    <Setter Property="BorderColor" Value="Transparent" />
-    <Setter Property="CornerRadius" Value="8" />
-    <Setter Property="Padding" Value="0" />
-    <Setter Property="HasShadow" Value="False" />
-    <Setter Property="HeightRequest" Value="60" />
-    <Setter Property="WidthRequest" Value="60" />
-  </Style>
-
   <!-- ============================================ -->
   <!-- INPUT STYLES                                 -->
   <!-- ============================================ -->
@@ -263,4 +225,34 @@
   <Style x:Key="InputEditor" TargetType="Editor">
     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightCardBackground}, Dark={StaticResource DarkCardBackground}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
-    <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecond
+    <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
+    <Setter Property="FontFamily" Value="MontserratRegular" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="MinimumHeightRequest" Value="100" />
+    <Setter Property="AutoSize" Value="TextChanges" />
+  </Style>
+
+  <!-- ============================================ -->
+  <!-- SEPARATOR / DIVIDER                          -->
+  <!-- ============================================ -->
+
+  <Style x:Key="Divider" TargetType="BoxView">
+    <Setter Property="Color" Value="{StaticResource BrandGold}" />
+    <Setter Property="HeightRequest" Value="1" />
+    <Setter Property="HorizontalOptions" Value="Fill" />
+    <Setter Property="Margin" Value="0,10" />
+    <Setter Property="Opacity" Value="0.3" />
+  </Style>
+
+  <!-- ============================================ -->
+  <!-- NAVIGATION TAB STYLES                        -->
+  <!-- ============================================ -->
+
+  <Style x:Key="TabLabel" TargetType="Label">
+    <Setter Property="FontFamily" Value="MontserratSemiBold" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="HorizontalOptions" Value="Center" />
+    <Setter Property="VerticalOptions" Value="End" />
+  </Style>
+
+</ResourceDictionary>

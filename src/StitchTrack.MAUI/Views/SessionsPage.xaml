@@ -361,16 +361,18 @@
                     <Label Text="{Binding ProjectName}"
                            Style="{StaticResource FontSemiBold}"
                            FontSize="14"
-                           TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
+                           TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                                       Dark={StaticResource DarkTextPrimary}}" />
                     <Label Text="{Binding DateText}"
                            Style="{StaticResource FontRegular}"
                            FontSize="12"
-                           TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
-                    <Label Text="{Binding RowsText}"
+                           TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                                       Dark={StaticResource DarkTextSecondary}}" />
+                                    <Label Text="{Binding DurationText}"
                            Style="{StaticResource FontRegular}"
                            FontSize="12"
-                           TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
-                           IsVisible="{Binding HasRows}" />
+                           TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                                       Dark={StaticResource DarkTextSecondary}}" />
                   </VerticalStackLayout>
 
                 </Grid>
@@ -394,4 +396,12 @@
                Opacity="0.6"
                IsVisible="{Binding HasMoreSessions}"
                TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
-               Margin="0,
+               Margin="0,0,0,16" />
+        
+      </VerticalStackLayout>
+
+    </ScrollView>
+
+  </Grid>
+
+</ContentPage>

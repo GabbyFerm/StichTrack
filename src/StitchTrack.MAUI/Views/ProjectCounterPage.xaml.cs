@@ -47,15 +47,15 @@ public partial class ProjectCounterPage : ContentPage
                     File = new ReadOnlyFile(filePath)
                 });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 await DisplayAlert("Cannot Open File", "The file path is invalid.", "OK");
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 await DisplayAlert("Cannot Open File", "Could not open the file.", "OK");
             }
-            catch (System.IO.IOException ex)
+            catch (System.IO.IOException)
             {
                 await DisplayAlert("Cannot Open File", "There was an error accessing the file.", "OK");
             }

@@ -120,7 +120,7 @@ public static class MauiProgram
                 await DbInitializer.InitializeAsync(dbContext).ConfigureAwait(false);
             }
 #pragma warning disable CA1031
-            catch (Exception ex)
+            catch (Exception)
 #pragma warning restore CA1031
             {
             }

@@ -62,7 +62,7 @@ public class MauiImportService : IImportService
                 imported++;
             }
 #pragma warning disable CA1031
-            catch (Exception ex)
+            catch (Exception)
 #pragma warning restore CA1031
             {
                 // Skip failed projects — don't abort the whole import

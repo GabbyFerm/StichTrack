@@ -33,19 +33,19 @@ public partial class SingleProjectPage : ContentPage
                     File = new ReadOnlyFile(filePath)
                 });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 await DisplayAlert("Cannot Open File", "The specified file path is invalid.", "OK");
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 await DisplayAlert("Cannot Open File", "Could not open the file due to an invalid operation.", "OK");
             }
-            catch (System.IO.IOException ex)
+            catch (System.IO.IOException)
             {
                 await DisplayAlert("Cannot Open File", "There was an error accessing the file.", "OK");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await DisplayAlert("Cannot Open File", "Could not open the pattern file.", "OK");
                 throw;
