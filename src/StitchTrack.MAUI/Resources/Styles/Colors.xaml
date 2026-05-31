@@ -8,7 +8,6 @@
   <!-- BRAND COLORS (Same in Light & Dark)          -->
   <!-- ============================================ -->
   <Color x:Key="BrandGold">#E1AD37</Color>
-  <Color x:Key="BrandCancel">#EB9057</Color>
   <Color x:Key="LinkColor">#16697A</Color>
 
   <!-- ============================================ -->
@@ -20,7 +19,6 @@
   <!-- Darkened from #424B54 — better contrast on warm backgrounds -->
   <Color x:Key="LightTextSecondary">#424B54</Color>
   <!-- Darkened from #6B7280 — readable on cream card backgrounds -->
-  <Color x:Key="LightLine">#E1AD37</Color>
   <Color x:Key="LightCardBackground">#F5EDD3</Color>
   <Color x:Key="LightIconColor">#2C3338</Color>
   <!-- Matches new LightTextPrimary -->
@@ -35,24 +33,14 @@
   <Color x:Key="DarkTextPrimary">#FFFFFF</Color>
   <Color x:Key="DarkTextSecondary">#E5E7EB</Color>
   <!-- Lightened from #D1D5DB — much more readable on dark grey -->
-  <Color x:Key="DarkLine">#424B54</Color>
   <Color x:Key="DarkCardBackground">#4A5259</Color>
   <!-- Slightly darkened to match new page background -->
   <Color x:Key="DarkIconColor">#FFFFFF</Color>
-
-  <!-- ============================================ -->
-  <!-- THEME-AWARE COLORS (Switch Automatically)    -->
-  <!-- Use AppThemeBinding in XAML where needed     -->
-  <!-- ============================================ -->
-
-  <Color x:Key="TextPrimary">#2C3338</Color>
-  <Color x:Key="TextSecondary">#424B54</Color>
   <Color x:Key="TextWhite">#ffffff</Color>
 
   <!-- ============================================ -->
   <!-- BUTTON COLORS -->
   <!-- ============================================ -->
-  <!-- BUTTON COLORS -->
   <Color x:Key="ButtonIncrease">#E1AD37</Color>
   <Color x:Key="ButtonDecrease">#424B54</Color>
   <!-- light mode only -->
@@ -64,15 +52,6 @@
   <Color x:Key="ButtonPrimary">#E1AD37</Color>
   <Color x:Key="ButtonTextOnGold">#FFFFFF</Color>
   <Color x:Key="ButtonTextOnDark">#FFFFFF</Color>
-
-  <!-- ============================================ -->
-  <!-- NAVIGATION COLORS                            -->
-  <!-- ============================================ -->
-  <Color x:Key="NavBackground">#d39d55</Color>
-  <Color x:Key="NavTextUnselected">#FFFFFF</Color>
-  <Color x:Key="NavTextSelected">#424B54</Color>
-  <Color x:Key="NavIconUnselected">#FFFFFF</Color>
-  <Color x:Key="NavIconSelected">#424B54</Color>
 
   <!-- ============================================ -->
   <!-- SEMANTIC COLORS                              -->
