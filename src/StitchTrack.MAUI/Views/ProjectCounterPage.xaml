@@ -40,7 +40,6 @@
         <Label Text="{Binding ProjectName}"
                Style="{StaticResource HeaderTitle}"
                TextTransform="Uppercase"
-               FontSize="20"
                VerticalOptions="Center" />
       </HorizontalStackLayout>
     </Grid>
@@ -61,7 +60,7 @@
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <Label Grid.Column="0"
                    Text="{Binding SessionTimerText}"
-                   FontFamily="MontserratBold"
+                   Style="{StaticResource FontBold}"
                    FontSize="22"
                    VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
@@ -88,7 +87,7 @@
                   </Image.Behaviors>
                 </Image>
                 <Label Text="{Binding SessionButtonText}"
-                       FontFamily="MontserratSemiBold"
+                       Style="{StaticResource FontSemiBold}"
                        FontSize="13"
                        TextColor="White"
                        VerticalOptions="Center" />
@@ -120,7 +119,7 @@
               </Image.Source>
             </Image>
             <Label Text="Pattern:"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="13"
                    Margin="2,0,5,0"
                    VerticalOptions="Center"
@@ -137,12 +136,12 @@
           <Grid ColumnDefinitions="*,Auto">
             <Label Grid.Column="0"
                    Text="{Binding ProgressText}"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="13"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
             <Label Grid.Column="1"
                    Text="{Binding ProgressPercentage}"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="13"
                    TextColor="{StaticResource BrandGold}" />
           </Grid>
@@ -172,7 +171,7 @@
               <TapGestureRecognizer Tapped="OnAddCounterTapped" />
             </Border.GestureRecognizers>
             <Label Text="+"
-                     FontFamily="MontserratBold"
+                     Style="{StaticResource FontBold}"
                      FontSize="20"
                      TextColor="White"
                      HorizontalOptions="Center"
@@ -180,7 +179,7 @@
           </Border>
 
           <Label Text="Add Counter"
-                 FontFamily="MontserratSemiBold"
+                 Style="{StaticResource FontSemiBold}"
                  FontSize="14"
                  VerticalOptions="Center"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
@@ -209,7 +208,7 @@
                 </Image.Source>
               </Image>
               <Label Text="Row Notes"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      VerticalOptions="Center"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
@@ -229,7 +228,7 @@
                 <Entry x:Name="RowNoteRowEntry"
                        Keyboard="Numeric"
                        Placeholder="Row"
-                       FontFamily="MontserratRegular"
+                       Style="{StaticResource FontRegular}"
                        FontSize="13"
                        MaxLength="5"
                        HorizontalTextAlignment="Center"
@@ -247,7 +246,7 @@
                 </Border.StrokeShape>
                 <Entry x:Name="RowNoteTextEntry"
                        Placeholder="e.g. decrease here"
-                       FontFamily="MontserratRegular"
+                       Style="{StaticResource FontRegular}"
                        FontSize="13"
                        MaxLength="80"
                        Margin="10,0"
@@ -267,7 +266,7 @@
                   <TapGestureRecognizer Tapped="OnAddRowNoteTapped" />
                 </Border.GestureRecognizers>
                 <Label Text="+"
-                       FontFamily="MontserratBold"
+                       Style="{StaticResource FontBold}"
                        FontSize="22"
                        TextColor="White"
                        HorizontalOptions="Center"
@@ -298,19 +297,19 @@
                 </Image.Source>
               </Image>
               <Label Text="Notes"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="14"
                      VerticalOptions="Center"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
             </HorizontalStackLayout>
             <Label Text="{Binding Notes}"
-                   FontFamily="MontserratRegular"
+                   Style="{StaticResource FontRegular}"
                    FontSize="14"
                    LineBreakMode="WordWrap"
                    MaxLines="{Binding NotesMaxLines}"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
             <Label Text="{Binding NotesToggleText}"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="14"
                    TextColor="{StaticResource BrandGold}"
                    IsVisible="{Binding NotesCanExpand}">

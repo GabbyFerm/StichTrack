@@ -36,7 +36,6 @@
         </Image>
         <Label Text="QUICK ROW COUNTER"
            Style="{StaticResource HeaderTitle}"
-           FontSize="20"
            VerticalOptions="Center" />
       </HorizontalStackLayout>
 
@@ -59,7 +58,7 @@
 
             <!-- Row count label -->
             <Label Text="Current Row"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="13"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                    HorizontalOptions="Center" />
@@ -144,9 +143,9 @@
                     </Image.Source>
                   </Image>
                   <Label Text="Undo"
-                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
-                         FontFamily="MontserratMedium"
+                         Style="{StaticResource FontMedium}"
                          FontSize="13"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
                          VerticalOptions="Center" />
                 </HorizontalStackLayout>
               </Border>
@@ -171,9 +170,9 @@
                     </Image.Source>
                   </Image>
                   <Label Text="Reset"
-                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
-                         FontFamily="MontserratMedium"
+                         Style="{StaticResource FontMedium}"
                          FontSize="13"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark=White}"
                          VerticalOptions="Center" />
                 </HorizontalStackLayout>
               </Border>
@@ -208,16 +207,16 @@
               </Image.Behaviors>
             </Image>
             <Label Text="SAVE TO PROJECT"
-                   TextColor="White"
-                   FontFamily="MontserratBold"
+                   Style="{StaticResource FontBold}"
                    FontSize="14"
+                   TextColor="White"
                    VerticalOptions="Center" />
           </HorizontalStackLayout>
         </Border>
 
         <!-- Explanatory text below Save to Project -->
         <Label Text="Quick Counter is a one-off digital counter — like a manual click counter. Save to Project creates a new project with your current count."
-               FontFamily="MontserratRegular"
+               Style="{StaticResource FontRegular}"
                FontSize="12"
                TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                HorizontalOptions="Start"

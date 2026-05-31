@@ -42,7 +42,6 @@
         </Image>
         <Label Text="MY PROJECTS"
                Style="{StaticResource HeaderTitle}"
-               FontSize="20"
                VerticalOptions="Center" />
       </HorizontalStackLayout>
 
@@ -94,7 +93,7 @@
                  PlaceholderColor="{AppThemeBinding Light=#999999, Dark=#AAAAAA}"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                              Dark=White}"
-                 FontFamily="MontserratRegular"
+                 Style="{StaticResource FontRegular}"
                  FontSize="14"
                  Keyboard="Text"
                  Margin="10,0" />
@@ -129,7 +128,7 @@
           <!-- Active Projects Tab (Left) -->
           <Label Grid.Column="0"
                  Text="{Binding ActiveProjectsTabText}"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="14"
                  HorizontalOptions="Start"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
@@ -149,7 +148,7 @@
           <!-- Archived Projects Tab (Right) -->
           <Label Grid.Column="1"
                  Text="{Binding ArchivedProjectsTabText}"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="14"
                  HorizontalOptions="End"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
@@ -222,13 +221,13 @@
                    HorizontalOptions="Center" />
 
             <Label Text="No projects yet"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="18"
                    HorizontalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
 
             <Label Text="Tap + to create your first project"
-                   FontFamily="MontserratRegular"
+                   Style="{StaticResource FontRegular}"
                    FontSize="14"
                    HorizontalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
@@ -292,7 +291,7 @@
 
                   <!-- Project Name -->
                   <Label Text="{Binding Name}"
-                         FontFamily="MontserratSemiBold"
+                         Style="{StaticResource FontSemiBold}"
                          FontSize="16"
                          LineBreakMode="TailTruncation"
                          TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
@@ -300,7 +299,7 @@
                   <!-- Row Count with Progress -->
                   <HorizontalStackLayout Spacing="8">
 
-                    <Label FontFamily="MontserratRegular"
+                    <Label Style="{StaticResource FontRegular}"
                            FontSize="14"
                            TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
                       <Label.Text>
@@ -312,7 +311,7 @@
                     </Label>
 
                     <!-- Progress Percentage (only if TotalRows is set) -->
-                    <Label FontFamily="MontserratMedium"
+                    <Label Style="{StaticResource FontMedium}"
                            FontSize="14"
                            TextColor="{StaticResource BrandGold}"
                            IsVisible="{Binding TotalRows, Converter={StaticResource IsNotNullConverter}}">
@@ -326,7 +325,7 @@
                   </HorizontalStackLayout>
 
                   <!-- Last Updated -->
-                  <Label FontFamily="MontserratRegular"
+                  <Label Style="{StaticResource FontRegular}"
                          FontSize="12"
                          TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
                     <Label.Text>

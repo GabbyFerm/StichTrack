@@ -44,7 +44,7 @@
           </BoxView>
 
           <Label Text="← Swipe to go back to projects"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="11"
                  FontAttributes="Italic"
                  TextColor="White"
@@ -74,11 +74,7 @@
             </Border>
 
             <Label Text="{Binding ProjectName}"
-                   FontFamily="MontserratBold"
-                   FontSize="20"
-                   TextTransform="Uppercase"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
-                   VerticalOptions="Center" />
+                   Style="{StaticResource ProjectPageTitleLabel}" />
 
           </HorizontalStackLayout>
 
@@ -112,7 +108,7 @@
                     <RoundRectangle CornerRadius="10" />
                   </Border.StrokeShape>
                   <Label Text="{Binding Name}"
-                         FontFamily="MontserratMedium"
+                         Style="{StaticResource FontMedium}"
                          FontSize="11"
                          TextColor="White" />
                 </Border>
@@ -140,7 +136,7 @@
 
             <!-- Needle size text -->
             <Label Text="{Binding NeedleOrHookSize}"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="14"
                    VerticalOptions="Center"
                    IsVisible="{Binding HasNeedleOrHookSize}"
@@ -149,7 +145,7 @@
 
             <!-- Separator — only shown if needle size is set -->
             <Label Text="|"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="14"
                    VerticalOptions="Center"
                    IsVisible="{Binding HasNeedleOrHookSize}"
@@ -157,7 +153,7 @@
                                                Dark={StaticResource DarkTextSecondary}}" />
 
             <!-- Row count — always shown -->
-            <Label FontFamily="MontserratMedium"
+            <Label Style="{StaticResource FontMedium}"
                    FontSize="14"
                    VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
@@ -173,7 +169,7 @@
 
             <!-- Separator — only shown if total rows is set -->
             <Label Text="|"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="14"
                    VerticalOptions="Center"
                    IsVisible="{Binding TotalRows,
@@ -183,7 +179,7 @@
 
             <!-- Progress percentage — only shown if total rows is set -->
             <Label Text="{Binding ProgressPercentage}"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="14"
                    VerticalOptions="Center"
                    IsVisible="{Binding TotalRows,
@@ -205,7 +201,7 @@
             </Image>
 
             <!-- "Last: Tuesday" -->
-            <Label FontFamily="MontserratMedium"
+            <Label Style="{StaticResource FontMedium}"
                    FontSize="14"
                    VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
@@ -218,14 +214,14 @@
             </Label>
 
             <Label Text="|"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="14"
                    VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                                Dark={StaticResource DarkTextSecondary}}" />
 
             <!-- "Total: 3h 20m" -->
-            <Label FontFamily="MontserratMedium"
+            <Label Style="{StaticResource FontMedium}"
                    FontSize="14"
                    VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
@@ -254,7 +250,7 @@
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center">
               <Label Text="CONTINUE COUNTING"
-                     FontFamily="MontserratBold"
+                     Style="{StaticResource FontBold}"
                      FontSize="14"
                      TextColor="White"
                      VerticalOptions="Center" />
@@ -281,7 +277,7 @@
               </Image.Source>
             </Image>
             <Label Text="Counters"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="16"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                                Dark={StaticResource DarkTextPrimary}}" />
@@ -309,14 +305,14 @@
                 <TapGestureRecognizer Tapped="OnAddCounterTapped" />
               </Border.GestureRecognizers>
               <Label Text="+"
-                     FontFamily="MontserratBold"
+                     Style="{StaticResource FontBold}"
                      FontSize="20"
                      TextColor="White"
                      HorizontalOptions="Center"
                      VerticalOptions="Center" />
             </Border>
             <Label Text="Add Counter"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="14"
                    VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
@@ -340,7 +336,7 @@
               </Image.Source>
             </Image>
             <Label Text="Pattern"
-                   FontFamily="MontserratSemiBold" FontSize="16"
+                   Style="{StaticResource FontSemiBold}" FontSize="16"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                                Dark={StaticResource DarkTextPrimary}}" />
           </HorizontalStackLayout>
@@ -361,7 +357,7 @@
               </Image.Source>
             </Image>
             <Label Text="Inspiration"
-                   FontFamily="MontserratSemiBold" FontSize="16"
+                   Style="{StaticResource FontSemiBold}" FontSize="16"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                                Dark={StaticResource DarkTextPrimary}}" />
           </HorizontalStackLayout>
@@ -388,7 +384,7 @@
               </Image.Source>
             </Image>
             <Label Text="Notes"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="16"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
           </HorizontalStackLayout>
@@ -400,14 +396,14 @@
                    Opacity="0.4" />
 
           <Label Text="{Binding Notes}"
-                 FontFamily="MontserratRegular"
+                 Style="{StaticResource FontRegular}"
                  FontSize="14"
                  LineBreakMode="WordWrap"
                  MaxLines="{Binding NotesMaxLines}"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
 
           <Label Text="{Binding NotesToggleText}"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="14"
                  TextColor="{StaticResource BrandGold}"
                  IsVisible="{Binding NotesCanExpand}">
@@ -444,7 +440,7 @@
                 </Image.Behaviors>
               </Image>
               <Label Text="Edit"
-                     FontFamily="MontserratMedium"
+                     Style="{StaticResource FontMedium}"
                      FontSize="14"
                      TextColor="White"
                      VerticalOptions="Center" />
@@ -472,7 +468,7 @@
                 </Image.Behaviors>
               </Image>
               <Label Text="{Binding ArchiveButtonText}"
-                     FontFamily="MontserratMedium"
+                     Style="{StaticResource FontMedium}"
                      FontSize="14"
                      TextColor="White"
                      VerticalOptions="Center" />
@@ -500,7 +496,7 @@
                 </Image.Behaviors>
               </Image>
               <Label Text="Delete"
-                     FontFamily="MontserratMedium"
+                     Style="{StaticResource FontMedium}"
                      FontSize="14"
                      TextColor="White"
                      VerticalOptions="Center" />

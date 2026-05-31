@@ -36,7 +36,6 @@
         </Image>
         <Label Text="EXPORT"
            Style="{StaticResource HeaderTitle}"
-           FontSize="20"
            VerticalOptions="Center" />
       </HorizontalStackLayout>
 
@@ -48,7 +47,7 @@
 
         <!-- Export Options -->
         <Label Text="Export Options"
-               FontFamily="MontserratBold"
+               Style="{StaticResource FontBold}"
                FontSize="16"
                TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
                Margin="0,0,0,16" />
@@ -61,11 +60,11 @@
                     VerticalOptions="Center" />
           <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
             <Label Text="Include archived projects"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="15"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
             <Label Text="Archived projects are excluded by default"
-                   FontFamily="MontserratRegular"
+                   Style="{StaticResource FontRegular}"
                    FontSize="12"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                    Opacity="0.6" />
@@ -78,13 +77,13 @@
 
         <!-- Export Data -->
         <Label Text="Export Data"
-               FontFamily="MontserratBold"
+               Style="{StaticResource FontBold}"
                FontSize="16"
                TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
                Margin="0,0,0,8" />
 
         <Label Text="Export your projects to a file you can save or share. JSON includes full project data, counters and session history. CSV is a simple spreadsheet format."
-               FontFamily="MontserratRegular"
+               Style="{StaticResource FontRegular}"
                FontSize="13"
                TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                            Dark={StaticResource DarkTextSecondary}}"
@@ -104,11 +103,11 @@
 
           <VerticalStackLayout Grid.Column="1" Spacing="2">
             <Label Text="Export All Projects (JSON)"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="15"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
             <Label Text="Includes projects and session history"
-                   FontFamily="MontserratRegular"
+                   Style="{StaticResource FontRegular}"
                    FontSize="12"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                    Opacity="0.6" />
@@ -128,7 +127,7 @@
               <TapGestureRecognizer Command="{Binding ExportJsonCommand}" />
             </Border.GestureRecognizers>
             <Label Text="EXPORT"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="12"
                    TextColor="{StaticResource BrandGold}" />
           </Border>
@@ -147,11 +146,11 @@
 
           <VerticalStackLayout Grid.Column="1" Spacing="2">
             <Label Text="Export All Projects (CSV)"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="15"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
             <Label Text="Columns: Name, CurrentCount, TotalRows, Notes, CreatedAt, IsArchived"
-                   FontFamily="MontserratRegular"
+                   Style="{StaticResource FontRegular}"
                    FontSize="12"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                    Opacity="0.6" />
@@ -171,7 +170,7 @@
               <TapGestureRecognizer Command="{Binding ExportCsvCommand}" />
             </Border.GestureRecognizers>
             <Label Text="EXPORT"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="12"
                    TextColor="{StaticResource BrandGold}" />
           </Border>
@@ -191,14 +190,14 @@
 
         <!-- Import Data -->
         <Label Text="Import Data"
-               FontFamily="MontserratBold"
+               Style="{StaticResource FontBold}"
                FontSize="16"
                TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                            Dark={StaticResource DarkTextPrimary}}"
                Margin="0,0,0,8" />
 
         <Label Text="Import a previously exported JSON file. Always creates new projects — your existing data is never overwritten."
-               FontFamily="MontserratRegular"
+               Style="{StaticResource FontRegular}"
                FontSize="13"
                TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                            Dark={StaticResource DarkTextSecondary}}"
@@ -218,12 +217,12 @@
 
           <VerticalStackLayout Grid.Column="1" Spacing="2">
             <Label Text="Import Projects (JSON)"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="15"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
                                                Dark={StaticResource DarkTextPrimary}}" />
             <Label Text="Restores projects, counters and session history"
-                   FontFamily="MontserratRegular"
+                   Style="{StaticResource FontRegular}"
                    FontSize="12"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
                                                Dark={StaticResource DarkTextSecondary}}"
@@ -244,7 +243,7 @@
               <TapGestureRecognizer Command="{Binding ImportJsonCommand}" />
             </Border.GestureRecognizers>
             <Label Text="IMPORT"
-                   FontFamily="MontserratSemiBold"
+                   Style="{StaticResource FontSemiBold}"
                    FontSize="12"
                    TextColor="{StaticResource BrandGold}" />
           </Border>

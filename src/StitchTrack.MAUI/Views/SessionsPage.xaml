@@ -38,7 +38,6 @@
         </Image>
         <Label Text="YOUR STATS"
                Style="{StaticResource HeaderTitle}"
-               FontSize="20"
                VerticalOptions="Center" />
       </HorizontalStackLayout>
 
@@ -52,7 +51,7 @@
         <!-- Tab labels -->
         <Grid Padding="16,0,16,10" ColumnDefinitions="*,*,*,*">
 
-          <Label Grid.Column="0" Text="Today" FontFamily="MontserratMedium" FontSize="14"
+          <Label Grid.Column="0" Text="Today" Style="{StaticResource FontMedium}" FontSize="14"
            HorizontalOptions="Center"
            TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
             <Label.Triggers>
@@ -66,7 +65,7 @@
             </Label.GestureRecognizers>
           </Label>
 
-          <Label Grid.Column="1" Text="Week" FontFamily="MontserratMedium" FontSize="14"
+          <Label Grid.Column="1" Text="Week" Style="{StaticResource FontMedium}" FontSize="14"
            HorizontalOptions="Center"
            TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
             <Label.Triggers>
@@ -80,7 +79,7 @@
             </Label.GestureRecognizers>
           </Label>
 
-          <Label Grid.Column="2" Text="Month" FontFamily="MontserratMedium" FontSize="14"
+          <Label Grid.Column="2" Text="Month" Style="{StaticResource FontMedium}" FontSize="14"
            HorizontalOptions="Center"
            TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
             <Label.Triggers>
@@ -94,7 +93,7 @@
             </Label.GestureRecognizers>
           </Label>
 
-          <Label Grid.Column="3" Text="All" FontFamily="MontserratMedium" FontSize="14"
+          <Label Grid.Column="3" Text="All" Style="{StaticResource FontMedium}" FontSize="14"
            HorizontalOptions="Center"
            TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
             <Label.Triggers>
@@ -168,12 +167,12 @@
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
               <Label Text="{Binding TotalTime}"
-                     FontFamily="MontserratBold"
+                     Style="{StaticResource FontBold}"
                      FontSize="28"
                      TextColor="{StaticResource BrandGold}"
                      HorizontalOptions="Center" />
               <Label Text="Total Time"
-                     FontFamily="MontserratMedium"
+                     Style="{StaticResource FontMedium}"
                      FontSize="13"
                      TextColor="White"
                      Opacity="0.85"
@@ -191,12 +190,12 @@
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
               <Label Text="{Binding SessionCount}"
-                     FontFamily="MontserratBold"
+                     Style="{StaticResource FontBold}"
                      FontSize="28"
                      TextColor="{StaticResource BrandGold}"
                      HorizontalOptions="Center" />
               <Label Text="Sessions"
-                     FontFamily="MontserratMedium"
+                     Style="{StaticResource FontMedium}"
                      FontSize="13"
                      TextColor="White"
                      Opacity="0.85"
@@ -214,12 +213,12 @@
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
               <Label Text="{Binding AvgSessionDuration}"
-                     FontFamily="MontserratBold"
+                     Style="{StaticResource FontBold}"
                      FontSize="28"
                      TextColor="{StaticResource BrandGold}"
                      HorizontalOptions="Center" />
               <Label Text="Avg Session"
-                     FontFamily="MontserratMedium"
+                     Style="{StaticResource FontMedium}"
                      FontSize="13"
                      TextColor="White"
                      Opacity="0.85"
@@ -237,12 +236,12 @@
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
               <Label Text="{Binding TotalRowsCompleted}"
-                     FontFamily="MontserratBold"
+                     Style="{StaticResource FontBold}"
                      FontSize="28"
                      TextColor="{StaticResource BrandGold}"
                      HorizontalOptions="Center" />
               <Label Text="Total Rows"
-                     FontFamily="MontserratMedium"
+                     Style="{StaticResource FontMedium}"
                      FontSize="13"
                      TextColor="White"
                      Opacity="0.85"
@@ -275,11 +274,11 @@
 
             <VerticalStackLayout Spacing="2" VerticalOptions="Center">
               <Label Text="Most Active Day:"
-                     FontFamily="MontserratBold"
+                     Style="{StaticResource FontBold}"
                      FontSize="14"
                      TextColor="White" />
               <Label Text="{Binding MostActiveDay}"
-                     FontFamily="MontserratRegular"
+                     Style="{StaticResource FontRegular}"
                      FontSize="13"
                      TextColor="White"
                      Opacity="0.85" />
@@ -292,7 +291,7 @@
         <!-- RECENT SESSIONS -->
         <VerticalStackLayout Margin="16,0,16,4" Spacing="8">
           <Label Text="Recent Sessions"
-             FontFamily="MontserratBold"
+             Style="{StaticResource FontBold}"
              FontSize="18"
              TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
           <BoxView HeightRequest="1"
@@ -307,12 +306,12 @@
                              IsVisible="{Binding IsEmpty}"
                              HorizontalOptions="Center">
           <Label Text="No sessions yet."
-                 FontFamily="MontserratSemiBold"
+                 Style="{StaticResource FontSemiBold}"
                  FontSize="16"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                  HorizontalOptions="Center" />
           <Label Text="Start a timer on any project to track your progress."
-                 FontFamily="MontserratRegular"
+                 Style="{StaticResource FontRegular}"
                  FontSize="14"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                  HorizontalOptions="Center"
@@ -360,15 +359,15 @@
                   <!-- Session details -->
                   <VerticalStackLayout Grid.Column="1" Spacing="2">
                     <Label Text="{Binding ProjectName}"
-                           FontFamily="MontserratSemiBold"
+                           Style="{StaticResource FontSemiBold}"
                            FontSize="14"
                            TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
                     <Label Text="{Binding DateText}"
-                           FontFamily="MontserratRegular"
+                           Style="{StaticResource FontRegular}"
                            FontSize="12"
                            TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
                     <Label Text="{Binding RowsText}"
-                           FontFamily="MontserratRegular"
+                           Style="{StaticResource FontRegular}"
                            FontSize="12"
                            TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                            IsVisible="{Binding HasRows}" />
@@ -389,7 +388,7 @@
         </CollectionView>
 
         <Label Text="Showing 10 most recent sessions"
-               FontFamily="MontserratRegular"
+               Style="{StaticResource FontRegular}"
                FontSize="12"
                HorizontalOptions="Center"
                Opacity="0.6"

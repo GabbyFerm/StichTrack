@@ -36,7 +36,6 @@
         </Image>
         <Label Text="SETTINGS"
            Style="{StaticResource HeaderTitle}"
-           FontSize="20"
            VerticalOptions="Center" />
       </HorizontalStackLayout>
 
@@ -48,7 +47,7 @@
 
         <!-- SECTION: App Settings -->
         <Label Text="App Settings"
-               FontFamily="MontserratBold"
+               Style="{StaticResource FontBold}"
                FontSize="16"
                TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
                Margin="0,0,0,16" />
@@ -63,7 +62,7 @@
               </Image.Source>
             </Image>
             <Label Text="Theme"
-                   FontFamily="MontserratMedium"
+                   Style="{StaticResource FontMedium}"
                    FontSize="15"
                    TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
           </HorizontalStackLayout>
@@ -89,7 +88,7 @@
                 <Border.GestureRecognizers>
                   <TapGestureRecognizer Command="{Binding SetLightThemeCommand}" />
                 </Border.GestureRecognizers>
-                <Label Text="Light" FontFamily="MontserratMedium" FontSize="13"
+                <Label Text="Light" Style="{StaticResource FontMedium}" FontSize="13"
                        HorizontalOptions="Center" VerticalOptions="Center"
                        TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
                   <Label.Triggers>
@@ -111,7 +110,7 @@
                 <Border.GestureRecognizers>
                   <TapGestureRecognizer Command="{Binding SetAutoThemeCommand}" />
                 </Border.GestureRecognizers>
-                <Label Text="Auto" FontFamily="MontserratMedium" FontSize="13"
+                <Label Text="Auto" Style="{StaticResource FontMedium}" FontSize="13"
                        HorizontalOptions="Center" VerticalOptions="Center"
                        TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
                   <Label.Triggers>
@@ -133,7 +132,7 @@
                 <Border.GestureRecognizers>
                   <TapGestureRecognizer Command="{Binding SetDarkThemeCommand}" />
                 </Border.GestureRecognizers>
-                <Label Text="Dark" FontFamily="MontserratMedium" FontSize="13"
+                <Label Text="Dark" Style="{StaticResource FontMedium}" FontSize="13"
                        HorizontalOptions="Center" VerticalOptions="Center"
                        TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}">
                   <Label.Triggers>
@@ -163,7 +162,7 @@
 
           <Label Grid.Column="1"
                  Text="Haptic Feedback"
-                 FontFamily="MontserratMedium"
+                 Style="{StaticResource FontMedium}"
                  FontSize="15"
                  VerticalOptions="Center"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
@@ -187,14 +186,14 @@
 
         <!-- SECTION: About -->
         <Label Text="About"
-               FontFamily="MontserratBold"
+               Style="{StaticResource FontBold}"
                FontSize="16"
                TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
                Margin="0,0,0,16" />
 
         <VerticalStackLayout Spacing="16">
 
-          <Label FontFamily="MontserratRegular"
+          <Label Style="{StaticResource FontRegular}"
                  FontSize="14"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
             <Label.FormattedText>
@@ -205,7 +204,7 @@
             </Label.FormattedText>
           </Label>
 
-          <Label FontFamily="MontserratRegular"
+          <Label Style="{StaticResource FontRegular}"
                  FontSize="14"
                  TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}">
             <Label.FormattedText>
@@ -221,11 +220,11 @@
 
             <VerticalStackLayout Grid.Column="0" Spacing="2">
               <Label Text="Welcome Screen"
-                     FontFamily="MontserratMedium"
+                     Style="{StaticResource FontMedium}"
                      FontSize="15"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
               <Label Text="Show the welcome screen again on next launch"
-                     FontFamily="MontserratRegular"
+                     Style="{StaticResource FontRegular}"
                      FontSize="12"
                      TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                      Opacity="0.7" />
@@ -245,7 +244,7 @@
                 <TapGestureRecognizer Command="{Binding ResetOnboardingCommand}" />
               </Border.GestureRecognizers>
               <Label Text="RESET"
-                     FontFamily="MontserratSemiBold"
+                     Style="{StaticResource FontSemiBold}"
                      FontSize="12"
                      TextColor="{StaticResource BrandGold}" />
             </Border>
@@ -260,7 +259,7 @@
 
         <!-- Version at bottom -->
         <Label Text="{Binding AppVersion}"
-               FontFamily="MontserratRegular"
+               Style="{StaticResource FontRegular}"
                FontSize="12"
                TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
                Opacity="0.6"
