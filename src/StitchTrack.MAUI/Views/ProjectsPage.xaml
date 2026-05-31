@@ -12,41 +12,48 @@
   <Grid RowDefinitions="Auto,Auto,*"
         RowSpacing="0">
 
-    <!-- ============================================ -->
-    <!-- TOP BAR:   Logo + Sync Icon                    -->
-    <!-- ============================================ -->
+    <!-- TOP BAR: Logo -->
     <Grid Grid.Row="0"
       BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-      Padding="30,30">
+      Padding="30,30,30,30">
       <Image Source="logo.svg"
          HeightRequest="35"
          HorizontalOptions="Start"
          Aspect="AspectFit" />
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- PAGE TITLE with Yellow Background            -->
-    <!-- ============================================ -->
+    <!-- HEADER: Icon + Title + Action buttons -->
     <Grid Grid.Row="1"
           BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-          HeightRequest="60"
-          Padding="20,15">
+          Padding="30,10,20,20">
 
-      <!-- MY PROJECTS Title -->
-      <Label Text="MY PROJECTS"
-             Style="{StaticResource HeaderTitle}"
-             HorizontalOptions="Start"
-             VerticalOptions="Center" />
+      <!-- Icon + Title — hidden when search open -->
+      <HorizontalStackLayout HorizontalOptions="Start"
+                             VerticalOptions="Center"
+                             Spacing="10"
+                             IsVisible="{Binding IsSearchNotVisible}">
+        <Image Source="projects.svg"
+               WidthRequest="22"
+               HeightRequest="22"
+               VerticalOptions="Center">
+          <Image.Behaviors>
+            <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+        </Image>
+        <Label Text="MY PROJECTS"
+               Style="{StaticResource HeaderTitle}"
+               FontSize="20"
+               VerticalOptions="Center" />
+      </HorizontalStackLayout>
 
-      <!-- Buttons Container (Right-aligned) -->
+      <!-- Buttons — hidden when search open -->
       <HorizontalStackLayout HorizontalOptions="End"
                              VerticalOptions="Center"
-                             Spacing="15">
-
-        <!-- Add Button -->
+                             Spacing="15"
+                             IsVisible="{Binding IsSearchNotVisible}">
         <Image Source="plus.svg"
-               HeightRequest="24"
-               WidthRequest="24">
+               HeightRequest="22"
+               WidthRequest="22">
           <Image.Behaviors>
             <toolkit:IconTintColorBehavior TintColor="White" />
           </Image.Behaviors>
@@ -54,11 +61,9 @@
             <TapGestureRecognizer Command="{Binding CreateProjectCommand}" />
           </Image.GestureRecognizers>
         </Image>
-
-        <!-- Search Button -->
         <Image Source="search.svg"
-               HeightRequest="24"
-               WidthRequest="24">
+               HeightRequest="22"
+               WidthRequest="22">
           <Image.Behaviors>
             <toolkit:IconTintColorBehavior TintColor="White" />
           </Image.Behaviors>
@@ -66,9 +71,49 @@
             <TapGestureRecognizer Command="{Binding SearchCommand}" />
           </Image.GestureRecognizers>
         </Image>
-
       </HorizontalStackLayout>
 
+      <!-- Search bar — shown when search open -->
+      <Grid ColumnDefinitions="*,Auto"
+            ColumnSpacing="12"
+            VerticalOptions="Center"
+            IsVisible="{Binding IsSearchVisible}">
+
+        <Border Grid.Column="0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground},
+                                           Dark=#4A5259}"
+                Padding="0">
+          <Border.StrokeShape>
+            <RoundRectangle CornerRadius="8" />
+          </Border.StrokeShape>
+          <Entry BackgroundColor="Transparent"
+                 StyleId="SearchEntry"
+                 Text="{Binding SearchText}"
+                 Placeholder="Search projects or tags..."
+                 PlaceholderColor="{AppThemeBinding Light=#999999, Dark=#AAAAAA}"
+                 TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                             Dark=White}"
+                 FontFamily="MontserratRegular"
+                 FontSize="14"
+                 Keyboard="Text"
+                 Margin="10,0" />
+        </Border>
+
+        <Image Grid.Column="1"
+               Source="close.svg"
+               WidthRequest="22"
+               HeightRequest="22"
+               VerticalOptions="Center">
+          <Image.Behaviors>
+            <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+          <Image.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding ClearSearchCommand}" />
+          </Image.GestureRecognizers>
+        </Image>
+
+      </Grid>
     </Grid>
 
     <!-- ============================================ -->

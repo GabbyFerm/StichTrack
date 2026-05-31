@@ -3,7 +3,6 @@ using StitchTrack.Application.Interfaces;
 using StitchTrack.Application.Models;
 using StitchTrack.Domain.Entities;
 using StitchTrack.Domain.Interfaces;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -19,12 +18,15 @@ public class ProjectsViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectFileRepository _projectFileRepository;
+    private readonly IProjectCounterRepository _counterRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly SynchronizationContext? _syncContext;
     private bool _isLoading;
     private bool _isEmpty;
     private bool _showArchived;
+    private string _searchText = string.Empty;
+    private bool _isSearchVisible;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -62,6 +64,34 @@ public class ProjectsViewModel : INotifyPropertyChanged
             }
         }
     }
+
+    // Search text from the search bar. Filtering is applied on every keystroke.
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (_searchText == value) return;
+            _searchText = value;
+            OnPropertyChanged();
+            FilterProjects(); // filter on every keystroke
+        }
+    }
+
+    public bool IsSearchVisible
+    {
+        get => _isSearchVisible;
+        set
+        {
+            if (_isSearchVisible == value) return;
+            _isSearchVisible = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsSearchNotVisible));
+        }
+    }
+
+    // Used in XAML to hide the normal header when search is open
+    public bool IsSearchNotVisible => !_isSearchVisible;
 
     // When true the empty state view is shown instead of the list
     public bool IsEmpty
@@ -107,6 +137,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
     public ICommand SearchCommand { get; }
     public ICommand SyncCommand { get; }
     public ICommand NavigateToProjectCommand { get; }
+    public ICommand ClearSearchCommand { get; }
 
     // Handles the ⋮ tap on a project card — shows Edit / Archive / Delete sheet
     public ICommand ShowProjectMenuCommand { get; }
@@ -114,11 +145,13 @@ public class ProjectsViewModel : INotifyPropertyChanged
     public ProjectsViewModel(
         IProjectRepository projectRepository,
         IProjectFileRepository projectFileRepository,
+        IProjectCounterRepository counterRepository,
         IDialogService dialogService,
         INavigationService navigationService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _projectFileRepository = projectFileRepository ?? throw new ArgumentNullException(nameof(projectFileRepository));
+        _counterRepository = counterRepository ?? throw new ArgumentNullException(nameof(counterRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
@@ -132,6 +165,7 @@ public class ProjectsViewModel : INotifyPropertyChanged
         SearchCommand = new RelayCommand(OnSearch);
         SyncCommand = new RelayCommand(OnSync);
         NavigateToProjectCommand = new RelayCommand<Guid>(OnNavigateToProject);
+        ClearSearchCommand = new RelayCommand(OnClearSearch);
 
         // Passes the full Project object so we have name + id without an extra lookup
         ShowProjectMenuCommand = new RelayCommand<Project?>(OnShowProjectMenu);
@@ -191,12 +225,19 @@ public class ProjectsViewModel : INotifyPropertyChanged
     {
         Projects.Clear();
 
-        var filtered = _allProjects.Where(p => p.IsArchived == ShowArchived);
+        IEnumerable<Project> filtered = _allProjects.Where(p => p.IsArchived == ShowArchived);
+
+        // Apply keyword search — matches name OR any tag, case-insensitive
+        var query = _searchText.Trim();
+        if (!string.IsNullOrEmpty(query))
+        {
+            filtered = filtered.Where(p =>
+                p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                p.Tags.Any(t => t.Name.Contains(query, StringComparison.OrdinalIgnoreCase)));
+        }
 
         foreach (var project in filtered)
-        {
             Projects.Add(project);
-        }
 
         IsEmpty = Projects.Count == 0;
 
@@ -260,6 +301,16 @@ public class ProjectsViewModel : INotifyPropertyChanged
                     .ConfigureAwait(false);
             }
 
+            var counterNames = result.InitialCounterNames.Count > 0
+                ? result.InitialCounterNames.ToList()
+                : new List<string> { "Rows" };
+
+            for (int i = 0; i < counterNames.Count; i++)
+            {
+                var counter = ProjectCounter.Create(newProject.Id, counterNames[i], sortOrder: i);
+                await _counterRepository.AddAsync(counter).ConfigureAwait(false);
+            }
+            await _counterRepository.SaveChangesAsync().ConfigureAwait(false);
 
             System.Diagnostics.Debug.WriteLine($"✅ Project created: {newProject.Name}");
             await LoadProjectsAsync().ConfigureAwait(false);
@@ -515,8 +566,22 @@ public class ProjectsViewModel : INotifyPropertyChanged
 
     private void OnSearch()
     {
-        System.Diagnostics.Debug.WriteLine("🔍 Search tapped");
-        // TODO: Implement search functionality
+        IsSearchVisible = !IsSearchVisible;
+        if (!IsSearchVisible)
+        {
+            // Hide → clear search and restore full list
+            _searchText = string.Empty;
+            OnPropertyChanged(nameof(SearchText));
+            FilterProjects();
+        }
+    }
+
+    private void OnClearSearch()
+    {
+        _searchText = string.Empty;
+        OnPropertyChanged(nameof(SearchText));
+        IsSearchVisible = false;
+        FilterProjects();
     }
 
     private void OnSync()

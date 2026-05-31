@@ -16,6 +16,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 {
     private readonly IAppSettingsRepository _settingsRepository;
     private readonly IHapticsService _hapticsService;
+    private readonly IDialogService _dialogService;
     private AppSettings? _settings;
     private readonly SynchronizationContext? _syncContext;
 
@@ -60,11 +61,12 @@ public class SettingsViewModel : INotifyPropertyChanged
     /// </summary>
     public Action<string>? ApplyTheme { get; set; }
 
-    public SettingsViewModel(IAppSettingsRepository settingsRepository, IHapticsService hapticsService)
+    public SettingsViewModel(IAppSettingsRepository settingsRepository, IHapticsService hapticsService, IDialogService dialogService)
     {
         _syncContext = SynchronizationContext.Current;
         _settingsRepository = settingsRepository ?? throw new ArgumentNullException(nameof(settingsRepository));
         _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
+        _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
 
         SetLightThemeCommand = new RelayCommand(() => _ = SetThemeAsync("Light"));
         SetAutoThemeCommand = new RelayCommand(() => _ = SetThemeAsync("Auto"));
@@ -151,6 +153,10 @@ public class SettingsViewModel : INotifyPropertyChanged
 
         _settings.ResetFirstRun();
         await SaveAsync().ConfigureAwait(false);
+
+        await _dialogService
+            .ShowToastAsync("Welcome screen will show on next launch")
+            .ConfigureAwait(false);
 
         System.Diagnostics.Debug.WriteLine("🔄 Onboarding reset — will show on next launch");
     }

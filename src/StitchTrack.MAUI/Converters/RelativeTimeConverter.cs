@@ -15,7 +15,11 @@ public class RelativeTimeConverter : IValueConverter
             return "Unknown";
         }
 
-        var timeSpan = DateTime.UtcNow - dateTime.ToUniversalTime();
+        var utcDateTime = dateTime.Kind == DateTimeKind.Unspecified
+            ? DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)
+            : dateTime.ToUniversalTime();
+
+        var timeSpan = DateTime.UtcNow - utcDateTime;
 
         // Less than 1 minute
         if (timeSpan.TotalMinutes < 1)

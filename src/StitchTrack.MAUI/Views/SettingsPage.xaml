@@ -10,26 +10,22 @@
 
   <Grid RowDefinitions="Auto,Auto,*">
 
-    <!-- ============================================ -->
-    <!-- TOP BAR: Logo                                -->
-    <!-- ============================================ -->
+    <!-- TOP BAR: Logo -->
     <Grid Grid.Row="0"
           BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-          Padding="30,30">
+          Padding="30,30,30,30">
       <Image Source="logo.svg"
              HeightRequest="35"
              HorizontalOptions="Start"
              Aspect="AspectFit" />
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- HEADER: Icon + Title                         -->
-    <!-- ============================================ -->
+    <!-- HEADER: Icon + Title -->
     <Grid Grid.Row="1"
       BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-      Padding="20,0,20,20">
+      Padding="30,10,20,20">
 
-      <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+      <HorizontalStackLayout Spacing="10" HorizontalOptions="Start">
         <Image Source="settings.svg"
            WidthRequest="22"
            HeightRequest="22"
@@ -46,15 +42,11 @@
 
     </Grid>
 
-    <!-- ============================================ -->
-    <!-- SCROLLABLE CONTENT                           -->
-    <!-- ============================================ -->
+    <!-- SCROLLABLE CONTENT -->
     <ScrollView Grid.Row="2">
       <VerticalStackLayout Spacing="0" Padding="20,24,20,32">
 
-        <!-- ============================================ -->
-        <!-- SECTION: App Settings                        -->
-        <!-- ============================================ -->
+        <!-- SECTION: App Settings -->
         <Label Text="App Settings"
                FontFamily="MontserratBold"
                FontSize="16"
@@ -177,7 +169,7 @@
                  TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}" />
 
           <Switch Grid.Column="2"
-                  IsToggled="{Binding HapticFeedbackEnabled}"
+                  IsToggled="{Binding HapticFeedbackEnabled, Mode=OneWay}"
                   OnColor="{StaticResource BrandGold}"
                   ThumbColor="{AppThemeBinding Light=#424B54, Dark=White}"
                   VerticalOptions="Center">
@@ -193,55 +185,7 @@
         <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
                  Opacity="0.3" Margin="0,4,0,24" />
 
-        <!-- ============================================ -->
-        <!-- SECTION: Backup & Sync                       -->
-        <!-- ============================================ -->
-        <Label Text="Backup &amp; Sync"
-               FontFamily="MontserratBold"
-               FontSize="16"
-               TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary}, Dark={StaticResource DarkTextPrimary}}"
-               Margin="0,0,0,16" />
-
-        <!-- Cloud Backup — disabled Phase 3 -->
-        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,0,0,8">
-
-          <Image Grid.Column="0" WidthRequest="20" HeightRequest="20" VerticalOptions="Start" Margin="0,2,0,0">
-            <Image.Source>
-              <AppThemeBinding Light="cloud_upload_light.svg" Dark="cloud_upload_dark.svg" />
-            </Image.Source>
-          </Image>
-
-          <VerticalStackLayout Grid.Column="1" Spacing="2">
-            <Label Text="Cloud Backup"
-                   FontFamily="MontserratMedium"
-                   FontSize="15"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}" />
-            <Label Text="Sync to your own Google Drive or iCloud"
-                   FontFamily="MontserratRegular"
-                   FontSize="12"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
-                   Opacity="0.6" />
-            <Label Text="Coming in Phase 3"
-                   FontFamily="MontserratRegular"
-                   FontSize="12"
-                   TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary}, Dark={StaticResource DarkTextSecondary}}"
-                   Opacity="0.6" />
-          </VerticalStackLayout>
-
-          <Switch Grid.Column="2"
-                  IsToggled="False"
-                  IsEnabled="False"
-                  VerticalOptions="Center" />
-
-        </Grid>
-
-        <!-- Divider -->
-        <BoxView HeightRequest="1" BackgroundColor="{StaticResource BrandGold}"
-                 Opacity="0.3" Margin="0,4,0,24" />
-
-        <!-- ============================================ -->
-        <!-- SECTION: About                               -->
-        <!-- ============================================ -->
+        <!-- SECTION: About -->
         <Label Text="About"
                FontFamily="MontserratBold"
                FontSize="16"

@@ -9,32 +9,31 @@ using StitchTrack.Domain.Interfaces;
 namespace StitchTrack.Application.ViewModels;
 
 /// <summary>
-/// ViewModel for Quick Counter - temporary counting that can be saved to a project.
+/// ViewModel for the Quick Counter — temporary in-memory counting
+/// that can optionally be saved as a permanent project.
+/// Uses a plain integer for counting rather than a Project entity,
+/// since no persistence is needed until the user explicitly saves.
 /// </summary>
+
 public class QuickCounterViewModel : INotifyPropertyChanged
 {
-    private readonly Project _project;
     private readonly IProjectRepository _projectRepository;
+    private readonly IProjectCounterRepository _counterRepository;
     private readonly IDialogService _dialogService;
     private readonly IHapticsService _hapticsService;
 
-    // Undo stack to track actions
-    private readonly Stack<CounterAction> _undoStack = new Stack<CounterAction>();
-    private const int MaxUndoStackSize = 50; // Limit undo history
+    // Plain integer — no domain entity needed for a temporary counter
+    private int _count;
 
-    // PropertyChanged event for data binding
+    private readonly Stack<CounterAction> _undoStack = new();
+    private const int MaxUndoStackSize = 50;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    // Current row count displayed to user
-    public int CurrentCount => _project.CurrentCount;
-
-    // Whether the Save button should be enabled
-    public bool CanSave => CurrentCount > 0;
-
-    // Whether undo is available
+    public int CurrentCount => _count;
+    public bool CanSave => _count > 0;
     public bool CanUndo => _undoStack.Count > 0;
 
-    // Commands
     public ICommand IncrementCommand { get; }
     public ICommand DecrementCommand { get; }
     public ICommand UndoCommand { get; }
@@ -42,21 +41,21 @@ public class QuickCounterViewModel : INotifyPropertyChanged
     public ICommand SaveToProjectCommand { get; }
 
     /// <summary>
-    /// Set by QuickCounterPage — callback invoked after the quick counter is successfully saved as a project.
-    /// Used for navigation (e.g., closing the page after save completes).
+    /// Set by QuickCounterPage — invoked after a successful save to project.
     /// </summary>
     public Func<Task>? OnProjectSaved { get; set; }
 
-    public QuickCounterViewModel(IProjectRepository projectRepository, IDialogService dialogService, IHapticsService hapticsService)
+    public QuickCounterViewModel(
+    IProjectRepository projectRepository,
+    IProjectCounterRepository counterRepository,
+    IDialogService dialogService,
+    IHapticsService hapticsService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
+        _counterRepository = counterRepository ?? throw new ArgumentNullException(nameof(counterRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _hapticsService = hapticsService ?? throw new ArgumentNullException(nameof(hapticsService));
 
-        // Create in-memory project (not saved to database yet)
-        _project = Project.CreateProject("Quick Counter");
-
-        // Initialize commands
         IncrementCommand = new RelayCommand(OnIncrement);
         DecrementCommand = new RelayCommand(OnDecrement);
         UndoCommand = new RelayCommand(OnUndo);
@@ -66,53 +65,48 @@ public class QuickCounterViewModel : INotifyPropertyChanged
         System.Diagnostics.Debug.WriteLine("✅ QuickCounterViewModel created");
     }
 
+    // ─── Counter actions ──────────────────────────────────────────
+
     private void OnIncrement()
     {
-        _project.IncrementCount();
+        _count++;
         AddToUndoStack(CounterAction.Increment);
         _hapticsService.Click();
         NotifyCountChanged();
-        System.Diagnostics.Debug.WriteLine($"➕ Incremented to {CurrentCount}");
+        System.Diagnostics.Debug.WriteLine($"➕ Incremented to {_count}");
     }
 
     private void OnDecrement()
     {
-        if (CurrentCount > 0)
-        {
-            _project.DecrementCount();
-            AddToUndoStack(CounterAction.Decrement);
-            _hapticsService.Click();
-            NotifyCountChanged();
-            System.Diagnostics.Debug.WriteLine($"➖ Decremented to {CurrentCount}");
-        }
+        if (_count <= 0) return;
+
+        _count--;
+        AddToUndoStack(CounterAction.Decrement);
+        _hapticsService.Click();
+        NotifyCountChanged();
+        System.Diagnostics.Debug.WriteLine($"➖ Decremented to {_count}");
     }
 
     private void OnUndo()
     {
-        if (_undoStack.Count == 0)
-        {
-            System.Diagnostics.Debug.WriteLine("⚠️ Nothing to undo");
-            return;
-        }
+        if (_undoStack.Count == 0) return;
 
         var lastAction = _undoStack.Pop();
 
-        // Reverse the last action
         switch (lastAction)
         {
             case CounterAction.Increment:
-                _project.DecrementCount();
-                System.Diagnostics.Debug.WriteLine($"↩️ Undid increment, now at {CurrentCount}");
+                if (_count > 0) _count--;
+                System.Diagnostics.Debug.WriteLine($"↩️ Undid increment, now at {_count}");
                 break;
 
             case CounterAction.Decrement:
-                _project.IncrementCount();
-                System.Diagnostics.Debug.WriteLine($"↩️ Undid decrement, now at {CurrentCount}");
+                _count++;
+                System.Diagnostics.Debug.WriteLine($"↩️ Undid decrement, now at {_count}");
                 break;
 
             case CounterAction.Reset:
-                // For reset, we need to store the previous count
-                // This is handled differently - see OnReset
+                // Reset undo not supported — stack entry is a no-op here
                 break;
         }
 
@@ -121,187 +115,112 @@ public class QuickCounterViewModel : INotifyPropertyChanged
 
     private void OnReset()
     {
-        if (CurrentCount > 0)
-        {
-            // Store current count before reset for potential undo
-            var previousCount = CurrentCount;
-            AddToUndoStack(CounterAction.Reset, previousCount);
+        if (_count <= 0) return;
 
-            _project.ResetCount();
-            _hapticsService.Click();
-            NotifyCountChanged();
-            System.Diagnostics.Debug.WriteLine($"🔄 Reset from {previousCount} to 0");
-        }
+        AddToUndoStack(CounterAction.Reset);
+        _count = 0;
+        _hapticsService.Click();
+        NotifyCountChanged();
+        System.Diagnostics.Debug.WriteLine("🔄 Counter reset to 0");
     }
 
-    private void OnSaveToProject()
-    {
-        System.Diagnostics.Debug.WriteLine("💾 Save to Project tapped");
-        _ = SaveToProjectAsync();
-    }
+    private void OnSaveToProject() => _ = SaveToProjectAsync();
 
-    /// <summary>
-    /// Adds an action to the undo stack with size limit.
-    /// </summary>
-    private void AddToUndoStack(CounterAction action, int? previousValue = null)
-    {
-        _undoStack.Push(action);
+    // ─── Save to project ──────────────────────────────────────────
 
-        // Limit stack size to prevent memory issues
-        if (_undoStack.Count > MaxUndoStackSize)
-        {
-            // Convert to list, remove oldest, convert back
-            var items = _undoStack.ToList();
-            items.RemoveAt(items.Count - 1);
-            _undoStack.Clear();
-            foreach (var item in items.AsEnumerable().Reverse())
-            {
-                _undoStack.Push(item);
-            }
-        }
-
-        OnPropertyChanged(nameof(CanUndo));
-
-        // Refresh command state
-        if (UndoCommand is RelayCommand undoCmd)
-        {
-            undoCmd.RaiseCanExecuteChanged();
-        }
-    }
-
-    /// <summary>
-    /// Notifies UI of count-related property changes. 
-    /// </summary>
-    private void NotifyCountChanged()
-    {
-        OnPropertyChanged(nameof(CurrentCount));
-        OnPropertyChanged(nameof(CanSave));
-        OnPropertyChanged(nameof(CanUndo));
-
-        // Refresh command state
-        if (UndoCommand is RelayCommand undoCmd)
-        {
-            undoCmd.RaiseCanExecuteChanged();
-        }
-    }
-
-    /// <summary>
-    /// Saves the current quick counter as a permanent project.
-    /// Shows a prompt for project name, validates input, and saves to database.
-    /// </summary>
     private async Task SaveToProjectAsync()
     {
         try
         {
-            // Show project name dialog
-            var projectName = await ShowProjectNameDialogAsync().ConfigureAwait(false);
+            var projectName = await _dialogService.ShowPromptAsync(
+                title: "Save to Project",
+                message: "Enter a name for this project:",
+                accept: "Save",
+                cancel: "Cancel",
+                placeholder: "My Knitting Project",
+                maxLength: 200)
+                .ConfigureAwait(false);
 
-            // Validate name
             if (string.IsNullOrWhiteSpace(projectName))
             {
-                System.Diagnostics.Debug.WriteLine("⚠️ Project save cancelled - no name provided");
-                return;
-            }
-
-            if (projectName.Length > 200)
-            {
-                System.Diagnostics.Debug.WriteLine($"❌ Project name too long: {projectName.Length} chars");
-                await ShowAlertAsync("Name Too Long", "Project name must be 200 characters or less.").ConfigureAwait(false);
+                System.Diagnostics.Debug.WriteLine("⚠️ Project save cancelled");
                 return;
             }
 
             System.Diagnostics.Debug.WriteLine($"💾 Creating project: {projectName}");
 
-            // Create new project with current counter state
+            // Create and save the project
             var newProject = Project.CreateProject(projectName.Trim());
-
-            // Transfer the current count by incrementing
-            for (int i = 0; i < _project.CurrentCount; i++)
-            {
-                newProject.IncrementCount();
-            }
-
-            System.Diagnostics.Debug.WriteLine($"✅ Project created with count: {newProject.CurrentCount}");
-
-            // Save to database
             await _projectRepository.AddAsync(newProject).ConfigureAwait(false);
             await _projectRepository.SaveChangesAsync().ConfigureAwait(false);
 
-            System.Diagnostics.Debug.WriteLine($"✅ Project saved to database: {newProject.Id}");
+            // Create a default "Rows" counter with the current quick count
+            var counter = ProjectCounter.Create(newProject.Id, "Rows", sortOrder: 0);
+            for (int i = 0; i < _count; i++)
+                counter.Increment();  // sets in-memory count + builds undo history
 
-            // Show success message
-            await ShowToastAsync($"✅ Project '{projectName}' saved!").ConfigureAwait(false);
+            await _counterRepository.AddAsync(counter).ConfigureAwait(false);
+            await _counterRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            // Sync Project.CurrentCount so the project card shows the right value
+            await _counterRepository.UpdateCountAsync(
+                counter.Id, counter.CurrentCount, isPrimary: true, projectId: newProject.Id)
+                .ConfigureAwait(false);
+
+            System.Diagnostics.Debug.WriteLine($"✅ Project saved: {newProject.Id}");
+
+            await _dialogService
+                .ShowToastAsync($"'{projectName}' saved!")
+                .ConfigureAwait(false);
 
             // Reset quick counter for next use
-            _project.ResetCount();
-            OnPropertyChanged(nameof(CurrentCount));
-            OnPropertyChanged(nameof(CanSave));
+            _count = 0;
+            _undoStack.Clear();
+            NotifyCountChanged();
 
-            // Notify that the project was saved
             if (OnProjectSaved != null)
-            {
-                System.Diagnostics.Debug.WriteLine("▶️ Executing OnProjectSaved callback...");
                 await OnProjectSaved.Invoke().ConfigureAwait(false);
-                System.Diagnostics.Debug.WriteLine("✅ OnProjectSaved callback completed");
-            }
         }
         catch (InvalidOperationException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Database error saving project: {ex.Message}");
-            await ShowAlertAsync("Save Failed", "Could not save project. Please try again.").ConfigureAwait(false);
+            System.Diagnostics.Debug.WriteLine($"❌ DB error: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Save Failed", "Could not save project.").ConfigureAwait(false);
         }
         catch (ArgumentException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Validation error: {ex.Message}");
-            await ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
+            System.Diagnostics.Debug.WriteLine($"❌ Validation: {ex.Message}");
+            await _dialogService.ShowAlertAsync("Invalid Input", ex.Message).ConfigureAwait(false);
         }
     }
 
-    /// <summary>
-    /// Shows a dialog prompting the user to enter a project name.
-    /// </summary>
-    private async Task<string> ShowProjectNameDialogAsync()
-    {
-        var result = await _dialogService.ShowPromptAsync(
-            title: "Save to Project",
-            message: "Enter a name for this project:",
-            accept: "Save",
-            cancel: "Cancel",
-            placeholder: "My Knitting Project",
-            maxLength: 200
-        ).ConfigureAwait(false);
+    // ─── Helpers ─────────────────────────────────────────────────
 
-        return result ?? string.Empty;
+    private void AddToUndoStack(CounterAction action)
+    {
+        _undoStack.Push(action);
+
+        if (_undoStack.Count > MaxUndoStackSize)
+        {
+            var items = _undoStack.ToList();
+            items.RemoveAt(items.Count - 1);
+            _undoStack.Clear();
+            foreach (var item in items.AsEnumerable().Reverse())
+                _undoStack.Push(item);
+        }
+
+        OnPropertyChanged(nameof(CanUndo));
     }
 
-    /// <summary>
-    /// Shows an alert dialog with title and message.
-    /// </summary>
-    private async Task ShowAlertAsync(string title, string message)
+    private void NotifyCountChanged()
     {
-        await _dialogService.ShowAlertAsync(title, message).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Shows a brief toast message
-    /// </summary>
-    private async Task ShowToastAsync(string message)
-    {
-        await _dialogService.ShowToastAsync(message).ConfigureAwait(false);
+        OnPropertyChanged(nameof(CurrentCount));
+        OnPropertyChanged(nameof(CanSave));
+        OnPropertyChanged(nameof(CanUndo));
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    /// <summary>
-    /// Enum representing counter actions for undo functionality. 
-    /// </summary>
-    private enum CounterAction
-    {
-        Increment,
-        Decrement,
-        Reset
-    }
+    private enum CounterAction { Increment, Decrement, Reset }
+
 }

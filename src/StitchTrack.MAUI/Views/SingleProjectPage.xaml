@@ -14,7 +14,7 @@
     <!-- TOP BAR: Logo -->
     <Grid Grid.Row="0"
       BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-      Padding="30,30">
+      Padding="30,30,30,30">
       <Image Source="logo.svg"
          HeightRequest="35"
          HorizontalOptions="Start"
@@ -56,19 +56,20 @@
         </Grid>
 
         <!-- PROJECT HEADER: Name + Color dot + Divider  -->
-        <VerticalStackLayout Padding="20,16,20,0" Spacing="8">
+        <VerticalStackLayout Padding="20,20,20,0" Spacing="8">
 
           <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
 
             <!-- Color dot -->
-            <Border WidthRequest="14"
-                    HeightRequest="14"
-                    StrokeThickness="0"
+            <Border WidthRequest="20"
+                    HeightRequest="20"
+                    StrokeThickness="1"
+                    Stroke="White"
                     BackgroundColor="{Binding ColorHex}"
                     VerticalOptions="Center"
                     IsVisible="{Binding ColorHex, Converter={StaticResource IsStringNotNullOrEmptyConverter}}">
               <Border.StrokeShape>
-                <RoundRectangle CornerRadius="7" />
+                <RoundRectangle CornerRadius="10" />
               </Border.StrokeShape>
             </Border>
 
@@ -267,6 +268,64 @@
               </Image>
             </HorizontalStackLayout>
           </Border>
+
+        </VerticalStackLayout>
+
+        <!-- COUNTERS SECTION -->
+        <VerticalStackLayout Padding="20,20,20,0" Spacing="8">
+
+          <HorizontalStackLayout Spacing="8">
+            <Image WidthRequest="16" HeightRequest="16" VerticalOptions="Center">
+              <Image.Source>
+                <AppThemeBinding Light="counter_light.svg" Dark="counter_dark.svg" />
+              </Image.Source>
+            </Image>
+            <Label Text="Counters"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="16"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                               Dark={StaticResource DarkTextPrimary}}" />
+          </HorizontalStackLayout>
+
+          <BoxView HeightRequest="1"
+                   BackgroundColor="{StaticResource BrandGold}"
+                   HorizontalOptions="Fill"
+                   Opacity="0.4" />
+
+          <!-- Counter chips built in code-behind via BuildCounterChips() -->
+          <VerticalStackLayout x:Name="CountersGrid" Spacing="8" />
+
+          <!-- Add Counter — same style as counter page -->
+          <HorizontalStackLayout Margin="0,4,0,0" Spacing="10">
+            <Border WidthRequest="36"
+                    HeightRequest="36"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource BrandGold}"
+                    VerticalOptions="Center">
+              <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+              </Border.StrokeShape>
+              <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnAddCounterTapped" />
+              </Border.GestureRecognizers>
+              <Label Text="+"
+                     FontFamily="MontserratBold"
+                     FontSize="20"
+                     TextColor="White"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Center" />
+            </Border>
+            <Label Text="Add Counter"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                               Dark={StaticResource DarkTextPrimary}}">
+              <Label.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnAddCounterTapped" />
+              </Label.GestureRecognizers>
+            </Label>
+          </HorizontalStackLayout>
 
         </VerticalStackLayout>
 

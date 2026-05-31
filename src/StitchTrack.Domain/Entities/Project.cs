@@ -1,8 +1,13 @@
 namespace StitchTrack.Domain.Entities;
 
 /// <summary>
-/// Represents a knitting or crocheting project with row counting capability.
-/// Aggregate root for counter history, sessions, notes, and files.
+/// Represents a knitting or crocheting project.
+/// Aggregate root for sessions, files, tags, row notes, and counters.
+///
+/// Counting operations have moved to ProjectCounter.
+/// Project.CurrentCount is a cached value of the primary counter (SortOrder == 0),
+/// kept in sync by ProjectCounterRepository.UpdateCountAsync when isPrimary = true.
+/// This cache is used by session tracking, export, and the project list card.
 /// </summary>
 public class Project
 {
@@ -11,55 +16,41 @@ public class Project
     public User? User { get; private set; }
 
     public string Name { get; private set; } = string.Empty;
+
+    // Cached value of the primary counter — kept in sync by the repository.
     public int CurrentCount { get; private set; }
 
     public string? ColorHex { get; private set; }
     public int? TotalRows { get; private set; }
     public int? RowsPerRepeat { get; private set; }
     public string? Notes { get; private set; }
+    public string? NeedleOrHookSize { get; private set; }
     public bool IsArchived { get; private set; }
     public string? ImagePath { get; private set; }
     public string? ImageUrl { get; private set; }
 
-    // Free-text so users can write "5.0mm", "US 8", "4.5mm / G-6", etc.
-    public string? NeedleOrHookSize { get; private set; }
-
-
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    // Cloud sync fields (nullable for local-only projects)
     public DateTime? LastSyncedAt { get; private set; }
-    public string? CloudFileId { get; private set; } // iCloud/Drive file ID
-    public int SyncVersion { get; private set; } // increment on each change
+    public string? CloudFileId { get; private set; }
+    public int SyncVersion { get; private set; }
 
     public ICollection<Session> Sessions { get; private set; } = new List<Session>();
-    public ICollection<CounterHistory> CounterHistoryEntries { get; private set; } = new List<CounterHistory>();
     public ICollection<RowNote> RowNotes { get; private set; } = new List<RowNote>();
+    public ICollection<ProjectTag> Tags { get; private set; } = new List<ProjectTag>();
     public ICollection<ProjectFile> ProjectFiles { get; private set; } = new List<ProjectFile>();
     public ICollection<Reminder> Reminders { get; private set; } = new List<Reminder>();
-
-    // Tags owned by this project — loaded via .Include(p => p.Tags)
-    public ICollection<ProjectTag> Tags { get; private set; } = new List<ProjectTag>();
-
+    public ICollection<ProjectCounter> Counters { get; private set; } = new List<ProjectCounter>();
 
     private Project() { }
 
-    /// <summary>
-    /// Creates a new project with validated initial state.
-    /// Initializes counter to 0, assigns random color if not specified, and sets timestamps.
-    /// </summary>
-    /// <param name="name">Project name (required, trimmed)</param>
-    /// <param name="userId">Optional user ID for project ownership</param>
-    /// <param name="colorHex">Optional project color; random color assigned if null</param>
-    /// <returns>A new Project instance ready for persistence</returns>
     public static Project CreateProject(string name, Guid? userId = null, string? colorHex = null)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Project name cannot be empty", nameof(name));
 
         var now = DateTime.UtcNow;
-
         return new Project
         {
             Id = Guid.NewGuid(),
@@ -70,119 +61,19 @@ public class Project
             CreatedAt = now,
             UpdatedAt = now
         };
-
     }
 
-    /// <summary>
-    /// Renames the project. Only the domain entity controls name changes.
-    /// </summary>
     public void Rename(string newName)
     {
         if (string.IsNullOrWhiteSpace(newName))
             throw new ArgumentException("Project name cannot be empty", nameof(newName));
-
         Name = newName.Trim();
         UpdatedAt = DateTime.UtcNow;
     }
 
-    /// <summary>
-    /// Increments the counter by 1 and records the change for undo.
-    /// </summary>
-    public void IncrementCount()
-    {
-        int oldValue = CurrentCount;
-        CurrentCount++;
-        UpdatedAt = DateTime.UtcNow;
-
-        RecordCounterChange(oldValue, CurrentCount);
-    }
-
-    /// <summary>
-    /// Decrements the counter by 1 if greater than 0, and records the change for undo.
-    /// </summary>
-    public void DecrementCount()
-    {
-        if (CurrentCount > 0)
-        {
-            int oldValue = CurrentCount;
-            CurrentCount--;
-            UpdatedAt = DateTime.UtcNow;
-
-            RecordCounterChange(oldValue, CurrentCount);
-        }
-    }
-
-    /// <summary>
-    /// Resets the counter to 0 and records the change for undo.
-    /// </summary>
-    public void ResetCount()
-    {
-        int oldValue = CurrentCount;
-        CurrentCount = 0;
-        UpdatedAt = DateTime.UtcNow;
-
-        RecordCounterChange(oldValue, CurrentCount);
-    }
-
-    /// <summary>
-    /// Undoes the last counter change, restoring the counter to its previous value.
-    /// Removes the associated history entry from the change tracking.
-    /// </summary>
-    /// <returns>True if an undo was performed, false if no history exists</returns>
-    public bool UndoLastChange()
-    {
-        var lastChange = CounterHistoryEntries
-            .OrderByDescending(h => h.ChangedAt)
-            .FirstOrDefault();
-
-        if (lastChange == null)
-        {
-            return false;
-        }
-
-        CurrentCount = lastChange.OldValue;
-        UpdatedAt = DateTime.UtcNow;
-
-        CounterHistoryEntries.Remove(lastChange);
-
-        return true;
-    }
-
-    // Only the project controls when history is recorded
-    private void RecordCounterChange(int oldValue, int newValue)
-    {
-        var history = CounterHistory.CreateCounterHistory(Id, oldValue, newValue);
-        CounterHistoryEntries.Add(history);
-    }
-
-    /// <summary>
-    /// Archives the project (soft delete). The project remains in the database but is hidden from active views.
-    /// </summary>
-    public void ArchiveProject()
-    {
-        IsArchived = true;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    /// <summary>
-    /// Restores an archived project to active status.
-    /// </summary>
-    public void UnarchiveProject()
-    {
-        IsArchived = false;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    /// <summary>
-    /// Updates the optional detail fields on the project.
-    /// Pass null to clear a field.
-    /// </summary>
     public void UpdateProjectDetails(
-        string? colorHex = null,
-        int? totalRows = null,
-        int? rowsPerRepeat = null,
-        string? notes = null,
-        string? needleOrHookSize = null)
+        string? colorHex = null, int? totalRows = null, int? rowsPerRepeat = null,
+        string? notes = null, string? needleOrHookSize = null)
     {
         ColorHex = colorHex;
         TotalRows = totalRows;
@@ -192,13 +83,6 @@ public class Project
         UpdatedAt = DateTime.UtcNow;
     }
 
-
-    /// <summary>
-    /// Sets the project's cover image by local path and/or cloud URL.
-    /// Pass null to clear both paths.
-    /// </summary>
-    /// <param name="imagePath">Local file path to the cover image</param>
-    /// <param name="imageUrl">Cloud URL for the cover image (Phase 3)</param>
     public void SetProjectImage(string? imagePath, string? imageUrl = null)
     {
         ImagePath = imagePath;
@@ -206,63 +90,66 @@ public class Project
         UpdatedAt = DateTime.UtcNow;
     }
 
-    // ─── Tag management ────────────────────────────────────────────
-    // The aggregate root controls all tag mutations so the collection
-    // never ends up in an inconsistent state.
+    public void ArchiveProject() { IsArchived = true; UpdatedAt = DateTime.UtcNow; }
+    public void UnarchiveProject() { IsArchived = false; UpdatedAt = DateTime.UtcNow; }
+
+    // ─── Counter management ───────────────────────────────────────
 
     /// <summary>
-    /// Adds a tag if one with the same name does not already exist (case-insensitive).
-    /// ColorIndex should be the tag's position in the list % TagColors.Palette.Length.
+    /// Adds a named counter. SortOrder 0 = primary (drives CurrentCount and sessions).
+    /// Returns the new counter so the caller can persist it.
     /// </summary>
-    public void AddTag(string name, int colorIndex)
+    public ProjectCounter AddCounter(string name, int sortOrder)
     {
-        // Silently ignore duplicate tag names
-        if (Tags.Any(t => t.Name.Equals(name.Trim(), StringComparison.OrdinalIgnoreCase)))
-            return;
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Counter name cannot be empty.", nameof(name));
 
-        Tags.Add(ProjectTag.Create(Id, name, colorIndex));
+        var counter = ProjectCounter.Create(Id, name.Trim(), sortOrder);
+        Counters.Add(counter);
         UpdatedAt = DateTime.UtcNow;
+        return counter;
     }
 
     /// <summary>
-    /// Removes the tag with the given name (case-insensitive). No-op if not found.
+    /// Removes a counter by ID.
+    /// Cascade delete of its history is handled at the DB level.
     /// </summary>
-    public void RemoveTag(string name)
+    public void RemoveCounter(Guid counterId)
     {
-        var tag = Tags.FirstOrDefault(
-            t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-
-        if (tag != null)
+        var counter = Counters.FirstOrDefault(c => c.Id == counterId);
+        if (counter != null)
         {
-            Tags.Remove(tag);
+            Counters.Remove(counter);
             UpdatedAt = DateTime.UtcNow;
         }
     }
 
-    /// <summary>
-    /// Removes all tags. Used before re-syncing the full tag list from the form.
-    /// </summary>
-    public void ClearTags()
+    // ─── Tag management ────────────────────────────────────────────
+
+    public void AddTag(string name, int colorIndex)
     {
-        Tags.Clear();
+        if (Tags.Any(t => t.Name.Equals(name.Trim(), StringComparison.OrdinalIgnoreCase)))
+            return;
+        Tags.Add(ProjectTag.Create(Id, name, colorIndex));
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void RemoveTag(string name)
+    {
+        var tag = Tags.FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (tag != null) { Tags.Remove(tag); UpdatedAt = DateTime.UtcNow; }
+    }
+
+    public void ClearTags() { Tags.Clear(); UpdatedAt = DateTime.UtcNow; }
 
     // ─── Cloud sync ────────────────────────────────────────────────
 
-    /// <summary>
-    /// Marks the project as synced to cloud storage, recording the file ID and incrementing sync version.
-    /// </summary>
-    /// <param name="cloudFileId">The cloud storage file ID (iCloud/Drive/etc.)</param>
     public void MarkAsSynced(string cloudFileId)
     {
         if (string.IsNullOrWhiteSpace(cloudFileId))
             throw new ArgumentException("Cloud file ID cannot be empty", nameof(cloudFileId));
-
         CloudFileId = cloudFileId;
         LastSyncedAt = DateTime.UtcNow;
         SyncVersion++;
     }
-
 }

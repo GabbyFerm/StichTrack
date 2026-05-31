@@ -13,6 +13,7 @@ public class SingleProjectViewModel : INotifyPropertyChanged
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectFileRepository _projectFileRepository;
+    private readonly IProjectCounterRepository _counterRepository;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private Project? _project;
@@ -99,6 +100,11 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     public string? NeedleOrHookSize => _project?.NeedleOrHookSize;
     public bool HasNeedleOrHookSize => !string.IsNullOrWhiteSpace(_project?.NeedleOrHookSize);
 
+    public IReadOnlyList<ProjectCounter> Counters =>
+    _project?.Counters.OrderBy(c => c.SortOrder).ToList() ?? [];
+
+    public bool HasCounters => (_project?.Counters.Count ?? 0) > 0;
+
     /// <summary>
     /// Set by SingleProjectPage — callback to display the project edit form popup.
     /// Returns the updated form result with any changes (tags, files, details), or null if cancelled.
@@ -158,11 +164,13 @@ public class SingleProjectViewModel : INotifyPropertyChanged
     public SingleProjectViewModel(
         IProjectRepository projectRepository,
         IProjectFileRepository projectFileRepository,
+        IProjectCounterRepository counterRepository,
         IDialogService dialogService,
         INavigationService navigationService)
     {
         _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
         _projectFileRepository = projectFileRepository ?? throw new ArgumentNullException(nameof(projectFileRepository));
+        _counterRepository = counterRepository ?? throw new ArgumentNullException(nameof(counterRepository));
         _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
@@ -355,6 +363,68 @@ public class SingleProjectViewModel : INotifyPropertyChanged
         await OpenFileAsync(filePath).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Adds a named counter to the project and reloads.
+    /// </summary>
+    public async Task AddCounterAsync(string name)
+    {
+        if (_project == null || string.IsNullOrWhiteSpace(name)) return;
+
+        var sortOrder = _project.Counters.Count > 0
+            ? _project.Counters.Max(c => c.SortOrder) + 1
+            : 0;
+
+        var counter = ProjectCounter.Create(_project.Id, name.Trim(), sortOrder);
+        await _counterRepository.AddAsync(counter).ConfigureAwait(false);
+        await _counterRepository.SaveChangesAsync().ConfigureAwait(false);
+
+        await LoadProjectAsync().ConfigureAwait(false);
+        System.Diagnostics.Debug.WriteLine($"✅ Counter added: {name}");
+    }
+
+    /// <summary>
+    /// Deletes a counter after confirmation. Blocked if it's the last one.
+    /// </summary>
+    public async Task RemoveCounterAsync(Guid counterId)
+    {
+        if (_project == null) return;
+
+        if (_project.Counters.Count <= 1)
+        {
+            await _dialogService.ShowAlertAsync(
+                "Cannot Delete", "A project must have at least one counter.")
+                .ConfigureAwait(false);
+            return;
+        }
+
+        var counter = _project.Counters.FirstOrDefault(c => c.Id == counterId);
+        if (counter == null) return;
+
+        var confirmed = await _dialogService.ShowConfirmAsync(
+            title: "Delete Counter?",
+            message: $"Delete '{counter.Name}' and all its history? This cannot be undone.",
+            accept: "Delete",
+            cancel: "Cancel")
+            .ConfigureAwait(true);
+
+        if (!confirmed) return;
+
+        await _counterRepository.DeleteAsync(counterId).ConfigureAwait(false);
+        await LoadProjectAsync().ConfigureAwait(false);
+        System.Diagnostics.Debug.WriteLine($"🗑️ Counter deleted: {counter.Name}");
+    }
+
+    /// <summary>
+    /// Renames a counter and reloads to reflect the change.
+    /// </summary>
+    public async Task RenameCounterAsync(Guid counterId, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName)) return;
+
+        await _counterRepository.RenameAsync(counterId, newName).ConfigureAwait(false);
+        await LoadProjectAsync().ConfigureAwait(false);
+        System.Diagnostics.Debug.WriteLine($"✏️ Counter renamed to: {newName}");
+    }
 
     // ─── Other handlers ──────────────────────────────────────────
 

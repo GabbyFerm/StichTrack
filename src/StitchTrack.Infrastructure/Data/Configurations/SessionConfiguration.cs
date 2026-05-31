@@ -21,6 +21,9 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
             .IsRequired()
             .HasDefaultValue(0);
 
+        builder.Property(s => s.PrimaryCounterName)
+            .HasMaxLength(100);
+
         // Index for queries
         builder.HasIndex(s => s.ProjectId);
         builder.HasIndex(s => s.StartedAt);

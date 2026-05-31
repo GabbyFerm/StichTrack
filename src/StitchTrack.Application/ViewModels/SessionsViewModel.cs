@@ -225,8 +225,9 @@ public class SessionsViewModel : INotifyPropertyChanged
             if (session.RowsCompleted.HasValue)
             {
                 var diff = session.RowsCompleted.Value;
-                var sign = diff >= 0 ? "+" : "";  // negative already includes -
-                rowsText = $"Rows: {session.StartingRowCount} → {session.EndingRowCount} ({sign}{diff} rows)";
+                var sign = diff >= 0 ? "+" : "";
+                var counterName = session.PrimaryCounterName ?? "Rows";
+                rowsText = $"{counterName}: {session.StartingRowCount} → {session.EndingRowCount} ({sign}{diff})";
             }
 
             RecentSessions.Add(new SessionDisplayItem

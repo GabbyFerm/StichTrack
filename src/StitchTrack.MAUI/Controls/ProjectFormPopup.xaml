@@ -315,6 +315,75 @@
 
             </VerticalStackLayout>
 
+            <!-- COUNTERS — create mode only (hidden in edit mode via code-behind) -->
+            <VerticalStackLayout x:Name="CounterSection" Spacing="8" Margin="0,16,0,0">
+
+              <Label Text="Counters"
+                     FontFamily="MontserratSemiBold"
+                     FontSize="14"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                                 Dark={StaticResource DarkTextPrimary}}" />
+
+              <Label Text="Add counters for your project, e.g. Rows, Stitches. A 'Rows' counter is added by default if you leave this empty."
+                     FontFamily="MontserratRegular"
+                     FontSize="12"
+                     TextColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                                 Dark={StaticResource DarkTextSecondary}}" />
+
+              <!-- Name entry + add button -->
+              <Grid ColumnDefinitions="*,44" ColumnSpacing="8">
+
+                <Border Grid.Column="0"
+                        StrokeThickness="1"
+                        Stroke="{StaticResource BrandGold}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackground},
+                                                           Dark=#1F2937}"
+                        Padding="0">
+                  <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                  </Border.StrokeShape>
+                  <Entry x:Name="CounterEntry"
+                         Keyboard="Text"
+                         Placeholder="e.g. Rows, Stitches"
+                         FontFamily="MontserratRegular"
+                         FontSize="13"
+                         MaxLength="50"
+                         Margin="10,0"
+                         Completed="OnCounterEntryCompleted"
+                         TextColor="{AppThemeBinding Light={StaticResource LightTextPrimary},
+                                                      Dark={StaticResource DarkTextPrimary}}"
+                         PlaceholderColor="{AppThemeBinding Light={StaticResource LightTextSecondary},
+                                                             Dark={StaticResource DarkTextSecondary}}" />
+                </Border>
+
+                <Border Grid.Column="1"
+                        StrokeThickness="0"
+                        BackgroundColor="{StaticResource BrandGold}"
+                        WidthRequest="44"
+                        HeightRequest="44">
+                  <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                  </Border.StrokeShape>
+                  <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAddCounterTapped" />
+                  </Border.GestureRecognizers>
+                  <Label Text="+"
+                         FontFamily="MontserratBold"
+                         FontSize="22"
+                         TextColor="White"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center" />
+                </Border>
+
+              </Grid>
+
+              <!-- Counter chips — built in code-behind via BuildCounterChips() -->
+              <FlexLayout x:Name="CounterChipContainer"
+                          Wrap="Wrap"
+                          Direction="Row" />
+
+            </VerticalStackLayout>
+
             <!-- Needle / Hook Size section -->
             <VerticalStackLayout Spacing="8">
 

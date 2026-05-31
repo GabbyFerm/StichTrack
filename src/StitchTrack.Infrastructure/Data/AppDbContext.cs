@@ -15,6 +15,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<AppSettings> AppSettings { get; set; } = null!;
     public DbSet<ProjectTag> ProjectTags { get; set; } = null!;
 
+    public DbSet<ProjectCounter> ProjectCounters { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ArgumentNullException.ThrowIfNull(modelBuilder);

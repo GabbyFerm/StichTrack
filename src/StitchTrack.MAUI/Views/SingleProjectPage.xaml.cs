@@ -113,6 +113,107 @@ public partial class SingleProjectPage : ContentPage
     }
 
     /// <summary>
+    /// Builds counter chips showing name, current count, and a bin delete button.
+    /// Follows the same 2-column grid pattern as file chips.
+    /// </summary>
+    private void BuildCounterChips()
+    {
+        CountersGrid.Children.Clear();
+
+        var counters = _viewModel.Counters;
+        if (counters.Count == 0) return;
+
+        var isDark = Microsoft.Maui.Controls.Application.Current?.RequestedTheme == AppTheme.Dark;
+
+        for (int i = 0; i < counters.Count; i += 2)
+        {
+            var row = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitionCollection
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Star }
+            },
+                ColumnSpacing = 8
+            };
+
+            row.Add(CreateCounterChip(counters[i], isDark), column: 0, row: 0);
+
+            if (i + 1 < counters.Count)
+                row.Add(CreateCounterChip(counters[i + 1], isDark), column: 1, row: 0);
+            else
+                row.Add(new BoxView { IsVisible = false }, column: 1, row: 0);
+
+            CountersGrid.Children.Add(row);
+        }
+    }
+
+    /// <summary>
+    /// A chip showing [counter icon] name · count  [bin icon].
+    /// Bin tap triggers delete with confirmation via ViewModel.
+    /// </summary>
+    private Border CreateCounterChip(ProjectCounter counter, bool isDark)
+    {
+        var chip = new Border
+        {
+            StrokeThickness = 0,
+            BackgroundColor = isDark
+                ? Color.FromArgb("#4A5259")
+                : Color.FromArgb("#F5EDD3"),
+            Padding = new Thickness(10, 8),
+            StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+            {
+                CornerRadius = new CornerRadius(8)
+            }
+        };
+
+        var textColor = isDark ? Colors.White : Color.FromArgb("#2C3338");
+
+        var content = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitionCollection
+        {
+            new ColumnDefinition { Width = GridLength.Star },   // name + count
+            new ColumnDefinition { Width = GridLength.Auto }    // bin icon
+        },
+            ColumnSpacing = 6
+        };
+
+        // Name · count
+        content.Add(new Label
+        {
+            Text = $"{counter.Name}  ·  {counter.CurrentCount}",
+            FontFamily = "MontserratMedium",
+            FontSize = 12,
+            TextColor = textColor,
+            VerticalOptions = LayoutOptions.Center,
+            LineBreakMode = LineBreakMode.TailTruncation
+        }, column: 0, row: 0);
+
+        // Bin icon
+        var binIcon = new Image
+        {
+            WidthRequest = 14,
+            HeightRequest = 14,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.End,
+            Source = isDark
+                ? ImageSource.FromFile("bin_dark.svg")
+                : ImageSource.FromFile("bin_light.svg")
+        };
+
+        var capturedId = counter.Id;
+        var binTap = new TapGestureRecognizer();
+        binTap.Tapped += async (_, _) => await _viewModel.RemoveCounterAsync(capturedId);
+        binIcon.GestureRecognizers.Add(binTap);
+
+        content.Add(binIcon, column: 1, row: 0);
+
+        chip.Content = content;
+        return chip;
+    }
+
+    /// <summary>
     /// Creates a single file chip with icon (📄 for PDF, 🖼️ for image) and tappable filename.
     /// Used for both pattern files and inspiration photos.
     /// </summary>
@@ -123,7 +224,9 @@ public partial class SingleProjectPage : ContentPage
         var chip = new Border
         {
             StrokeThickness = 0,
-            BackgroundColor = isDark ? Color.FromArgb("#3D4449") : Color.FromArgb("#EBE3C8"),
+            BackgroundColor = isDark
+                ? Color.FromArgb("#4A5259")
+                : Color.FromArgb("#F5EDD3"),
             Padding = new Thickness(10, 8),
             StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
             {
@@ -178,6 +281,22 @@ public partial class SingleProjectPage : ContentPage
         return formResult;
     }
 
+    private async void OnAddCounterTapped(object sender, EventArgs e)
+    {
+        var name = await DisplayPromptAsync(
+            "Add Counter",
+            "Enter a name for the new counter:",
+            accept: "Add",
+            cancel: "Cancel",
+            placeholder: "e.g. Stitches",
+            maxLength: 50,
+            keyboard: Keyboard.Create(KeyboardFlags.CapitalizeSentence));
+
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        await _viewModel.AddCounterAsync(name);
+    }
+
     /// <summary>
     /// Rebuilds dynamic file grids when the ViewModel signals a full property refresh.
     /// OnPropertyChanged(string.Empty) fires at the end of LoadProjectAsync —
@@ -192,6 +311,7 @@ public partial class SingleProjectPage : ContentPage
             {
                 BuildFilesGrid(PatternFilesGrid, _viewModel.PatternFiles);
                 BuildFilesGrid(InspirationPhotosGrid, _viewModel.InspirationPhotos);
+                BuildCounterChips();
             });
         }
     }

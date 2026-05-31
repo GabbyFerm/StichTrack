@@ -13,20 +13,33 @@
     <!-- TOP BAR: Logo -->
     <Grid Grid.Row="0"
       BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-      Padding="30,30">
+      Padding="30,30,30,30">
       <Image Source="logo.svg"
          HeightRequest="35"
          HorizontalOptions="Start"
          Aspect="AspectFit" />
     </Grid>
 
-    <!-- PAGE TITLE -->
+    <!-- HEADER: Icon + Title -->
     <Grid Grid.Row="1"
-          BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
-          HeightRequest="60"
-          Padding="20,15">
-      <Label Text="QUICK ROW COUNTER"
-             Style="{StaticResource HeaderTitle}" />
+      BackgroundColor="{AppThemeBinding Light={StaticResource LightAppBackground}, Dark={StaticResource DarkAppBackground}}"
+      Padding="30,10,20,20">
+
+      <HorizontalStackLayout Spacing="10" HorizontalOptions="Start">
+        <Image Source="counter.svg"
+           WidthRequest="22"
+           HeightRequest="22"
+           VerticalOptions="Center">
+          <Image.Behaviors>
+            <toolkit:IconTintColorBehavior TintColor="White" />
+          </Image.Behaviors>
+        </Image>
+        <Label Text="QUICK ROW COUNTER"
+           Style="{StaticResource HeaderTitle}"
+           FontSize="20"
+           VerticalOptions="Center" />
+      </HorizontalStackLayout>
+
     </Grid>
 
     <!-- MAIN CONTENT -->

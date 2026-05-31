@@ -32,7 +32,7 @@ public class ProjectRepository : IProjectRepository
             .AsNoTracking()
             .AsSplitQuery()
             .Include(p => p.Tags)
-            .Include(p => p.CounterHistoryEntries)
+            .Include(p => p.Counters)
             .Include(p => p.Sessions)
             .Include(p => p.ProjectFiles)
             .FirstOrDefaultAsync(p => p.Id == id)
@@ -100,6 +100,7 @@ public class ProjectRepository : IProjectRepository
             .AsNoTracking()
             .Include(p => p.Sessions)
             .Include(p => p.Tags)
+            .Include(p => p.Counters)
             .AsQueryable();
 
         if (userId.HasValue)

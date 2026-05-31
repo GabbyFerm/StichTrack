@@ -59,6 +59,15 @@ public class MauiExportService : IExportService
                 IsArchived = p.IsArchived,
                 CreatedAt = p.CreatedAt.ToString("o"),
                 UpdatedAt = p.UpdatedAt.ToString("o"),
+                Counters = p.Counters
+                .OrderBy(c => c.SortOrder)
+                .Select(c => new CounterExportDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    CurrentCount = c.CurrentCount,
+                    SortOrder = c.SortOrder
+                }).ToList(),
                 Sessions = p.Sessions.Select(s => new SessionExportDto
                 {
                     Id = s.Id,

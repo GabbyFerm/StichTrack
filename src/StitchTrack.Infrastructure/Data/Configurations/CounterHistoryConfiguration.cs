@@ -15,16 +15,16 @@ public class CounterHistoryConfiguration : IEntityTypeConfiguration<CounterHisto
         builder.HasKey(ch => ch.Id);
 
         builder.Property(ch => ch.OldValue)
-            .IsRequired();
+               .IsRequired();
 
         builder.Property(ch => ch.NewValue)
-            .IsRequired();
+               .IsRequired();
 
         builder.Property(ch => ch.ChangedAt)
-            .IsRequired();
+               .IsRequired();
 
-        // Foreign key and cascade delete configured in ProjectConfiguration via HasMany().WithOne()
-        // This index optimizes undo queries that fetch the latest change by date
-        builder.HasIndex(ch => new { ch.ProjectId, ch.ChangedAt });
+        // Relationship and cascade delete configured in ProjectCounterConfiguration
+        // Index optimises per-counter undo queries (fetch latest change)
+        builder.HasIndex(ch => new { ch.ProjectCounterId, ch.ChangedAt });
     }
 }
