@@ -1,60 +1,79 @@
 # StitchTrack
 
-Cross-platform row counter for knitters & crocheters — .NET MAUI · SQLite · Local-First
+Row counter for knitters & crocheters — .NET MAUI · SQLite · Local-First
 
-[![CI status](https://img.shields.io/badge/ci-passing-brightgreen)](#) [![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-blue)](#) [![License](https://img.shields.io/badge/license-Unlicensed-lightgrey)](#)
+[![CI status](https://img.shields.io/badge/ci-passing-brightgreen)](#) [![Platform](https://img.shields.io/badge/platform-Android-blue)](#) [![License](https://img.shields.io/badge/license-Unlicensed-lightgrey)](#)
 
 ---
 
 ## Overview
 
-StitchTrack is a **local-first**, **privacy-focused** mobile app for knitters and crocheters to track row counts, projects, and sessions. No account required—your data stays on your device unless you choose to back it up to your own cloud storage.
+StitchTrack is a **local-first**, **privacy-focused** mobile app for knitters and crocheters to track row counts, projects, and sessions. No account required — your data stays on your device.
 
 ### Core Philosophy
 - **Start immediately** — no signup, no friction
-- **Privacy by default** — data lives on your device
-- **Own your data** — export anytime, sync to your cloud (optional)
+- **Privacy by default** — data lives on your device, nowhere else
+- **Own your data** — export and import anytime
 - **Offline-first** — works perfectly without internet
 
 ---
 
-## Key Features
+## Features
 
-### Phase 1 (Current - MVP) ✅
+### Counters
 - ✅ **Quick Counter** — start counting immediately without creating a project
-- ✅ **Project Management** — create, edit, delete projects with row counts
-- ✅ **Undo Support** — undo counter changes with full history
-- ✅ **Local Storage** — SQLite database, no cloud required
-- ✅ **Haptic Feedback** — tactile response on button press
-- ✅ **Bottom Navigation** — quick access to Counter, Projects, Sessions, Export, Settings
+- ✅ **Multiple counters per project** — track different sections independently
+- ✅ **Row notes** — add a note to any row on the main counter
+- ✅ **Undo support** — full undo history for counter changes
+- ✅ **Haptic feedback** — tactile response on button press (toggleable in Settings)
 
-### Phase 2 (Enhanced Features) 🚧
-- 📸 Project photos
-- 📝 Notes and comments per project
-- ⏱️ Session timer with history
-- 📊 Progress tracking (X of Y rows)
-- 📦 Archive completed projects
-- 🌓 Dark mode
+### Projects
+- ✅ **Project management** — create, edit, and delete projects
+- ✅ **Colour tags** — quickly identify projects at a glance
+- ✅ **Project tags** — organise by type, status, or anything you like
+- ✅ **Needle/hook size** — store the tools used per project
+- ✅ **Total rows** — track overall project length
+- ✅ **Notes** — freeform notes per project
+- ✅ **Photos** — cover photo, pattern files, and inspiration images
 
-### Phase 3 (Cloud Sync) 📅
-- ☁️ iCloud sync (iOS)
-- ☁️ Google Drive sync (Android)  
-- 📤 Conflict resolution UI
-- 🔄 Sync status indicator
-- 💾 Automatic backup reminders
+### Sessions & Stats
+- ✅ **Session tracking** — log crafting sessions per project
+- ✅ **Statistics dashboard** — filter by today, this week, this month, or all time
 
-### Phase 4 (Polish) 📅
-- 🏷️ Project tags
-- 🔍 Search and filters
-- 📊 Multiple counters per project
-- 🎨 Custom themes
-- 📱 App Store & Play Store release
+### Data
+- ✅ **Export to JSON** — full backup of projects, counters, and session history
+- ✅ **Export to CSV** — for spreadsheets and external tools
+- ✅ **Import from JSON** — fully restore projects, counters, and session history
+
+### Settings
+- ✅ **Theme** — light and dark mode
+- ✅ **Haptic feedback toggle**
+- ✅ **About section**
 
 ---
 
-## Screenshots
+## Architecture
 
-> Coming soon — check `docs/assets/` for wireframes
+StitchTrack follows **Clean Architecture** principles:
+
+```
+StitchTrack/
+├── src/
+│   ├── StitchTrack.Domain/        # Core entities, business rules
+│   ├── StitchTrack.Application/   # ViewModels, commands, use cases
+│   ├── StitchTrack.Infrastructure/# Database, repositories, sync services
+│   └── StitchTrack.MAUI/          # UI, views, platform-specific code
+└── tests/
+    ├── StitchTrack.Domain.Tests/
+    ├── StitchTrack.Application.Tests/
+    └── StitchTrack.IntegrationTests/
+```
+
+**Key Technologies:**
+- .NET MAUI — cross-platform UI framework
+- SQLite + Entity Framework Core — local database
+- MVVM — ViewModels and data binding
+- NUnit + FluentAssertions — testing
 
 ---
 
@@ -63,7 +82,7 @@ StitchTrack is a **local-first**, **privacy-focused** mobile app for knitters an
 ### Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - Visual Studio 2022/2023 with .NET MAUI workload
-- Android emulator or iOS simulator
+- Android emulator or physical device
 
 ### Quick Start
 ```bash
@@ -88,38 +107,8 @@ dotnet format
 ### Run the app
 **Android (Visual Studio):**
 1. Open `StitchTrack.sln`
-2. Select Android emulator as target
+2. Select an Android emulator or connected device as target
 3. Press F5 to run
-
-**iOS (Mac only):**
-1. Open `StitchTrack.sln`
-2. Select iOS simulator as target
-3. Press F5 to run
-
----
-
-## Architecture
-
-StitchTrack follows **Clean Architecture** principles:
-
-```
-StitchTrack/
-├── src/
-│   ├── StitchTrack.Domain/        # Core entities, business rules
-│   ├── StitchTrack.Application/   # ViewModels, commands, use cases
-│   ├── StitchTrack.Infrastructure/# Database, repositories, sync services
-│   └── StitchTrack.MAUI/          # UI, views, platform-specific code
-└── tests/
-    ├── StitchTrack.Domain.Tests/
-    ├── StitchTrack.Application.Tests/
-    └── StitchTrack.IntegrationTests/
-```
-
-**Key Technologies:**
-- .NET MAUI (UI framework)
-- SQLite + EF Core (local database)
-- MVVM pattern (ViewModels + data binding)
-- NUnit + FluentAssertions (testing)
 
 ---
 
@@ -131,83 +120,62 @@ StitchTrack/
 - `feature/*` — short-lived feature branches
 - `bugfix/*` — bug fixes
 
-See [BRANCHING.md](docs/BRANCHING.md) for detailed workflow.
-
 ### CI/CD
 GitHub Actions automatically:
 - ✅ Runs tests on all PRs
 - ✅ Enforces code formatting (`.editorconfig`)
-- ✅ Builds Android/iOS packages (on `develop` and `main`)
-- 🔔 Posts Discord notifications on deploy (optional)
+- ✅ Builds Android packages on `develop` and `main`
 
 ---
 
 ## Data & Privacy
 
 ### Where is my data stored?
-- **Phase 1:** All data stored locally in SQLite on your device
-- **Phase 2+:** Optional sync to **your own cloud** (iCloud, Google Drive, Dropbox)
+All data is stored locally in SQLite on your device. Nothing is ever sent to a server.
 
 ### Do you collect my data?
 **No.** StitchTrack does not:
 - ❌ Require an account
-- ❌ Send data to our servers (we don't have any!)
+- ❌ Send data to any server
 - ❌ Track your usage
 - ❌ Sell your data
 
-Your knitting projects are **yours**. We just help you count rows.
+Your projects are **yours**.
 
 ### Can I export my data?
-**Yes!** You can export all projects as:
-- JSON (full backup)
-- CSV (for spreadsheets)
-
-Export is available in Settings → Data Management → Export All Projects.
+**Yes.** Export all projects, counters, and session history from Settings → Data Management → Export. Import JSON to fully restore everything on a new device.
 
 ---
 
-## Roadmap & Status
+## Roadmap
 
-| Phase | Status | Features | Target |
+| Phase | Status | Features | Released |
 |-------|--------|----------|--------|
-| Phase 1 | ✅ Complete | Quick counter, projects, local storage | Jan 2025 |
-| Phase 2 | 🚧 In Progress | Photos, notes, sessions | Mar 2025 |
-| Phase 3 | 📅 Planned | Cloud sync (iCloud/Drive) | Jun 2025 |
-| Phase 4 | 📅 Planned | Polish, app store release | Sep 2025 |
+| Phase 1 | ✅ Complete | Quick counter, projects, local storage | Sept 2025 |
+| Phase 2 | ✅ Complete | Photos, notes, sessions | Dec 2025 |
+| Phase 3 | ✅ Complete | Multiple counters, enhancements, bugfixes | April 2026 |
+| Phase 4 | ✅ Complete | Polish, Google Play release | May 2026 |
 
 ---
 
-## Contributing
+## Download
 
-We're not accepting external contributions yet, but you can:
-- 🐛 Report bugs via [GitHub Issues](https://github.com/GabbyFerm/StitchTrack/issues)
-- 💡 Suggest features (use "Feature Request" template)
-- ⭐ Star the repo if you find it useful!
-
-If you want to contribute code, please reach out first: gabbzf@gmail.com
+**[StitchTrack on Google Play](https://play.google.com/store/apps/details?id=com.gabbyferm.stitchtrack)**
 
 ---
 
 ## License
 
-This project is currently **unlicensed** — all rights reserved by Gabriella Frank Ferm. If you'd like to use or fork this code, please contact the author for permission.
+This project is currently **unlicensed** — all rights reserved by Gabriella Frank Ferm. If you'd like to use or fork this code, please get in touch.
 
 ---
 
-## Contact & Support
+## Contact
 
-**Author:** Gabriella Frank Ferm  
-**Email:** gabbzf@gmail.com  
-**GitHub:** [@GabbyFerm](https://github.com/GabbyFerm)
+**Gabriella Frank Ferm**  
+📧 gabbzf@gmail.com  
+💻 [@GabbyFerm](https://github.com/GabbyFerm)
 
 ---
 
-## Acknowledgments
-
-Built with:
-- [.NET MAUI](https://dotnet.microsoft.com/apps/maui) — Microsoft's cross-platform framework
-- [SQLite](https://www.sqlite.org/) — Lightweight local database
-- [Entity Framework Core](https://docs.microsoft.com/ef/core/) — ORM for database access
-- [NUnit](https://nunit.org/) + [FluentAssertions](https://fluentassertions.com/) — Testing frameworks
-
-Special thanks to the .NET community for excellent documentation and support! 🎉
+Built with ❤️ using .NET MAUI
