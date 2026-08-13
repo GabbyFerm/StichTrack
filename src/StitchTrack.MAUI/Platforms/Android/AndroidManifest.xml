@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-  <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" />
   <application
       android:allowBackup="true"
       android:icon="@mipmap/appicon"
       android:roundIcon="@mipmap/appicon"
       android:supportsRtl="true"
       android:label="StitchTrack" />
-
   <uses-permission android:name="android.permission.VIBRATE" />
   <uses-permission android:name="android.permission.CAMERA" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
@@ -23,5 +21,4 @@
       <action android:name="android.intent.action.GET_CONTENT" />
     </intent>
   </queries>
-  
 </manifest>
